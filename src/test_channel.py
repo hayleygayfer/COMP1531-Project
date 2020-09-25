@@ -100,49 +100,74 @@ def test_channel_leave():
 # channel_join returns True if success (SUBJECT TO CHANGE)
 def test_channel_join():
     # Get a user to create a public channel
-    auth.auth_register("master@public.com", "iamthemaster", "Master", "Channel")
-    auth.auth_login("master@public.com", "iamthemaster")
-    token = get_info_auth('token', 'master@public.com')
-    ch_id = channels.channels_create(token, "PublicChannel", "public")
+    auth.auth_register("mario@nintendo.com", "mammamia", "Mario", "Idk")
+    auth.auth_login("mario@nintendo.com", "mammamia")
+    token = get_info_auth('token', 'mario@nintendo.com')
+    pub_ch_id = channels.channels_create(token, "PublicChannel", "public")
+
+    '''
+    Users: Mario
+    PublicChannel: Mario (O)
+    '''
 
     # Check whether a new user can join this channel
-    auth.auth_register("servant@join.com", "iamaservant", "Channel", "Joiner")
-    auth.auth_login("servant@join.com", "iamaservant")
-    token = get_info_auth('token', 'servant@join.com')
-    assert channel.channel_join(token, ch_id) == True
+    auth.auth_register("luigi@nintendo.com", "letsgo", "Luigi", "Idk")
+    auth.auth_login("luigi@nintendo.com", "letsgo")
+    token = get_info_auth('token', 'luigi@nintendo.com')
+    assert channel.channel_join(token, pub_ch_id) == True
 
-    auth.auth_register("newbie@dummies.com", "password", "Newbie", "Rick")
-    auth.auth_login("newbie@dummies.com", "password")
-    token = get_info_auth('token', 'newbie@dummies.com')
-    assert channel.channel_join(token, ch_id) == True
+    auth.auth_register("princesspeach@nintendo.com", "mushroom", "Peach", "Toadstool")
+    auth.auth_login("princesspeach@nintendo.com", "mushroom")
+    token = get_info_auth('token', 'peach@nintendo.com')
+    assert channel.channel_join(token, pub_ch_id) == True
+
+    '''
+    Users: Mario, Luigi, Peach
+    PublicChannel: Mario (O), Luigi, Peach
+    '''
+
+    # Joining a channel that does not exist
+    assert channel.channel_join(token, 3474214) == False
 
     # Joining a private channel
-    private_ch_id = channels.channels_create(token, "NewbiePrivate", "private")
-    token = get_info_auth('token', 'master@public.com')
-    assert channel.channel_join(token, private_ch_id) == False
-    token = get_info_auth('token', 'servant@join.com')
-    assert channel.channel_join(token, private_ch_id) == False
+    prv_ch_id = channels.channels_create(token, "PrivateChannel", "private")
+    token = get_info_auth('token', 'mario@nintendo.com')
+    assert channel.channel_join(token, prv_ch_id) == False # Mario cannot join private
+    token = get_info_auth('token', 'luigi@nintendo.com')
+    assert channel.channel_join(token, prv_ch_id) == False # Luigi cannot join private
+
+    '''
+    Users: Mario, Luigi, Peach
+    PublicChannel: Mario (O), Luigi, Peach
+    PrivateChannel: Peach (O)
+    '''
 
     # Joining a channel you're already in
-    assert channel.channel_join(token, ch_id) == False
-    token = get_info_auth('token', 'newbie@dummies.com')
-    assert channel.channel_join(token, ch_id) == False
+    assert channel.channel_join(token, pub_ch_id) == False # Luigi already in public
+    token = get_info_auth('token', 'princesspeach@nintendo.com')
+    assert channel.channel_join(token, pub_ch_id) == False # Peach already in public
 
     # Leaving a public channel then joining again
-    channel.channel_leave(token, ch_id)
-    assert channel.channel_join(token, ch_id) == True
-    token = get_info_auth('token', 'servant@join.com')
-    channel.channel_leave(token, ch_id)
-    assert channel.channel_join(token, ch_id) == True
+    channel.channel_leave(token, pub_ch_id)
+    assert channel.channel_join(token, pub_ch_id) == True # Peach can leave and enter again
+    token = get_info_auth('token', 'luigi@nintendo.com')
+    channel.channel_leave(token, pub_ch_id)
+    assert channel.channel_join(token, pub_ch_id) == True # Luigi can leave and enter again
 
     # Leaving a private channel then joining again
-    token = get_info_auth('token', 'newbie@dummies.com')
-    master_id = get_info_auth('u_id', 'master@public.com')
-    channel.channel_invite(token, private_ch_id, master_id)
+    token = get_info_auth('token', 'princesspeach@nintendo.com')
+    mario_id = get_info_auth('u_id', 'mario@nintendo.com')
+    channel.channel_invite(token, prv_ch_id, mario_id)
+
+    '''
+    Users: Mario, Luigi, Peach
+    PublicChannel: Mario (O), Luigi, Peach
+    PrivateChannel: Peach (O), Mario
+    '''
     
-    token = get_info_auth('token', 'master@public.com')
-    channel.channel_leave(token, private_ch_id)
-    assert channel.channel_join(token, private_ch_id) == False
+    token = get_info_auth('token', 'mario@nintendo.com')
+    channel.channel_leave(token, prv_ch_id) # Mario has left private
+    assert channel.channel_join(token, prv_ch_id) == False # He cannot join again
 
 
 def test_channel_addowner():
