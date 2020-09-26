@@ -1,6 +1,8 @@
 import auth
 import channel
 import channels
+import pytest
+from error import InputError, AccessError
 from data import data
 
 # Returns either the token or u_id depending on first parameter 
@@ -9,7 +11,7 @@ def get_info_auth(data_type, email):
 
 
 # channel_invite returns True if success (SUBJECT TO CHANGE)
-def test_channel_invite():
+def test_channel_invite_InputErrors():
     # Person1 creates a channel
     auth.auth_register("person1@unsw.com", "pass1234", "Person", "One")
     auth.auth_login("person1@unsw.com", "pass1234")
@@ -33,58 +35,79 @@ def test_channel_invite():
     '''
 
     # Person1 invite a user that already exists in the channel
-    assert channel.channel_invite(token, ch_id, person1_id) == False # Can't invite yourself
-    assert channel.channel_invite(token, ch_id, person2_id) == False # Person2 already exists in channel
+    with pytest.raises(InputError):
+        channel.channel_invite(token, ch_id, person1_id) # Can't invite yourself
+    with pytest.raises(InputError):
+        channel.channel_invite(token, ch_id, person2_id) # Person2 already exists in channel
 
     # Invite a non-existant user to that channel
-    assert channel.channel_invite(token, ch_id, 31415926) == False
-    assert channel.channel_invite(token, ch_id, 4243) == False
+    with pytest.raises(InputError):
+        channel.channel_invite(token, ch_id, 31415926)
+    with pytest.raises(InputError):
+        channel.channel_invite(token, ch_id, 4243)
 
     # Invite valid user to a non-existant channel
-    assert channel.channel_invite(token, 75385, person2_id) == False
+    with pytest.raises(InputError):
+        channel.channel_invite(token, 75385, person2_id)
 
-    # Create a new private channel and invite a new user to that channel
-    ch2_id = channels.channels_create(token, "PrivateChannel", "private")
+    # Invite a new user to that channel
     auth.auth_register("donaldtrump@america.com", "idklol", "Donald", "Trump")
-    trump_id = get_info_auth('u_id', 'donaldtrump@america.com')
-    
-    '''
-    Users: Person1, Person2, Trump
-    ch_id (Public) Members: Person1 (O), Person2
-    ch2_id (Private) Members: Person1 (O)
-    '''    
-    
-    assert channel.channel_invite(token, ch2_id, trump_id) == True
-    assert channel.channel_invite(token, ch2_id, trump_id) == False # Invite twice error
+    trump_id = get_info_auth('u_id', 'donaldtrump@america.com')   
     assert channel.channel_invite(token, ch_id, trump_id) == True
-
-    channel.channel_addowner(token, ch_id, person2_id)
-
+    
     '''
     Users: Person1, Person2, Trump
-    ch_id (Public) Members: Person1 (O), Person2 (O), Trump
-    ch2_id (Private) Members:  Person1 (O), Trump
+    ch_id (Public) Members: Person1 (O), Person2, Trump
     '''
 
-    # Inviting people depending on your owner status
-    auth.auth_register("person3@hotmail.com", "lonelysad", "Person", "Three")
-    person3_id = [ person['u_id'] for person in data['users'] if person['email'] == 'person3@hotmail.com' ][0]
+def test_channel_invite_AccessErrors():
+    # Scomo creates a public channel
+    auth.auth_register("scottmorrison@auspm.com", "scomo", "Scott", "Morrison")
+    auth.auth_login("scottmorrison@auspm.com", "scomo")
+    token = get_info_auth('token', 'scottmorrison@auspm.com')
+    pub_id = channels.channels_create(token, "PublicChannel", "public")
+
+    # Abbott creates a private channel
+    auth.auth_register("tonyabbott@auspm.com", "idontcare", "Tony", "Abbott")
+    auth.auth_login("tonyabbott@auspm.com", "idontcare")
+    abbott_id = get_info_auth('u_id', 'tonyabbott@auspm.com')
+    token = get_info_auth('token', 'tonyabbott@auspm.com')
+    prv_id = channels.channels_create(token, "PrivateChannel", "private")
+
+    # Owners inviting other users
+    auth.auth_register("kevinrudd@auspm.com", "idontcare", "Kevin", "Rudd")
+    auth.auth_login("kevinrudd@auspm.com", "idontcare")
+    rudd_id = get_info_auth('u_id', 'kevinrudd@auspm.com')
+    assert channel.channel_invite(token, prv_id, rudd_id) == True
+
+    auth.auth_register("juliagillard@auspm.com", "idontcare", "Julia", "Gillard")
+    auth.auth_login("juliagillard@auspm.com", "idontcare")
+    gillard_id = get_info_auth('u_id', 'juliagillard@auspm.com')
+    token = get_info_auth('token', 'scottmorrison@auspm.com')
+    assert channel.channel_invite(token, pub_id, gillard_id) == True
 
     '''
-    Users: Person1, Person2, Trump, Person3
-    ch_id (Public) Members: Person1 (O), Person2 (O), Trump
-    ch2_id (Private) Members:  Person1 (O), Trump
+    Users: Scomo, Abbott, Rudd, Gillard
+    PublicChannel: Scomo (O), Gillard
+    PrivateChannel: Abbott (O), Rudd
     '''
 
-    token = get_info_auth('token', 'person2@gmail.com')
-    assert channel.channel_invite(token, ch_id, person3_id) == True # Person2 can invite Person3 to ch_id
-    token = get_info_auth('token', 'donaldtrump@america.com')
-    assert channel.channel_invite(token, ch_id, person3_id) == True # Trump can't invite Person3 to ch2_id
+    # Regular members inviting other users
+    token = get_info_auth('token', 'kevinrudd@auspm.com')
+    with pytest.raises(AccessError):
+        channel.channel_invite(token, prv_id, gillard_id) # Rudd cannot invite Gillard to private
+    with pytest.raises(AccessError):
+        channel.channel_invite(token, prv_id, abbott_id) # Rudd cannot invite Abbott to public (since Rudd is not a member)
+    
+    token = get_info_auth('token', 'juliagillard@auspm.com')
+    assert channel.channel_invite(token, pub_id, rudd_id) == True # Gillard can invite Rudd to public
+    token = get_info_auth('token', 'kevinrudd@auspm.com')
+    assert channel.channel_invite(token, prv_id, abbott_id) == True # NOW Rudd can invite Abbott
 
     '''
-    Users: Person1, Person2, Trump, Person3
-    ch_id (Public) Members: Person1 (O), Person2 (O), Trump, Person3
-    ch2_id (Private) Members:  Person1 (O), Trump
+    Users: Scomo, Abbott, Rudd, Gillard
+    PublicChannel: Scomo (O), Gillard, Rudd, Abbott
+    PrivateChannel: Abbott (O), Rudd
     '''
 
 
