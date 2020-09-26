@@ -2,6 +2,10 @@ from data import *
 import re
 
 def auth_login(email, password):
+    if validate_email(email) == False:
+        return {
+            'is_success': False
+        }
     for user in data['users']:
         if user['email'] == email:
             if user['password'] == password:
@@ -40,6 +44,7 @@ def auth_logout(token):
 def auth_register(email, password, name_first, name_last):
     if validate_email(email) == False:
         print("Invalid email")
+        # change these to input error later
         return False
 
     if validate_first_name(name_first) == False:
@@ -100,7 +105,7 @@ def validate_last_name(name_last):
             return False
 
 def validate_password(password):
-    if len(password) <= 1:
+    if len(password) < 6:
         return False
 
     
