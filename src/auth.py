@@ -1,7 +1,7 @@
-from data_storage import *
+from data import *
 
 def auth_login(email, password):
-    for user in state['users']:
+    for user in data['users']:
         if user['email'] == email:
             if user['password'] == password:
                 print(f"You've logged in as {email}")
@@ -19,7 +19,7 @@ def auth_login(email, password):
     return "Unsuccessful"
 
 def auth_logout(token):
-    for user in state['users']:
+    for user in data['users']:
         if user['token'] == token:
             user['token'] = ''
             print(f"{user['email']}) has been logged out")
@@ -33,9 +33,9 @@ def auth_logout(token):
     }
 
 def auth_register(email, password, name_first, name_last):
-    state['users'].append(
+    data['users'].append(
         {
-            'u_id': len(state['users']) + 1,
+            'u_id': len(data['users']) + 1,
             'token': '',
             'email': email,
             'password': password,
@@ -45,7 +45,7 @@ def auth_register(email, password, name_first, name_last):
     )
 
     return {
-        'u_id': len(state['users']),
+        'u_id': len(data['users']),
         'token': email,
     }
 
