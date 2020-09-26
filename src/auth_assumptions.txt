@@ -1,0 +1,7 @@
+Logging in is determined by whether or not the user's token is set as their email, if it is not set they are not logged in
+if an email is not recognised the program should return a prompt to register / inform the user they are not registered
+if an email is recognised but the password does not match the program should inform the user the entered password is incorrect
+Logging out is done by adjusting the user's token to be empty
+If the token is not recognised whilst logging out, the program should assume this means they are not registered, and inform the user
+The user should be informed when they are successful if logging out, and if it is found the token does not exist, return that they are already logged out
+The u_id is iterative, starting at user 1, etc
