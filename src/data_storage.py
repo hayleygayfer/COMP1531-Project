@@ -1,7 +1,7 @@
 # state to store user data, channel data and channels
 
 state = {
-    'users' : [
+    'users': [
         {
             'u_id': 1,
             'token': 123456,
@@ -11,10 +11,10 @@ state = {
             'name_last': "lastname",
         },
     ],
-    'channel' : [
+    'channel': [
 
     ],
-    'channels' : [
+    'channels': [
 
     ],
 }
