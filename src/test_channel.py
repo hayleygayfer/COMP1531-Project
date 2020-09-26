@@ -2,16 +2,19 @@ import auth
 import channel
 import channels
 import pytest
+
 from error import InputError, AccessError
 from data import data
+from other import clear
 
 # Returns either the token or u_id depending on first parameter 
 def get_info_auth(data_type, email):
-    return [ person[data_type] for person in data['users'] if person['email'] == email ][0]
+    return [ user[data_type] for user in data['users'] if user['email'] == email ][0]
 
 
 # channel_invite returns True if success (SUBJECT TO CHANGE)
 def test_channel_invite_InputErrors():
+    clear()
     # Create users
     auth.auth_register("person1@unsw.com", "pass1234", "Person", "One")
     auth.auth_login("person1@unsw.com", "pass1234")
@@ -28,7 +31,6 @@ def test_channel_invite_InputErrors():
     '''
 
     # Person1 creates a channel and invites other users
-
     ch_id = channels.channels_create(p1_token, "MainChannel", "public")
     assert channel.channel_invite(p1_token, ch_id, person2_id) == True
 
@@ -62,6 +64,7 @@ def test_channel_invite_InputErrors():
     '''
 
 def test_channel_invite_AccessErrors():
+    clear()
     # Create users
     auth.auth_register("scottmorrison@auspm.com", "scomo", "Scott", "Morrison")
     auth.auth_login("scottmorrison@auspm.com", "scomo")
@@ -119,16 +122,78 @@ def test_channel_invite_AccessErrors():
 
 
 def test_channel_details():
-    pass
+    clear()
 
 def test_channel_messages():
-    pass
+    clear()
 
+# channel_leave returns True if success
 def test_channel_leave():
-    pass
+    clear()
+    # Create users
+    auth.auth_register("diglett@pokemon.com", "arenatrap", "Diglett", "Pokemon")
+    auth.auth_login("diglett@pokemon.com", "arenatrap")
+    diglett_token = get_info_auth('token', "diglett@pokemon.com")
+
+    auth.auth_register("ponyta@pokemon.com", "horndrillXD", "Ponyta", "Pokemon")
+    auth.auth_login("ponyta@pokemon.com", "horndrillXD")
+    ponyta_token = get_info_auth('token', "ponyta@pokemon.com")
+    ponyta_id = get_info_auth('u_id', "ponyta@pokemon.com")
+
+    auth.auth_register("gyarados@pokemon.com", "notadragontype", "Gyarados", "Pokemon")
+    auth.auth_login("gyarados@pokemon.com", "notadragontype")
+    gyarados_token = get_info_auth('token', "gyarados@pokemon.com")
+
+    auth.auth_register("dratini@pokemon.com", "notawatertype", "Dratini", "Pokemon")
+    auth.auth_login("dratini@pokemon.com", "notadragontype")
+    dratini_token = get_info_auth('token', "dratini@pokemon.com")
+
+    # Users create and join channels
+    moleID = channels.channels_create(diglett_token, "MoleChannel", "public")
+    splashID = channels.channels_create(gyarados_token, "SplashChannel", "public")
+    channel.channel_join(ponyta_token, splashID)
+    channel.channel_join(dratini_token, splashID)
+
+    '''
+    MoleChannel: Diglett (O)
+    SplashChannel: Gyarados (O), Ponyta, Dratini
+    '''
+
+    # Ensure Ponyta can leave
+    assert channel.channel_leave(ponyta_token, splashID) == True
+    channel.channel_join(ponyta_token, moleID)
+
+    '''
+    MoleChannel: Diglett (O), Ponyta
+    SplashChannel: Gyarados (O), Dratini
+    '''
+
+    # Leaving a channel you're not in
+    with pytest.raises(AccessError):
+        channel.channel_leave(ponyta_token, splashID) # Ponyta is not in Splash
+    with pytest.raises(AccessError):
+        channel.channel_leave(dratini_token, moleID) # Dratini is not in Mole
+
+    # Channels that don't exist
+    with pytest.raises(InputError):
+        channel.channel_leave(ponyta_token, 82372873)
+    with pytest.raises(InputError):
+        channel.channel_leave(dratini_token, 9374)
+
+    # Owners leaving channels
+    with pytest.raises(InputError):
+        channel.channel_leave(diglett_token, moleID) # If diglett leaves there are no owners
+    channel.channel_addowner(diglett_token, moleID, ponyta_id)
+    assert channel.channel_leave(diglett_token, moleID) == True # NOW Diglett can leave since Ponyta is an owner
+
+    '''
+    MoleChannel: Ponyta (O)
+    SplashChannel: Gyarados (O), Dratini
+    '''
 
 # channel_join returns True if success (SUBJECT TO CHANGE)
 def test_channel_join():
+    clear()
     # Create users
     auth.auth_register("mario@nintendo.com", "mammamia", "Mario", "Idk")
     auth.auth_login("mario@nintendo.com", "mammamia")
@@ -196,10 +261,10 @@ def test_channel_join():
 
 
 def test_channel_addowner():
-    pass
+    clear()
 
 def test_channel_removeowner():
-    pass
+    clear()
 
 
 # IGNORE THIS
