@@ -1,15 +1,4 @@
-state = {
-    users = [
-        {
-            'u_id': 1,
-            'token': 123456,
-            'email': "email@email.com",
-            'password': "password",
-            'name_first': "firstname",
-            'name_last': "lastname",
-        }
-    ]
-}
+from data_storage import *
 
 def auth_login(email, password):
     for user in state[users]:
@@ -59,3 +48,5 @@ def auth_register(email, password, name_first, name_last):
         'u_id': len(state[users]) + 1,
         'token': '12345',
     }
+
+
