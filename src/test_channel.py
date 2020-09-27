@@ -141,13 +141,13 @@ def test_channel_details():
         channel.channel_detail(cowardylion_token, emeraldcityID) # Not part of the channel just joining
     
     # Check return when valid 
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['name'] == 'scarecrow'
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members']['u_id'] == scarecrow_ID
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members']['first_name'] == 'scarecrow'
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members']['name_last'] == 'wizardofoz'
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members']['u_id'] == croardylion_ID
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members']['first_name'] == 'cowardylion'
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members']['name_last'] == 'wizardofoz'
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['name'] == 'yellowbrickroadID'
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members'][0]['u_id'] == scarecrow_ID
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members'][0[['first_name'] == 'scarecrow'
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members'][0]['name_last'] == 'wizardofoz'
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][1]['u_id'] == croardylion_ID
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][1]['first_name'] == 'cowardylion'
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][1]['name_last'] == 'wizardofoz'
 
 
     
