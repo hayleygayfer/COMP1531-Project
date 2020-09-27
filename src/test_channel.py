@@ -375,18 +375,22 @@ def test_channel_removeowner():
         channel.channel_removeowner(blossom_token, girls_channel_id, 1232123)
     
     with pytest.raises(InputError):
-        channel.channel_addowner(blossom_token, 13579, blossom_id)
+        channel.channel_removeowner(blossom_token, 13579, blossom_id)
 
     with pytest.raises(InputError):
-        channel.channel_addowner(hello_powerpuff, girls_channel_id, blossom_id)
+        channel.channel_removeowner(hello_powerpuff, girls_channel_id, blossom_id)
 
     # User id u_id is not an owner of the channel
     with pytest.raises(InputError):
-        channel.channel_addowner(buttercup_token, girls_channel_id, buttercup_id)
+        channel.channel_removeowner(buttercup_token, girls_channel_id, buttercup_id)
 
     # Removing someone not in the channel
     with pytest.raises(InputError):
-        channel.channel_addowner(bubbles_id, girls_channel_id, blossom_id)
+        channel.channel_removeowner(bubbles_id, girls_channel_id, blossom_id)
+
+    # Checking that the removal works 
+    assert channel.channel_removeowner(blossom_token, girls_channel_id, blossom_id)['is_success'] == True
+    assert channel.channel_removeowner(bubbles_token, power_channel_id, bubbles_token)['is_success'] == True
 
 
 # IGNORE THIS
