@@ -145,6 +145,9 @@ def test_channel_details():
     assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members'][0]['u_id'] == scarecrow_ID
     assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members'][0[['first_name'] == 'scarecrow'
     assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members'][0]['name_last'] == 'wizardofoz'
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][0]['u_id'] == scarecrow_ID
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][0[['first_name'] == 'scarecrow'
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][0]['name_last'] == 'wizardofoz'
     assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][1]['u_id'] == croardylion_ID
     assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][1]['first_name'] == 'cowardylion'
     assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][1]['name_last'] == 'wizardofoz'
