@@ -79,5 +79,6 @@ def test_valid_last_name():
     result = auth.auth_register("peterparker@avengers.com", "password", "Peter", "P")
     assert(result != None)
     result = auth.auth_register("peterquill@avengers.com", "password", "Peter", "QuillQuillQuillQuillQuillQuillQuillQuillQuillQuill")
+    assert(result != None)
 
     
