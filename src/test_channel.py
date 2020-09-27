@@ -237,6 +237,74 @@ def test_channel_join():
 
 def test_channel_addowner():
     clear()
+    # Create users
+    comp_id = auth.auth_register("compgod@unsw.edu", "computerscience", "Comp", "God")['u_id']
+    comp_token = auth.auth_login("compgod@unsw.edu", "computerscience")['token']
+
+    math_id = auth.auth_register("mathgod@unsw.edu", "calculus", "Math", "God")['u_id']
+    math_token = auth.auth_login("mathgod@unsw.edu", "calculus")['token']
+
+    engg_id = auth.auth_register("enggod@unsw.edu", "engineering", "Eng", "God")['u_id']
+    engg_token = auth.auth_login("enggod@unsw.edu", "engineering")['token']
+
+    # Creating channels and adding users
+    gods_channel_id = channels.channels_create(comp_token, "TheGods", "public")
+    alt_channel_id = channels.channels_create(math_id, "Alternate", "public")
+    channel.channel_invite(comp_token, gods_channel_id, math_id)
+    channel.channel_invite(comp_token, gods_channel_id, engg_id)
+    channel.channel_invite(math_token, gods_channel_id, engg_id)
+
+    '''
+    GodsChannel: Comp (O), Math, Eng
+    AltChannel: Math (O), Eng
+    '''
+    
+    # Adding owners without access permission
+    with pytest.raises(AccessError):
+        channel.channel_addowner(engg_token, gods_channel_id, math_id) # Eng cant add Math as owner
+
+    # Adding owners success
+    assert channel.channel_addowner(comp_token, gods_channel_id, math_id)['is_success'] == True
+    assert channel.channel_addowner(math_token, alt_channel_id, engg_id)['is_success'] == True
+    
+    '''
+    GodsChannel: Comp (O), Math (O), Eng
+    AltChannel: Math (O), Eng (O)
+    '''
+
+    # Adding owners when they are already owners
+    with pytest.raises(InputError):
+        channel.channel_addowner(math_token, gods_channel_id, comp_id) # Comp is an owner of GodsChannel by default
+    with pytest.raises(InputError):
+        channel.channel_addowner(comp_token, gods_channel_id, math_id) # Math is already an owner of GodsChannel
+    with pytest.raises(InputError):
+        channel.channel_addowner(engg_token, alt_channel_id, math_id) # Math is an owner of AltChannel by default
+
+    # Making yourself an owner
+    with pytest.raises(InputError):
+        channel.channel_addowner(comp_token, gods_channel_id, comp_id)
+    with pytest.raises(AccessError):
+        channel.channel_addowner(engg_token, gods_channel_id, engg_id)
+
+    # Making someone who is not in the channel an owner
+    with pytest.raises(InputError):
+        channel.channel_addowner(math_token, alt_channel_id, comp_id) # Comp is not in AltChannel
+
+    # After they join, then the above step is successful
+    channel.channel_join(comp_id, alt_channel_id)
+    assert channel.channel_addowner(math_token, alt_channel_id, comp_id)['is_success'] == True
+
+    # Testing with invalid channels/users
+    with pytest.raises(InputError):
+        channel.channel_addowner(comp_token, gods_channel_id, 64476)
+    with pytest.raises(InputError):
+        channel.channel_addowner(comp_token, 24874, engg_id)
+
+    '''
+    GodsChannel: Comp (O), Math (O), Eng
+    AltChannel: Math (O), Eng (O), Comp (O)
+    '''
+
 
 def test_channel_removeowner():
     clear()
@@ -246,5 +314,5 @@ def test_channel_removeowner():
 if __name__ == "__main__":
     u_id = auth.auth_register("person1@unsw.com", "pass1234", "Person", "One")['u_id']
     print(u_id)
-    u_id2 = auth.auth_register("person2@unsw.com", "pass1234", "Person", "One")['u_id']
-    print(u_id2)
+    u2_id = auth.auth_register("person2@unsw.com", "pass1234", "Person", "One")['u_id']
+    print(u2_id)

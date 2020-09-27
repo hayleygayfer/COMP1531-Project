@@ -5,7 +5,6 @@
 
 def channel_invite(token, channel_id, u_id):
     # If you invite someone (yourself included) to a channel that the user already exists in then raise InputError
-    
     return {
         'is_success': True
     }
