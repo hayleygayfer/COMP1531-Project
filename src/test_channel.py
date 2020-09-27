@@ -104,9 +104,53 @@ def test_channel_invite_AccessErrors():
     PrivateChannel: Abbott (O), Rudd
     '''
 
-
+# channel_leave returns a dictionary { name: , owner_members, all_members }
 def test_channel_details():
     clear()
+    # Create users
+    scarecrow_ID = auth.auth_register("scarecrow@wizardofoz.com", "wantsbrain", "scarecrow", "wizardofoz")['u_id']
+    scarecrow_token = auth.auth_login("scarecrow@wizardofoz.com", "arenatrap")['token']
+
+    auth.auth_register("tinman@wizardofoz.com", "wantsheard", "tinman", "wizardofoz")
+    tinman_token = auth.auth_login("tinman@wizardofoz.com", "horndrillXD")['token']
+
+    croardylion_ID = auth.auth_register("cowardylion@wizardofoz.com", "wantscourage", "cowardylion", "wizardofoz")['u_id']
+    cowardylion_token = auth.auth_login("cowardylion@wizardofoz.com", "notadragontype")['token']
+
+    auth.auth_register("dorothy@wizardofoz.com", "wantshome", "dorothy", "wizardofoz")
+    dorothy_token = auth.auth_login("dorothy@wizardofoz.com", "notawatertype")['token']
+
+    # Create channels 
+    yellowbrickroadID = channels.channels_create(scarecrow_token, "YellowBrickRoadChannel", "public")
+    emeraldcityID = channels.channels_create(tinman_token, "EmeraldCityChannel", "public")
+    channel.channel_join(cowardylion_token, yellowbrickroadID)
+    channel.channel_join(dorothy_token, emeraldcityID)
+
+    # Invalid ID
+    with pytest.raises(InputError):
+        channel.channel_detail(scarecrow_token, 20202021) # Channel ID does not exist being o
+    
+    with pytest.raises(InputError):
+        channel.channel_detail(dorothy_token, 82303392) # Channel ID does not exist just joining
+
+    # Invalid authorisation 
+    with pytest.raises(AccessError):
+        channel.channel_detail(tinman_token, yellowbrickroadID) # Not part of the channel being o
+    
+    with pytest.raises(AccessError):
+        channel.channel_detail(cowardylion_token, emeraldcityID) # Not part of the channel just joining
+    
+    # Check return when valid 
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['name'] == 'scarecrow'
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members']['u_id'] == scarecrow_ID
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members']['first_name'] == 'scarecrow'
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members']['name_last'] == 'wizardofoz'
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members']['u_id'] == croardylion_ID
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members']['first_name'] == 'cowardylion'
+    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members']['name_last'] == 'wizardofoz'
+
+
+    
 
 def test_channel_messages():
     clear()
