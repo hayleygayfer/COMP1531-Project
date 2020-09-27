@@ -109,16 +109,16 @@ def test_channel_details():
     clear()
     # Create users
     scarecrow_ID = auth.auth_register("scarecrow@wizardofoz.com", "wantsbrain", "scarecrow", "wizardofoz")['u_id']
-    scarecrow_token = auth.auth_login("scarecrow@wizardofoz.com", "arenatrap")['token']
+    scarecrow_token = auth.auth_login("scarecrow@wizardofoz.com", "wantsbrain")['token']
 
     auth.auth_register("tinman@wizardofoz.com", "wantsheard", "tinman", "wizardofoz")
-    tinman_token = auth.auth_login("tinman@wizardofoz.com", "horndrillXD")['token']
+    tinman_token = auth.auth_login("tinman@wizardofoz.com", "wantsheard")['token']
 
     croardylion_ID = auth.auth_register("cowardylion@wizardofoz.com", "wantscourage", "cowardylion", "wizardofoz")['u_id']
-    cowardylion_token = auth.auth_login("cowardylion@wizardofoz.com", "notadragontype")['token']
+    cowardylion_token = auth.auth_login("cowardylion@wizardofoz.com", "wantscourage")['token']
 
     auth.auth_register("dorothy@wizardofoz.com", "wantshome", "dorothy", "wizardofoz")
-    dorothy_token = auth.auth_login("dorothy@wizardofoz.com", "notawatertype")['token']
+    dorothy_token = auth.auth_login("dorothy@wizardofoz.com", "wantshome")['token']
 
     # Create channels 
     yellowbrickroadID = channels.channels_create(scarecrow_token, "YellowBrickRoadChannel", "public")
