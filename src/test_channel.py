@@ -355,6 +355,38 @@ def test_channel_addowner():
 
 def test_channel_removeowner():
     clear()
+    # Create users
+    blossom_id = auth.auth_register("blossom@powerpuff.com", "colourpink", "blossom", "powerpuff")['u_id']
+    blossom_token = auth.auth_login("blossom@powerpuff.com", "colourpink")['token']
+
+    bubbles_id = auth.auth_register("bubbles@powerpuff.com", "colourblue", "bubbles", "powerpuff")['u_id']
+    bubbles_token = auth.auth_login("bubbles@powerpuff.com", "colourblue")['token']
+
+    buttercup_id = auth.auth_register("buttercup@powerpuff.com", "colourgreen", "buttercup", "powerpuff")['u_id']
+    buttercup_token = auth.auth_login("buttercup@powerpuff.com", "colourgreen")['token']
+
+    # Create channel 
+    girls_channel_id = channels.channels_create(blossom_token, "girls_channel", "public")
+    power_channel_id = channels.channels_create(bubbles_token, "power_channel", "public")
+    channel.channel_join(buttercup_token, girls_channel_id)
+
+    # Channel ID is not valid and invalid channel and invalid token
+    with pytest.raises(InputError):
+        channel.channel_removeowner(blossom_token, girls_channel_id, 1232123)
+    
+    with pytest.raises(InputError):
+        channel.channel_addowner(blossom_token, 13579, blossom_id)
+
+    with pytest.raises(InputError):
+        channel.channel_addowner(hello_powerpuff, girls_channel_id, blossom_id)
+
+    # User id u_id is not an owner of the channel
+    with pytest.raises(InputError):
+        channel.channel_addowner(buttercup_token, girls_channel_id, buttercup_id)
+
+    # Removing someone not in the channel
+    with pytest.raises(InputError):
+        channel.channel_addowner(bubbles_id, girls_channel_id, blossom_id)
 
 
 # IGNORE THIS
