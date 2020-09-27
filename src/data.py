@@ -3,7 +3,8 @@ data = {
         {
             'u_id': 1,
             'email': 'random@email.com',
-            'password': 'password'
+            'password': 'password',
+            'token': '123456'
         }
     ],
     'channels': [

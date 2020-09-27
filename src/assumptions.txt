@@ -1,0 +1,15 @@
+AUTH.PY ASSUMPTIONS
+Logging in is determined by whether or not the user's token is set as their email, if it is not set they are not logged in
+if an email is not recognised the program should return a prompt to register / inform the user they are not registered
+if an email is recognised but the password does not match the program should inform the user the entered password is incorrect
+Logging out is done by adjusting the user's token to be empty
+If the token is not recognised whilst logging out, the program should assume this means they are not registered, and inform the user
+The user should be informed when they are successful if logging out, and if it is found the token does not exist, return that they are already logged out
+The u_id is iterative, starting at user 1, etc
+
+CHANNEL.PY
+- You cannot invite someone (yourelf included) to a channel if the user already exists (InputError)
+- You cannot leave a channel if you are the only owner (InputError)
+- The only ways to be in a private channel is if the user is the creator, or they got invited by a member
+- A user trying to join a private channel is denied (AccessError)
+- If a user has been invited to a private channel and they leave, then they cannot join that channel (AccessError)
