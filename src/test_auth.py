@@ -116,4 +116,57 @@ def test_valid_last_name():
     result = auth.auth_register("peterquill@avengers.com", "password", "Peter", "QuillQuillQuillQuillQuillQuillQuillQuillQuillQuill")
     assert(result != None)
 
+
+###### Auth Login & Auth Lougout ######
+
+'''
+First test case to check for valid email will be checked in auth_register. Thus it will be covered under the next test case (checking
+whether an email belongs to a user)
+'''
+
+# EXCEPTIONS #
+
+# Email does not belong to a user
+def test_email_not_belong_to_user():
+    clear()
+    with pytest.raises(InputError) as e:
+        auth.auth_login("tonystark@avengers.com", "password")
+
+# Password is invalid
+def test_password_incorrect():
+    clear()
+    auth.auth_register("tonystark@avengers.com", "password", "Tony", "Stark")
+    with pytest.raises(InputError) as e:
+        auth.auth_login("tonystark@avengers.com", "hello1234")
+        
+# Logout with invalid token
+def test_invalid_logout():
+    clear()
+    assert(auth.auth_logout(1) == False)
+        
+# VALID CASES #
+
+# Test Register, Login, Logout
+def test_register_login_logout():
+    clear()
     
+    # Register
+    (u_id, token) = auth.auth_register("tonystark@avengers.com", "password", "Tony", "Stark")
+    assert token != None and u_id != None
+    
+    # Login
+    (u_id1, token) = auth.auth_login("tonystark@avengers.com", "password")
+    assert u_id1 == u_id and token != None
+    
+    # Logout
+    assert(auth.auth_logout(token) == True)
+    
+
+    
+    
+    
+
+
+
+
+
