@@ -128,29 +128,29 @@ def test_channel_details():
 
     # Invalid ID
     with pytest.raises(InputError):
-        channel.channel_detail(scarecrow_token, 20202021) # Channel ID does not exist being o
+        channel.channel_details(scarecrow_token, 20202021) # Channel ID does not exist being o
     
     with pytest.raises(InputError):
-        channel.channel_detail(dorothy_token, 82303392) # Channel ID does not exist just joining
+        channel.channel_details(dorothy_token, 82303392) # Channel ID does not exist just joining
 
     # Invalid authorisation 
     with pytest.raises(AccessError):
-        channel.channel_detail(tinman_token, yellowbrickroadID) # Not part of the channel being o
+        channel.channel_details(tinman_token, yellowbrickroadID) # Not part of the channel being o
     
     with pytest.raises(AccessError):
-        channel.channel_detail(cowardylion_token, emeraldcityID) # Not part of the channel just joining
+        channel.channel_details(cowardylion_token, emeraldcityID) # Not part of the channel just joining
     
     # Check return when valid 
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['name'] == 'YellowBrickRoadChannel'
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members'][0]['u_id'] == scarecrow_ID
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members'][0[['first_name'] == 'scarecrow'
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['owner_members'][0]['name_last'] == 'wizardofoz'
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][0]['u_id'] == scarecrow_ID
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][0[['first_name'] == 'scarecrow'
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][0]['name_last'] == 'wizardofoz'
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][1]['u_id'] == croardylion_ID
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][1]['first_name'] == 'cowardylion'
-    assert channel.channel_detail(scarecrow_token, yellowbrickroadID)['all_members'][1]['name_last'] == 'wizardofoz'
+    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['name'] == 'YellowBrickRoadChannel'
+    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['owner_members'][0]['u_id'] == scarecrow_ID
+    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['owner_members'][0]['name_first'] == 'scarecrow'
+    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['owner_members'][0]['name_last'] == 'wizardofoz'
+    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['all_members'][0]['u_id'] == scarecrow_ID
+    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['all_members'][0]['name_first'] == 'scarecrow'
+    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['all_members'][0]['name_last'] == 'wizardofoz'
+    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['all_members'][1]['u_id'] == croardylion_ID
+    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['all_members'][1]['name_first'] == 'cowardylion'
+    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['all_members'][1]['name_last'] == 'wizardofoz'
 
 
     
@@ -165,7 +165,7 @@ def test_channel_leave():
     auth.auth_register("diglett@pokemon.com", "arenatrap", "Diglett", "Pokemon")
     diglett_token = auth.auth_login("diglett@pokemon.com", "arenatrap")['token']
 
-    ponyta_id = auth.auth_register("ponyta@pokemon.com", "horndrillXD", "Ponyta", "Pokemon")['u_id']
+    auth.auth_register("ponyta@pokemon.com", "horndrillXD", "Ponyta", "Pokemon")['u_id']
     ponyta_token = auth.auth_login("ponyta@pokemon.com", "horndrillXD")['token']
 
     auth.auth_register("gyarados@pokemon.com", "notadragontype", "Gyarados", "Pokemon")
@@ -205,12 +205,15 @@ def test_channel_leave():
         channel.channel_leave(ponyta_token, 82372873)
     with pytest.raises(InputError):
         channel.channel_leave(dratini_token, 9374)
+    '''
+    ONLY USE THIS CODE IF WE DECIDE TO INCLUDE THE POSSIBLE ASSUMPTIONS IN THE .TXT FILE
 
     # Owners leaving channels
     with pytest.raises(InputError):
         channel.channel_leave(diglett_token, moleID) # If diglett leaves there are no owners
     channel.channel_addowner(diglett_token, moleID, ponyta_id)
     assert channel.channel_leave(diglett_token, moleID)['is_success'] == True # NOW Diglett can leave since Ponyta is an owner
+    '''
 
     '''
     MoleChannel: Ponyta (O)
@@ -377,6 +380,7 @@ def test_channel_removeowner():
     with pytest.raises(InputError):
         channel.channel_removeowner(blossom_token, 13579, blossom_id)
 
+    hello_powerpuff = 237223
     with pytest.raises(InputError):
         channel.channel_removeowner(hello_powerpuff, girls_channel_id, blossom_id)
 
@@ -386,11 +390,17 @@ def test_channel_removeowner():
 
     # Removing someone not in the channel
     with pytest.raises(InputError):
-        channel.channel_removeowner(bubbles_id, girls_channel_id, blossom_id)
+        channel.channel_removeowner(bubbles_token, girls_channel_id, blossom_id)
 
-    # Checking that the removal works 
-    assert channel.channel_removeowner(blossom_token, girls_channel_id, blossom_id)['is_success'] == True
-    assert channel.channel_removeowner(bubbles_token, power_channel_id, bubbles_token)['is_success'] == True
+    # Removing someone without access permission
+    with pytest.raises(AccessError):
+        channel.channel_removeowner(buttercup_token, girls_channel_id, blossom_id)
+
+    # Checking that the removal works
+    channel.channel_addowner(blossom_token, girls_channel_id, buttercup_id)
+    assert channel.channel_removeowner(buttercup_token, girls_channel_id, blossom_id)['is_success'] == True
+    assert channel.channel_removeowner(buttercup_token, girls_channel_id, buttercup_id)['is_success'] == True
+    assert channel.channel_removeowner(bubbles_token, power_channel_id, bubbles_id)['is_success'] == True
 
 
 # IGNORE THIS
