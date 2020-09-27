@@ -5,7 +5,9 @@
 
 def channel_invite(token, channel_id, u_id):
     # If you invite someone (yourself included) to a channel that the user already exists in then raise InputError
+    
     return {
+        'is_success': True
     }
 
 def channel_details(token, channel_id):
@@ -44,17 +46,23 @@ def channel_messages(token, channel_id, start):
 def channel_leave(token, channel_id):
     # You cannot leave a channel if you are the only owner (raise InputError)
     return {
+        'is_success': True
     }
 
 def channel_join(token, channel_id):
     # A user CANNOT join a private channel they MUST be invited (raise AccessError)
     return {
+        'is_success': True
     }
 
 def channel_addowner(token, channel_id, u_id):
+    
     return {
+        'is_success': True
     }
 
 def channel_removeowner(token, channel_id, u_id):
+    
     return {
+        'is_success': True
     }
