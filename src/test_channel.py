@@ -174,8 +174,8 @@ def test_channel_leave():
 def test_channel_join():
     clear()
     # Create users
-    mario_id = auth.auth_register("mario@nintendo.com", "mammamia", "Mario", "Idk")['mario_id']
-    mario_token = auth.auth_login("mario@nintendo.com", "mammamia")
+    mario_id = auth.auth_register("mario@nintendo.com", "mammamia", "Mario", "Idk")['u_id']
+    mario_token = auth.auth_login("mario@nintendo.com", "mammamia")['token']
 
     auth.auth_register("luigi@nintendo.com", "letsgo", "Luigi", "Idk")
     luigi_token = auth.auth_login("luigi@nintendo.com", "letsgo")['token']
