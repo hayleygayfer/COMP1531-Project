@@ -13,3 +13,10 @@ CHANNEL.PY
 - The only ways to be in a private channel is if the user is the creator, or they got invited by a member
 - A user trying to join a private channel is denied (AccessError)
 - If a user has been invited to a private channel and they leave, then they cannot join that channel (AccessError)
+
+CHANNELS.PY
+- channels_listall does not require any authentication.
+- Channel names can be any characters as long as they are over 20 characters in length.
+- Channel names can be identical to other channel names.
+- When a channel is created the creator is automatically assigned as both the sole owner and member of the channel.
+- A channel owner is also considered a channel member.
