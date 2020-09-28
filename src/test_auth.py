@@ -1,14 +1,173 @@
-# test the auth functions
+import auth
+import pytest
+import clear from data
 
-from auth import *
+###### Auth Register ######
 
-def test_auth_register():
-    assert auth_register("test@email.com", "password123", "John", "Doe") == {'u_id': 2, 'token': "test@email.com"}
-    assert auth_login("test@email.com", "password123") == {'u_id': 2, 'token': "test@email.com"}
-    assert auth_logout("test@email.com") == {'is_success': True}
+# EXCEPTIONS #
 
-#def test_auth_login():
-#    auth_login("test@email.com", "password123")
+# Invalid Email
+def test_invalid_email():
+    clear()
+    # Missing @ in email
+    with pytest.raises(InputError) as e:
+        auth.auth_register("clintbarton.com", "password", "Clint", "Barton")
+        
+    # Missing domain in email
+    with pytest.raises(InputError) as e:
+        auth.auth_register("steverodgers@.com", "password", "Steve", "Rodgers")
+        
+    # Invalid character in email username
+    with pytest.raises(InputError) as e:
+        auth.auth_register("nata$haromanoff@avengers.com", "password", "Natasha", "Romanoff")
+        
+    # Missing email username
+    with pytest.raises(InputError) as e:
+        auth.auth_register("@avengers.com", "password", "Pepper", "Potts")
+    
+# Duplicate Email
+def test_duplicate_email_address():
+    clear()
+    result = auth.auth_register("tonystark@avengers.com", "password", "Tony", "Stark")
+    assert(result != None)
+    
+    # Checking duplicate register
+    with pytest.raises(InputError) as e:
+        auth.auth_register("tonystark@avengers.com", "password", "Anthony", "Stark")
 
-#def test_auth_logout():
-#    auth_logout("test@email.com")
+# Invalid Password
+def test_invalid_password():
+    clear()
+    # Empty password
+    with pytest.raises(InputError) as e:
+        auth.auth_register("nickfury@avengers.com", "", "Nick", "Fury")
+        
+    # Under 6 letter password
+    with pytest.raises(InputError) as e:
+        auth.auth_register("nickfury@avengers.com", "123", "Nick", "Fury")
+        
+    # Edge case, 5 letter password
+    with pytest.raises(InputError) as e:
+        auth.auth_register("nickfury@avengers.com", "12345", "Nick", "Fury")
+
+# Invalid First Name
+def test_invalid_first_name():
+    clear()
+    # Empty first name
+    with pytest.raises(InputError) as e:
+        auth.auth_register("stanlee@avengers.com", "password", "", "Lee")
+        
+    # First name over 50 characters
+    with pytest.raises(InputError) as e:
+        auth.auth_register("stanlee@avengers.com", "password", "stanstanstanstanstanstanstanstanstanstanstanstansta", "Lee")
+
+#Invalid Last Name
+def test_invalid_last_name():
+    clear()
+    # Empty last name
+    with pytest.raises(InputError) as e:
+        auth.auth_register("stanlee@avengers.com", "password", "Stan", "")
+    
+    # Last name over 50 characters
+    with pytest.raises(InputError) as e:
+        auth.auth_register("stanlee@avengers.com", "password", "Stan", "LeeLeeLeeLeeLeeLeeLeeLeeLeeLeeLeeLeeLeeLeeLeeLeeLee")
+
+# VALID CASES #
+
+def test_alternative_valid_emails():
+    clear()
+    # Underscore in email username
+    result = auth.auth_register("bruce_banner@avengers.com", "password", "Bruce", "Banner")
+    assert(result != None)
+    # Full stop in email username
+    result = auth.auth_register("thor.odinson@avengers.com", "password", "Thor", "Odinson")
+    assert(result != None)
+    
+def test_valid_passwords():
+    clear()
+    # Password with edge case amount of characters (6) and with all numbers
+    result = auth.auth_register("nickfury@avengers.com", "123456", "Nick", "Fury")
+    assert (result != None)
+    
+    # Password in all uppercase characters
+    result = auth.auth_register("mariahill@avengers.com", "PASSWORD", "Maria", "Hill")
+    assert(result != None)
+    
+    # Password with a mix of upper case, lower case and number characters
+    result = auth.auth_register("happyhogan@avengers.com", "123FOURfive6", "Happy", "Hogan")
+    assert(result != None)
+    
+def test_valid_first_name():
+    clear()
+    # First name with 1 character (edge case)
+    result = auth.auth_register("stanlee@avengers.com", "password", "S", "Lee")
+    assert(result != None)
+    
+    # First name with 50 characters (edge case)
+    result = auth.auth_register("scottlang@avengers.com", "password", "ScottScottScottScottScottScottScottScottScottScott", "Lang")
+    assert(result != None)
+    
+def test_valid_last_name():
+    clear()
+    # Last name with 1 character (edge case)
+    result = auth.auth_register("peterparker@avengers.com", "password", "Peter", "P")
+    assert(result != None)
+    
+    # Last name with 50 characters (edge case)
+    result = auth.auth_register("peterquill@avengers.com", "password", "Peter", "QuillQuillQuillQuillQuillQuillQuillQuillQuillQuill")
+    assert(result != None)
+
+
+###### Auth Login & Auth Lougout ######
+
+'''
+First test case to check for valid email will be checked in auth_register. Thus it will be covered under the next test case (checking
+whether an email belongs to a user)
+'''
+
+# EXCEPTIONS #
+
+# Email does not belong to a user
+def test_email_not_belong_to_user():
+    clear()
+    with pytest.raises(InputError) as e:
+        auth.auth_login("tonystark@avengers.com", "password")
+
+# Password is invalid
+def test_password_incorrect():
+    clear()
+    auth.auth_register("tonystark@avengers.com", "password", "Tony", "Stark")
+    with pytest.raises(InputError) as e:
+        auth.auth_login("tonystark@avengers.com", "hello1234")
+        
+# Logout with invalid token
+def test_invalid_logout():
+    clear()
+    assert(auth.auth_logout(1) == False)
+        
+# VALID CASES #
+
+# Test Register, Login, Logout
+def test_register_login_logout():
+    clear()
+    
+    # Register
+    (u_id, token) = auth.auth_register("tonystark@avengers.com", "password", "Tony", "Stark")
+    assert token != None and u_id != None
+    
+    # Login
+    (u_id1, token) = auth.auth_login("tonystark@avengers.com", "password")
+    assert u_id1 == u_id and token != None
+    
+    # Logout
+    assert(auth.auth_logout(token) == True)
+    
+
+    
+    
+    
+
+
+
+
+
