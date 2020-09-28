@@ -22,7 +22,7 @@ def test_channel_invite_InputErrors():
     '''
 
     # Person1 creates a channel and invites other users
-    ch_id = channels.channels_create(p1_token, "MainChannel", "public")
+    ch_id = channels.channels_create(p1_token, "MainChannel", "public")['channel_id']
     assert channel.channel_invite(p1_token, ch_id, person2_id)['is_success'] == True
 
     '''
@@ -70,8 +70,8 @@ def test_channel_invite_AccessErrors():
     gillard_token = auth.auth_login("juliagillard@auspm.com", "idontcare")['token']
 
     # Scomo and Abbot creating channels
-    pub_id = channels.channels_create(scomo_token, "PublicChannel", "public")
-    prv_id = channels.channels_create(abbott_token, "PrivateChannel", "private")
+    pub_id = channels.channels_create(scomo_token, "PublicChannel", "public")['channel_id']
+    prv_id = channels.channels_create(abbott_token, "PrivateChannel", "private")['channel_id']
 
     '''
     Users: Scomo, Abbott, Rudd, Gillard
@@ -121,8 +121,8 @@ def test_channel_details():
     dorothy_token = auth.auth_login("dorothy@wizardofoz.com", "wantshome")['token']
 
     # Create channels 
-    yellowbrickroadID = channels.channels_create(scarecrow_token, "YellowBrickRoadChannel", "public")
-    emeraldcityID = channels.channels_create(tinman_token, "EmeraldCityChannel", "public")
+    yellowbrickroadID = channels.channels_create(scarecrow_token, "YellowBrickRoadChannel", "public")['channel_id']
+    emeraldcityID = channels.channels_create(tinman_token, "EmeraldCityChannel", "public")['channel_id']
     channel.channel_join(cowardylion_token, yellowbrickroadID)
     channel.channel_join(dorothy_token, emeraldcityID)
 
@@ -175,8 +175,8 @@ def test_channel_leave():
     dratini_token = auth.auth_login("dratini@pokemon.com", "notawatertype")['token']
 
     # Users create and join channels
-    moleID = channels.channels_create(diglett_token, "MoleChannel", "public")
-    splashID = channels.channels_create(gyarados_token, "SplashChannel", "public")
+    moleID = channels.channels_create(diglett_token, "MoleChannel", "public")['channel_id']
+    splashID = channels.channels_create(gyarados_token, "SplashChannel", "public")['channel_id']
     channel.channel_join(ponyta_token, splashID)
     channel.channel_join(dratini_token, splashID)
 
@@ -234,8 +234,8 @@ def test_channel_join():
     peach_token = auth.auth_login("princesspeach@nintendo.com", "mushroom")['token']
 
     # Mario and Peach create a public and private channel respectively
-    pub_ch_id = channels.channels_create(mario_token, "PublicChannel", "public")
-    prv_ch_id = channels.channels_create(peach_token, "PrivateChannel", "private")
+    pub_ch_id = channels.channels_create(mario_token, "PublicChannel", "public")['channel_id']
+    prv_ch_id = channels.channels_create(peach_token, "PrivateChannel", "private")['channel_id']
 
     '''
     Users: Mario, Luigi, Peach
@@ -298,8 +298,8 @@ def test_channel_addowner():
     engg_token = auth.auth_login("enggod@unsw.edu", "engineering")['token']
 
     # Creating channels and adding users
-    gods_channel_id = channels.channels_create(comp_token, "TheGods", "public")
-    alt_channel_id = channels.channels_create(math_id, "Alternate", "public")
+    gods_channel_id = channels.channels_create(comp_token, "TheGods", "public")['channel_id']
+    alt_channel_id = channels.channels_create(math_id, "Alternate", "public")['channel_id']
     channel.channel_invite(comp_token, gods_channel_id, math_id)
     channel.channel_invite(comp_token, gods_channel_id, engg_id)
     channel.channel_invite(math_token, gods_channel_id, engg_id)
@@ -369,8 +369,8 @@ def test_channel_removeowner():
     buttercup_token = auth.auth_login("buttercup@powerpuff.com", "colourgreen")['token']
 
     # Create channel 
-    girls_channel_id = channels.channels_create(blossom_token, "girls_channel", "public")
-    power_channel_id = channels.channels_create(bubbles_token, "power_channel", "public")
+    girls_channel_id = channels.channels_create(blossom_token, "girls_channel", "public")['channel_id']
+    power_channel_id = channels.channels_create(bubbles_token, "power_channel", "public")['channel_id']
     channel.channel_join(buttercup_token, girls_channel_id)
 
     # Channel ID is not valid and invalid channel and invalid token
