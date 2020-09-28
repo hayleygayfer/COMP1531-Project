@@ -1,6 +1,6 @@
 import auth
 import pytest
-import clear from data
+from other import clear
 
 ###### Auth Register ######
 
