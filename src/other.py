@@ -2,10 +2,8 @@ from data import data
 
 def clear():
     global data
-    data = {
-        'users': [],
-        'channels': []
-    }
+    data['users'].clear()
+    data['channels'].clear()
 
     
 
