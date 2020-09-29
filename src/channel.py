@@ -1,8 +1,4 @@
-# IMPORTANT
-# To whoever is implementing the functions for channel.py ,
-# if you're not happy with some of the assumptions then pls let me know
-# - Rohan
-
+# Comments in this file are assumptions
 from data import data
 from error import InputError, AccessError
 
@@ -55,7 +51,6 @@ def channel_leave(token, channel_id):
                 if user['u_id'] == u_id:
                     pass
 
-    # You cannot leave a channel if you are the only owner (raise InputError)
     return {
     }
 
@@ -69,5 +64,6 @@ def channel_addowner(token, channel_id, u_id):
     }
 
 def channel_removeowner(token, channel_id, u_id):
+    # You are allowed to remove yourself as an owner
     return {
     }
