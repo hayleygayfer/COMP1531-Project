@@ -1,7 +1,7 @@
 import auth
 import pytest
 from other import clear
-from error import InputError
+from error import InputError, AccessError
 
 ###### Auth Register ######
 
@@ -144,7 +144,9 @@ def test_password_incorrect():
 # Logout with invalid token
 def test_invalid_logout():
     clear()
-    assert(auth.auth_logout(1)['is_success'] == False)
+    with pytest.raises(AccessError):
+        auth.auth_logout(1)
+        # auth_logout should raise an AccessError with an invalid token
         
 # VALID CASES #
 
