@@ -4,7 +4,6 @@ import channels
 import pytest
 
 from error import InputError, AccessError
-from data import data
 from other import clear
 
 ### channels_list ###
@@ -31,9 +30,9 @@ def test_user_in_no_channels():
     (u3_id, token3) = auth.auth_login("person3@email.com", "password")
 
     # user1 creates a channel
-    channels.channels_create(token1, "channel_1", True)
+    ch_id = channels.channels_create(token1, "channel_1", True)
     # invites user2
-    channel.channel_invite(token1, "channel_1", u2_id)
+    channel.channel_invite(token1, ch_id, u2_id)
     # user3 is not in any channels
     assert channels.channels_list(token3) == []
 
@@ -54,10 +53,10 @@ def test_user_is_in_all_channels():
     # user2 creates a channel
     c2_id = channels.channels_create(token2, "channel_2", True)
     # user1 invites user2 to channel_1
-    channel.channel_invite(token1, "channel_1", u2_id)
+    channel.channel_invite(token1, c1_id, u2_id)
     # user1 and user2 invite user3 to both channels
-    channel.channel_invite(token1, "channel_1", u3_id)
-    channel.channel_invite(token2, "channel_2", u3_id)
+    channel.channel_invite(token1, c1_id, u3_id)
+    channel.channel_invite(token2, c2_id, u3_id)
     assert channels.channels_list(token3) == [
         {
             'channel_id': c1_id, 
@@ -73,6 +72,11 @@ def test_user_is_in_all_channels():
                     'name_first': 'Person',
                     'name_last': 'Two'
                 },
+                {
+                    'u_id': u3_id,
+                    'name_first': 'Person',
+                    'name_last': 'Three'                    
+                }
             ],
             'owner_members': [
                 {
@@ -160,6 +164,10 @@ def test_user_is_in_some_channels():
             'is_public': True
         },
     ]
+    # user2 and user3 will not see the same list
+    assert channels.channels_list(token2) != channels.channels_list(token3)
+    # user1 and user3 will see the same list
+    assert channels.channels_list(token1) == channels.channels_list(token3)
 
 ### channels_listall ###
 
@@ -244,6 +252,8 @@ def test_total_channels():
             'is_public': True
         },   
     ]
+    # check that user1 is in all channels
+    assert channels.channels_listall(token1) == channels.channels_list(token1)
 
 def test_total_channels_not_created_by_user():
     clear()
@@ -319,6 +329,8 @@ def test_total_channels_not_created_by_user():
             'is_public': True
         },   
     ]
+    # user1 and user2 see the same list
+    assert channels.channels_listall(token1) == channels.channels_listall(token2)
 
 ### channels_create ###
 
@@ -340,8 +352,8 @@ def test_name_1_or_20_characters():
     auth.auth_register("person1@email.com", "password", "Person", "One")
     (u1_id, token1) = auth.auth_login("person1@email.com", "password")
 
-    assert channels.channels_create(token1, "channels___________1", True) == {'channel_id': 1}
-    assert channels.channels_create(token1, "2", True) == {'channel_id': 2}
+    assert channels.channels_create(token1, "channels___________1", True) != None
+    assert channels.channels_create(token1, "2", True) != None
 
 
 def test_public_private():
