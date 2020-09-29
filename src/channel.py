@@ -3,6 +3,9 @@
 # if you're not happy with some of the assumptions then pls let me know
 # - Rohan
 
+from data import data
+from error import InputError, AccessError
+
 def channel_invite(token, channel_id, u_id):
     # If you invite someone (yourself included) to a channel that the user already exists in then raise InputError
     return {
@@ -42,6 +45,16 @@ def channel_messages(token, channel_id, start):
     }
 
 def channel_leave(token, channel_id):
+    for user in data['users']:
+        if user['token'] == token:
+            u_id = user['u_id']
+
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            for user in channel['all_members']:
+                if user['u_id'] == u_id:
+                    pass
+
     # You cannot leave a channel if you are the only owner (raise InputError)
     return {
     }
