@@ -13,22 +13,22 @@ from other import clear
 def test_no_channels():
     clear()
     # create user1
-    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login(token1, "password")
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    (u1_id, token1) = auth.auth_login("person1@email.com", "password")
     # no channels created / joined
     assert channels.channels_list(token1) == {}
 
 def test_user_in_no_channels():
     clear()
     # create user1
-    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login(token1, "password")
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    (u1_id, token1) = auth.auth_login("person1@email.com", "password")
     # create user2
-    (u2_id, token2) = auth.auth_register("person2@email.com", "password", "Person", "Two")
-    auth.auth_login(token2, "password")
+    auth.auth_register("person2@email.com", "password", "Person", "Two")
+    (u2_id, token2) = auth.auth_login("person2@email.com", "password")
     # create user3
-    (u3_id, token3) = auth.auth_register("person3@email.com", "password", "Person", "Three")
-    auth.auth_login(token3, "password")
+    auth.auth_register("person3@email.com", "password", "Person", "Three")
+    (u3_id, token3) = auth.auth_login("person3@email.com", "password")
 
     # user1 creates a channel
     channels.channels_create(token1, "channel_1", True)
@@ -40,14 +40,14 @@ def test_user_in_no_channels():
 def test_user_is_in_all_channels():
     clear()
     # create user1
-    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login(token1, "password")
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    (u1_id, token1) = auth.auth_login("person1@email.com", "password")
     # create user2
-    (u2_id, token2) = auth.auth_register("person2@email.com", "password", "Person", "Two")
-    auth.auth_login(token2, "password")
+    auth.auth_register("person2@email.com", "password", "Person", "Two")
+    (u2_id, token2) = auth.auth_login("person2@email.com", "password")
     # create user3
-    (u3_id, token3) = auth.auth_register("person3@email.com", "password", "Person", "Three")
-    auth.auth_login(token3, "password")
+    auth.auth_register("person3@email.com", "password", "Person", "Three")
+    (u3_id, token3) = auth.auth_login("person3@email.com", "password")
 
     # user1 creates a channel
     c1_id = channels.channels_create(token1, "channel_1", True)
@@ -112,14 +112,14 @@ def test_user_is_in_all_channels():
 def test_user_is_in_some_channels():
     clear()
     # create user1
-    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login(token1, "password")
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    (u1_id, token1) = auth.auth_login("person1@email.com", "password")
     # create user2
-    (u2_id, token2) = auth.auth_register("person2@email.com", "password", "Person", "Two")
-    auth.auth_login(token2, "password")
+    auth.auth_register("person2@email.com", "password", "Person", "Two")
+    (u2_id, token2) = auth.auth_login("person2@email.com", "password")
     # create user3
-    (u3_id, token3) = auth.auth_register("person3@email.com", "password", "Person", "Three")
-    auth.auth_login(token3, "password")
+    auth.auth_register("person3@email.com", "password", "Person", "Three")
+    (u3_id, token3) = auth.auth_login("person3@email.com", "password")
 
     # user1 creates a channel
     c1_id = channels.channels_create(token1, "channel_1", True)
@@ -167,8 +167,8 @@ def test_user_is_in_some_channels():
 def test_no_total_channels():
     clear()
     # create user1
-    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login(token1, "password")
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    (u1_id, token1) = auth.auth_login("person1@email.com", "password")
 
     # no channels exist
     assert channels.channels_listall(token1) == []
@@ -176,8 +176,8 @@ def test_no_total_channels():
 def test_total_channels():
     clear()
     # create user1
-    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login(token1, "password")
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    (u1_id, token1) = auth.auth_login("person1@email.com", "password")
 
     # user1 creates 3 channels
     c1_id = channels.channels_create(token1, "channel_1", True)
@@ -248,11 +248,11 @@ def test_total_channels():
 def test_total_channels_not_created_by_user():
     clear()
     # create user1
-    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login(token1, "password")
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    (u1_id, token1) = auth.auth_login("person1@email.com", "password")
     # create user2
-    (u2_id, token2) = auth.auth_register("person2@email.com", "password", "Person", "Two")
-    auth.auth_login(token2, "password")
+    auth.auth_register("person2@email.com", "password", "Person", "Two")
+    (u2_id, token2) = auth.auth_login("person2@email.com", "password")
 
     # user1 creates 3 channels
     c1_id = channels.channels_create(token1, "channel_1", True)
@@ -326,8 +326,8 @@ def test_total_channels_not_created_by_user():
 def test_name_over_20_characters():
     clear()
     # create user1
-    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login(token1, "password")
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    (u1_id, token1) = auth.auth_login("person1@email.com", "password")
 
     with pytest.raises(InputError):
         channels.channels_create(token1, "channels____________1", True)
@@ -337,8 +337,8 @@ def test_name_over_20_characters():
 def test_name_1_or_20_characters():
     clear()
     # create user1
-    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login(token1, "password")
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    (u1_id, token1) = auth.auth_login("person1@email.com", "password")
 
     assert channels.channels_create(token1, "channels___________1", True) == {'channel_id': 1}
     assert channels.channels_create(token1, "2", True) == {'channel_id': 2}
@@ -347,8 +347,8 @@ def test_name_1_or_20_characters():
 def test_public_private():
     clear()
     # create user1
-    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login(token1, "password")
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    (u1_id, token1) = auth.auth_login("person1@email.com", "password")
 
     cpublic_id = channels.channels_create(token1, "channels_public", True)
     cprivate_id = channels.channels_create(token1, "channels_private", False)
