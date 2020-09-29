@@ -55,22 +55,25 @@ def channel_leave(token, channel_id):
     }
 
 def channel_join(token, channel_id):
-    # A user CANNOT join a private channel they MUST be invited (raise AccessError)
-    if validate_channel(channel_id) == False:
-        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
-    
-    if private_channel(channel_id, token) == True:
-        raise AccessError(f"The Channel ID: {channel_id} entered is a private channel ")
-
-    if exists_in_channel(channel_id) == True:
-        raise AccessError(f"You are already a member of the Channel ID: {channel_id} ")
-    
+    # Matching the user and the token
     for user in data['users']:
         if user['token'] == token:
             u_id = user['u_id']
             name_first = user['name_first']
             name_last = user['name_last']
-            append_data(channel_id, u_id, name_first, name_last)
+
+    # Raising input and access errors
+    if validate_channel(channel_id) == False:
+        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+    
+    if private_channel(channel_id) == True:
+        raise AccessError(f"The Channel ID: {channel_id} entered is a private channel ")
+
+    if exists_in_channel(channel_id, u_id) == True:
+        raise InputError(f"You are already a member of the Channel ID: {channel_id} ")
+    
+    # After all tests are passed, append the data for all channel members
+    append_data(channel_id, u_id, name_first, name_last)
 
     return {
         'is_success': True
@@ -91,14 +94,20 @@ def validate_channel(channel_id):
             return True
     return False
 
-def private_channel(channel_id, token):
+def private_channel(channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             if status == channel['is_public']:
                 return False
     return True
 
-# def exists_in_channel(channel_id, token):
+def exists_in_channel(channel_id, u_id):
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            for user in channel['all_members']:
+                if user['u_id'] == u_id:
+                    return True
+    return False
    
 def append_data(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
