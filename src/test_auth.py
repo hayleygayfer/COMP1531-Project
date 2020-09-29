@@ -1,6 +1,7 @@
 import auth
 import pytest
 from other import clear
+from error import InputError
 
 ###### Auth Register ######
 
@@ -143,7 +144,7 @@ def test_password_incorrect():
 # Logout with invalid token
 def test_invalid_logout():
     clear()
-    assert(auth.auth_logout(1) == False)
+    assert(auth.auth_logout(1)['is_success'] == False)
         
 # VALID CASES #
 
@@ -152,15 +153,21 @@ def test_register_login_logout():
     clear()
     
     # Register
-    (u_id, token) = auth.auth_register("tonystark@avengers.com", "password", "Tony", "Stark")
+    result = auth.auth_register("tonystark@avengers.com", "password", "Tony", "Stark")
+    token = result['token']
+    u_id = result['u_id']
+
     assert token != None and u_id != None
     
     # Login
-    (u_id1, token) = auth.auth_login("tonystark@avengers.com", "password")
-    assert u_id1 == u_id and token != None
+    result = auth.auth_login("tonystark@avengers.com", "password")
+    u_id1 = result['u_id']
+    token1 = result['token']
+
+    assert u_id1 == u_id and token == token1
     
     # Logout
-    assert(auth.auth_logout(token) == True)
+    assert(auth.auth_logout(token)['is_success'] == True)
     
 
     
