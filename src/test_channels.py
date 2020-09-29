@@ -13,70 +13,70 @@ from other import clear
 def test_no_channels():
     clear()
     # create user1
-    auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login("person1@email.com", "password")
+    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login(token1, "password")
     # no channels created / joined
-    assert channels.channels_list("person1@email.com") == {}
+    assert channels.channels_list(token1) == {}
 
 def test_user_in_no_channels():
     clear()
     # create user1
-    auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login("person1@email.com", "password")
+    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login(token1, "password")
     # create user2
-    auth.auth_register("person2@email.com", "password", "Person", "Two")
-    auth.auth_login("person2@email.com", "password")
+    (u2_id, token2) = auth.auth_register("person2@email.com", "password", "Person", "Two")
+    auth.auth_login(token2, "password")
     # create user3
-    auth.auth_register("person3@email.com", "password", "Person", "Three")
-    auth.auth_login("person3@email.com", "password")
+    (u3_id, token3) = auth.auth_register("person3@email.com", "password", "Person", "Three")
+    auth.auth_login(token3, "password")
 
     # user1 creates a channel
-    channels.channels_create("person1@email.com", "channel_1", True)
+    channels.channels_create(token1, "channel_1", True)
     # invites user2
-    channel.channel_invite("person1@email.com", "channel_1", 2)
+    channel.channel_invite(token1, "channel_1", u2_id)
     # user3 is not in any channels
-    assert channels.channels_list("person3@gmail.com") == []
+    assert channels.channels_list(token3) == []
 
 def test_user_is_in_all_channels():
     clear()
     # create user1
-    auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login("person1@email.com", "password")
+    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login(token1, "password")
     # create user2
-    auth.auth_register("person2@email.com", "password", "Person", "Two")
-    auth.auth_login("person2@email.com", "password")
+    (u2_id, token2) = auth.auth_register("person2@email.com", "password", "Person", "Two")
+    auth.auth_login(token2, "password")
     # create user3
-    auth.auth_register("person3@email.com", "password", "Person", "Three")
-    auth.auth_login("person3@email.com", "password")
+    (u3_id, token3) = auth.auth_register("person3@email.com", "password", "Person", "Three")
+    auth.auth_login(token3, "password")
 
     # user1 creates a channel
-    channels.channels_create("person1@email.com", "channel_1", True)
+    c1_id = channels.channels_create(token1, "channel_1", True)
     # user2 creates a channel
-    channels.channels_create("person2@email.com", "channel_2", True)
+    c2_id = channels.channels_create(token2, "channel_2", True)
     # user1 invites user2 to channel_1
-    channel.channel_invite("person1@email.com", "channel_1", 2)
+    channel.channel_invite(token1, "channel_1", u2_id)
     # user1 and user2 invite user3 to both channels
-    channel.channel_invite("person1@email.com", "channel_1", 3)
-    channel.channel_invite("person2@email.com", "channel_2", 3)
-    assert channels.channels_list("person3@gmail.com") == [
+    channel.channel_invite(token1, "channel_1", u3_id)
+    channel.channel_invite(token2, "channel_2", u3_id)
+    assert channels.channels_list(token3) == [
         {
-            'channel_id': 1, 
+            'channel_id': c1_id, 
             'name': "channel_1", 
             'all_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 },
                 {
-                    'u_id': 2,
+                    'u_id': u2_id,
                     'name_first': 'Person',
                     'name_last': 'Two'
                 },
             ],
             'owner_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 }
@@ -84,23 +84,23 @@ def test_user_is_in_all_channels():
             'is_public': True
         },
         {
-            'channel_id': 2, 
+            'channel_id': c2_id, 
             'name': "channel_2", 
             'all_members': [
                 {
-                    'u_id': 2,
+                    'u_id': u2_id,
                     'name_first': 'Person',
                     'name_last': 'Two'
                 },
                 {
-                    'u_id': 3,
+                    'u_id': u3_id,
                     'name_first': 'Person',
                     'name_last': 'Three'
                 },
             ],
             'owner_members': [
                 {
-                    'u_id': 2,
+                    'u_id': u2_id,
                     'name_first': 'Person',
                     'name_last': 'Two'
                 }
@@ -112,47 +112,47 @@ def test_user_is_in_all_channels():
 def test_user_is_in_some_channels():
     clear()
     # create user1
-    auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login("person1@email.com", "password")
+    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login(token1, "password")
     # create user2
-    auth.auth_register("person2@email.com", "password", "Person", "Two")
-    auth.auth_login("person2@email.com", "password")
+    (u2_id, token2) = auth.auth_register("person2@email.com", "password", "Person", "Two")
+    auth.auth_login(token2, "password")
     # create user3
-    auth.auth_register("person3@email.com", "password", "Person", "Three")
-    auth.auth_login("person3@email.com", "password")
+    (u3_id, token3) = auth.auth_register("person3@email.com", "password", "Person", "Three")
+    auth.auth_login(token3, "password")
 
     # user1 creates a channel
-    channels.channels_create("person1@email.com", "channel_1", True)
+    c1_id = channels.channels_create(token1, "channel_1", True)
     # user2 creates a channel
-    channels.channels_create("person2@email.com", "channel_2", True)
+    channels.channels_create(token2, "channel_2", True)
     # user1 invites user2 to channel_1
-    channel.channel_invite("person1@email.com", "channel_1", 2)
+    channel.channel_invite(token1, "channel_1", u2_id)
     # user1 invites user3 to channel_1 channels
-    channel.channel_invite("person1@email.com", "channel_1", 3)
-    assert channels.channels_list("person3@gmail.com") == [
+    channel.channel_invite(token1, "channel_1", u3_id)
+    assert channels.channels_list(token3) == [
         {
-            'channel_id': 1, 
+            'channel_id': c1_id, 
             'name': "channel_1", 
             'all_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 },
                 {
-                    'u_id': 2,
+                    'u_id': u2_id,
                     'name_first': 'Person',
                     'name_last': 'Two'
                 },
                 {
-                    'u_id': 3,
+                    'u_id': u3_id,
                     'name_first': 'Person',
                     'name_last': 'Three'
                 },
             ],
             'owner_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 }
@@ -167,38 +167,38 @@ def test_user_is_in_some_channels():
 def test_no_total_channels():
     clear()
     # create user1
-    auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login("person1@email.com", "password")
+    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login(token1, "password")
 
     # no channels exist
-    assert channels.channels_listall("person1@email.com") == []
+    assert channels.channels_listall(token1) == []
 
 def test_total_channels():
     clear()
     # create user1
-    auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login("person1@email.com", "password")
+    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login(token1, "password")
 
     # user1 creates 3 channels
-    channels.channels_create("person1@email.com", "channel_1", True)
-    channels.channels_create("person1@email.com", "channel_2", True)
-    channels.channels_create("person1@email.com", "channel_3", True)
+    c1_id = channels.channels_create(token1, "channel_1", True)
+    c2_id = channels.channels_create(token1, "channel_2", True)
+    c3_id = channels.channels_create(token1, "channel_3", True)
 
     # 3 channels exist
-    assert channels.channels_listall("person1@email.com") == [
+    assert channels.channels_listall(token1) == [
         {
-            'channel_id': 1, 
+            'channel_id': c1_id, 
             'name': "channel_1", 
             'all_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 },
             ],
             'owner_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 }
@@ -206,18 +206,18 @@ def test_total_channels():
             'is_public': True
         },  
                 {
-            'channel_id': 2, 
+            'channel_id': c2_id, 
             'name': "channel_2", 
             'all_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 },
             ],
             'owner_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 }
@@ -225,18 +225,18 @@ def test_total_channels():
             'is_public': True
         },   
                 {
-            'channel_id': 3, 
+            'channel_id': c3_id, 
             'name': "channel_3", 
             'all_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 },
             ],
             'owner_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 }
@@ -248,32 +248,32 @@ def test_total_channels():
 def test_total_channels_not_created_by_user():
     clear()
     # create user1
-    auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login("person1@email.com", "password")
+    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login(token1, "password")
     # create user2
-    auth.auth_register("person2@email.com", "password", "Person", "Two")
-    auth.auth_login("person2@email.com", "password")
+    (u2_id, token2) = auth.auth_register("person2@email.com", "password", "Person", "Two")
+    auth.auth_login(token2, "password")
 
     # user1 creates 3 channels
-    channels.channels_create("person1@email.com", "channel_1", True)
-    channels.channels_create("person1@email.com", "channel_2", True)
-    channels.channels_create("person1@email.com", "channel_3", True)
+    c1_id = channels.channels_create(token1, "channel_1", True)
+    c2_id = channels.channels_create(token1, "channel_2", True)
+    c3_id = channels.channels_create(token1, "channel_3", True)
 
     # user2 checks all channels
-    assert channels.channels_listall("person2@email.com") == [
+    assert channels.channels_listall(token2) == [
         {
-            'channel_id': 1, 
+            'channel_id': c1_id, 
             'name': "channel_1", 
             'all_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 },
             ],
             'owner_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 }
@@ -281,18 +281,18 @@ def test_total_channels_not_created_by_user():
             'is_public': True
         },  
                 {
-            'channel_id': 2, 
+            'channel_id': c2_id, 
             'name': "channel_2", 
             'all_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 },
             ],
             'owner_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 }
@@ -300,18 +300,18 @@ def test_total_channels_not_created_by_user():
             'is_public': True
         },   
                 {
-            'channel_id': 3, 
+            'channel_id': c3_id, 
             'name': "channel_3", 
             'all_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 },
             ],
             'owner_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 }
@@ -326,47 +326,47 @@ def test_total_channels_not_created_by_user():
 def test_name_over_20_characters():
     clear()
     # create user1
-    auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login("person1@email.com", "password")
+    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login(token1, "password")
 
     with pytest.raises(InputError):
-        channels.channels_create("person1@email.com", "channels____________1", True)
+        channels.channels_create(token1, "channels____________1", True)
 
 # VALID CASES #
 
 def test_name_1_or_20_characters():
     clear()
     # create user1
-    auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login("person1@email.com", "password")
+    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login(token1, "password")
 
-    assert channels.channels_create("person1@email.com", "channels___________1", True) == {'channel_id': 1}
-    assert channels.channels_create("person1@email.com", "2", True) == {'channel_id': 2}
+    assert channels.channels_create(token1, "channels___________1", True) == {'channel_id': 1}
+    assert channels.channels_create(token1, "2", True) == {'channel_id': 2}
 
 
 def test_public_private():
     clear()
     # create user1
-    auth.auth_register("person1@email.com", "password", "Person", "One")
-    auth.auth_login("person1@email.com", "password")
+    (u1_id, token1) = auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login(token1, "password")
 
-    channels.channels_create("person1@email.com", "channels_public", True)
-    channels.channels_create("person1@email.com", "channels_private", False)
+    cpublic_id = channels.channels_create(token1, "channels_public", True)
+    cprivate_id = channels.channels_create(token1, "channels_private", False)
 
-    assert channels.channels_listall("person1@email.com") == [
+    assert channels.channels_listall(token1) == [
         {
-            'channel_id': 1, 
+            'channel_id': cpublic_id, 
             'name': "channel_public", 
             'all_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 },
             ],
             'owner_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 }
@@ -374,18 +374,18 @@ def test_public_private():
             'is_public': True
         },  
         {
-            'channel_id': 2, 
+            'channel_id': cprivate_id, 
             'name': "channel_private", 
             'all_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 },
             ],
             'owner_members': [
                 {
-                    'u_id': 1,
+                    'u_id': u1_id,
                     'name_first': 'Person',
                     'name_last': 'One'
                 }
