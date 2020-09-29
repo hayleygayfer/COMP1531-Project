@@ -1,5 +1,13 @@
+from data import data
+
 def clear():
-    pass
+    global data
+    data = {
+        'users': [],
+        'channels': []
+    }
+
+    
 
 def users_all(token):
     return {
