@@ -57,8 +57,8 @@ def test_channel_invite_InputErrors():
 def test_channel_invite_AccessErrors():
     clear()
     # Create users
-    auth.auth_register("scottmorrison@auspm.com", "scomo", "Scott", "Morrison")
-    scomo_token = auth.auth_login("scottmorrison@auspm.com", "scomo")['token']
+    auth.auth_register("scottmorrison@auspm.com", "iamscomo", "Scott", "Morrison")
+    scomo_token = auth.auth_login("scottmorrison@auspm.com", "iamscomo")['token']
 
     abbott_id = auth.auth_register("tonyabbott@auspm.com", "idontcare", "Tony", "Abbott")['u_id']
     abbott_token = auth.auth_login("tonyabbott@auspm.com", "idontcare")['token']
@@ -401,14 +401,14 @@ def test_channel_removeowner():
 def test_invalid_tokens():
     clear()
     # Create users
-    tom_id = auth.auth_register("tom@tomandjerry.com", "mouse", "Tom", "Cat")['u_id']
-    tom_token = auth.auth_login("tom@tomandjerry.com", "mouse")['token']
+    tom_id = auth.auth_register("tom@tomandjerry.com", "chasingmice", "Tom", "Cat")['u_id']
+    tom_token = auth.auth_login("tom@tomandjerry.com", "chasingmice")['token']
 
-    jerry_id = auth.auth_register("jerry@tomandjerry.com", "cheese", "Jerry", "Mouse")['u_id']
-    auth.auth_login("jerry@tomandjerry.com", "cheese")['token']
+    jerry_id = auth.auth_register("jerry@tomandjerry.com", "eatingcheese", "Jerry", "Mouse")['u_id']
+    auth.auth_login("jerry@tomandjerry.com", "eatingcheese")['token']
 
-    spike_id = auth.auth_register("spike@tomandjerry.com", "bone", "Spike", "Dog")['u_id']
-    auth.auth_login("spike@tomandjerry.com", "bone")['token']
+    spike_id = auth.auth_register("spike@tomandjerry.com", "chewingbone", "Spike", "Dog")['u_id']
+    auth.auth_login("spike@tomandjerry.com", "chewingbone")['token']
 
     # Create a public channel
     channel_id = channels.channels_create(tom_token, "TomAndJerry", True)['channel_id']
