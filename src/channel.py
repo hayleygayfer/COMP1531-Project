@@ -4,10 +4,19 @@ from error import InputError, AccessError
 
 def channel_invite(token, channel_id, u_id):
     # If you invite someone (yourself included) to a channel that the user already exists in then raise InputError
+    if validate_channel(channel_id) == False:
+        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+    
+    if validate_user(user_id) == False:
+        raise InputError(f"The User ID: {u_id} entered is not a valid user ")
+
     return {
     }
 
 def channel_details(token, channel_id):
+    if validate_channel(channel_id) == False:
+        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
     return {
         'name': 'Hayden',
         'owner_members': [
@@ -27,6 +36,9 @@ def channel_details(token, channel_id):
     }
 
 def channel_messages(token, channel_id, start):
+    if validate_channel(channel_id) == False:
+        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
     return {
         'messages': [
             {
@@ -50,6 +62,9 @@ def channel_leave(token, channel_id):
             for user in channel['all_members']:
                 if user['u_id'] == u_id:
                     pass
+
+    if validate_channel(channel_id) == False:
+        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
     return {
     }
@@ -80,17 +95,29 @@ def channel_join(token, channel_id):
     }
 
 def channel_addowner(token, channel_id, u_id):
+    if validate_channel(channel_id) == False:
+        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
     return {
     }
 
 def channel_removeowner(token, channel_id, u_id):
     # You are allowed to remove yourself as an owner
+    if validate_channel(channel_id) == False:
+        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
     return {
     }
 
 def validate_channel(channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
+            return True
+    return False
+
+def validate_user(u_id):
+    for users in data['users']:
+        if users['u_id'] == u_id:
             return True
     return False
 
