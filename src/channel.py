@@ -56,6 +56,8 @@ def channel_leave(token, channel_id):
 
 def channel_join(token, channel_id):
     # A user CANNOT join a private channel they MUST be invited (raise AccessError)
+    if validate_channel(channel_id) == False:
+        raise InputError(f"The Channel ID {channel_id} entered is not valid ")
     return {
     }
 
@@ -67,3 +69,9 @@ def channel_removeowner(token, channel_id, u_id):
     # You are allowed to remove yourself as an owner
     return {
     }
+
+def validate_channel(channel_id):
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            return True
+    return False
