@@ -22,7 +22,7 @@ def test_channel_invite_InputErrors():
     '''
 
     # Person1 creates a channel and invites other users
-    ch_id = channels.channels_create(p1_token, "MainChannel", "public")['channel_id']
+    ch_id = channels.channels_create(p1_token, "MainChannel", True)['channel_id']
     assert channel.channel_invite(p1_token, ch_id, person2_id)['is_success'] == True
 
     '''
@@ -70,8 +70,8 @@ def test_channel_invite_AccessErrors():
     gillard_token = auth.auth_login("juliagillard@auspm.com", "idontcare")['token']
 
     # Scomo and Abbot creating channels
-    pub_id = channels.channels_create(scomo_token, "PublicChannel", "public")['channel_id']
-    prv_id = channels.channels_create(abbott_token, "PrivateChannel", "private")['channel_id']
+    pub_id = channels.channels_create(scomo_token, "PublicChannel", True)['channel_id']
+    prv_id = channels.channels_create(abbott_token, "PrivateChannel", False)['channel_id']
 
     '''
     Users: Scomo, Abbott, Rudd, Gillard
@@ -121,8 +121,8 @@ def test_channel_details():
     dorothy_token = auth.auth_login("dorothy@wizardofoz.com", "wantshome")['token']
 
     # Create channels 
-    yellowbrickroadID = channels.channels_create(scarecrow_token, "YellowBrickRoadChannel", "public")['channel_id']
-    emeraldcityID = channels.channels_create(tinman_token, "EmeraldCityChannel", "public")['channel_id']
+    yellowbrickroadID = channels.channels_create(scarecrow_token, "YellowBrickRoadChannel", True)['channel_id']
+    emeraldcityID = channels.channels_create(tinman_token, "EmeraldCityChannel", True)['channel_id']
     channel.channel_join(cowardylion_token, yellowbrickroadID)
     channel.channel_join(dorothy_token, emeraldcityID)
 
@@ -175,8 +175,8 @@ def test_channel_leave():
     dratini_token = auth.auth_login("dratini@pokemon.com", "notawatertype")['token']
 
     # Users create and join channels
-    moleID = channels.channels_create(diglett_token, "MoleChannel", "public")['channel_id']
-    splashID = channels.channels_create(gyarados_token, "SplashChannel", "public")['channel_id']
+    moleID = channels.channels_create(diglett_token, "MoleChannel", True)['channel_id']
+    splashID = channels.channels_create(gyarados_token, "SplashChannel", True)['channel_id']
     channel.channel_join(ponyta_token, splashID)
     channel.channel_join(dratini_token, splashID)
 
@@ -234,8 +234,8 @@ def test_channel_join():
     peach_token = auth.auth_login("princesspeach@nintendo.com", "mushroom")['token']
 
     # Mario and Peach create a public and private channel respectively
-    pub_ch_id = channels.channels_create(mario_token, "PublicChannel", "public")['channel_id']
-    prv_ch_id = channels.channels_create(peach_token, "PrivateChannel", "private")['channel_id']
+    pub_ch_id = channels.channels_create(mario_token, "PublicChannel", True)['channel_id']
+    prv_ch_id = channels.channels_create(peach_token, "PrivateChannel", False)['channel_id']
 
     '''
     Users: Mario, Luigi, Peach
@@ -298,8 +298,8 @@ def test_channel_addowner():
     engg_token = auth.auth_login("enggod@unsw.edu", "engineering")['token']
 
     # Creating channels and adding users
-    gods_channel_id = channels.channels_create(comp_token, "TheGods", "public")['channel_id']
-    alt_channel_id = channels.channels_create(math_id, "Alternate", "public")['channel_id']
+    gods_channel_id = channels.channels_create(comp_token, "TheGods", True)['channel_id']
+    alt_channel_id = channels.channels_create(math_id, "Alternate", True)['channel_id']
     channel.channel_invite(comp_token, gods_channel_id, math_id)
     channel.channel_invite(comp_token, gods_channel_id, engg_id)
     channel.channel_invite(math_token, gods_channel_id, engg_id)
@@ -369,8 +369,8 @@ def test_channel_removeowner():
     buttercup_token = auth.auth_login("buttercup@powerpuff.com", "colourgreen")['token']
 
     # Create channel 
-    girls_channel_id = channels.channels_create(blossom_token, "girls_channel", "public")['channel_id']
-    power_channel_id = channels.channels_create(bubbles_token, "power_channel", "public")['channel_id']
+    girls_channel_id = channels.channels_create(blossom_token, "girls_channel", True)['channel_id']
+    power_channel_id = channels.channels_create(bubbles_token, "power_channel", True)['channel_id']
     channel.channel_join(buttercup_token, girls_channel_id)
 
     # Channel ID is not valid and invalid channel and invalid token
@@ -379,10 +379,6 @@ def test_channel_removeowner():
     
     with pytest.raises(InputError):
         channel.channel_removeowner(blossom_token, 13579, blossom_id)
-
-    hello_powerpuff = 237223
-    with pytest.raises(InputError):
-        channel.channel_removeowner(hello_powerpuff, girls_channel_id, blossom_id)
 
     # User id u_id is not an owner of the channel
     with pytest.raises(InputError):
@@ -401,6 +397,40 @@ def test_channel_removeowner():
     assert channel.channel_removeowner(buttercup_token, girls_channel_id, blossom_id)['is_success'] == True
     assert channel.channel_removeowner(buttercup_token, girls_channel_id, buttercup_id)['is_success'] == True
     assert channel.channel_removeowner(bubbles_token, power_channel_id, bubbles_id)['is_success'] == True
+
+def test_invalid_tokens():
+    clear()
+    # Create users
+    tom_id = auth.auth_register("tom@tomandjerry.com", "mouse", "Tom", "Cat")['u_id']
+    tom_token = auth.auth_login("tom@tomandjerry.com", "mouse")['token']
+
+    jerry_id = auth.auth_register("jerry@tomandjerry.com", "cheese", "Jerry", "Mouse")['u_id']
+    auth.auth_login("jerry@tomandjerry.com", "cheese")['token']
+
+    spike_id = auth.auth_register("spike@tomandjerry.com", "bone", "Spike", "Dog")['u_id']
+    auth.auth_login("spike@tomandjerry.com", "bone")['token']
+
+    # Create a public channel
+    channel_id = channels.channels_create(tom_token, "TomAndJerry", True)['channel_id']
+    channel.channel_invite(tom_token, channel_id, jerry_id)
+
+    # Token AccessErrors
+    with pytest.raises(AccessError):
+        channel.channel_invite(2736273, channel_id, spike_id)
+    with pytest.raises(AccessError):
+        channel.channel_join(56453, channel_id)
+    with pytest.raises(AccessError):
+        channel.channel_details(23532, channel_id)
+    with pytest.raises(AccessError):
+        channel.channel_leave(563464, channel_id)
+    with pytest.raises(AccessError):
+        channel.channel_addowner(23141, channel_id, jerry_id)
+    with pytest.raises(AccessError):
+        channel.channel_removeowner(23141, channel_id, tom_id)
+    '''
+    with pytest.raises(AccessError):
+        channel.channel_messages(232414, channel_id, start)
+    '''
 
 
 # IGNORE THIS
