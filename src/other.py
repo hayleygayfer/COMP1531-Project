@@ -1,8 +1,7 @@
-from data import data
+import data
 
 def clear():
-    global data
-    data = {
+    data.data = {
         'users': [],
         'channels': []
     }
