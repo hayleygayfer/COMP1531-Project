@@ -1,4 +1,4 @@
-from data import *
+from data import data
 import re
 
 def auth_login(email, password):
