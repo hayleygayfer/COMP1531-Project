@@ -28,7 +28,7 @@ def channel_invite(token_inviter, channel_id, u_id_invitee):
         raise AccessError("User is not a part of the Channel ")
 
     # Append the user to 'all_members' of the channel after all tests are passed
-    append_data(channel_id, u_id, name_first, name_last)
+    append_data(channel_id, u_id_invitee, name_first, name_last)
 
     return {
         'is_success': True
@@ -102,7 +102,7 @@ def channel_leave(token, channel_id):
     }
 
 def channel_join(token, channel_id):
-    
+
     if validate_token(token_inviter) == False:
         raise AccessError(f"Not a valid token ")
 
