@@ -168,10 +168,22 @@ def channel_addowner(token, channel_id, u_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    for user in data['users']:
+        if user['token'] == token:
+            u_id = user['u_id']
+            name_first = user['name_first']
+            name_last = user['name_last']
+
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
+    if user_is_owner(channel_id, u_id) == True:
+        raise InputError(f"User {u_id} is already an owner of the channel ")
+    
+    append_user_owner(channel_id, u_id, name_first, name_last)
+
     return {
+        'is_success': True
     }
 
 def channel_removeowner(token, channel_id, u_id):
@@ -234,3 +246,21 @@ def append_data(channel_id, u_id, name_first, name_last):
                 }
             )
 
+def user_is_owner(channel_id, u_id):
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            for owners in channel['owner_members']:
+                if owner_members['u_id'] == u_id:
+                    return True:
+    return False
+
+def append_user_owner(channel_id, u_id, name_first, name_last):
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            channel['owner_members'].append(
+                {
+                    'u_id': u_id,
+                    'name_first': name_first,
+                    'name_last': name_last,
+                }
+            )
