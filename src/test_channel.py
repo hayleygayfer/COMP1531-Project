@@ -158,6 +158,43 @@ def test_channel_details():
 def test_channel_messages():
     clear()
     # Create Users
+    MrIncredible_id = auth.auth_register("MrIncredible@theincredibles.com", "strength", "MrIncredible", "theincredibles")['u_id']
+    MrIncredible_token = auth.auth_login("tom@theincredibles.com", "chasingmice")['token']
+
+    MrsIncredible_id = auth.auth_register("MrsIncredible@theincredibles.com", "shapeshifting", "MrsIncredible", "theincredibles")['u_id']
+    MrsIncredible_token = auth.auth_login("MrsIncredible@theincredibles.com", "shapeshifting")['token']
+
+    Violet_id = auth.auth_register("Violet@theincredibles.com", "invisible", "Violet", "theincredibles")['u_id']
+    Violet_token = auth.auth_login("Violet@theincredibles.com", "invisible")['token']
+
+    Jack_id = auth.auth_register("Jack@theincredibles.com", "multiplication", "Jack", "theincredibles")['u_id']
+    Jack_token = auth.auth_login("Jack@theincredibles.com", "multiplication")['token']
+
+    Dash_id = auth.auth_register("Dash@theincredibles.com", "speed", "Dash", "theincredibles")['u_id']
+    Dash_token = auth.auth_login("Dash@theincredibles.com", "speed")['token']
+
+    # Create channels
+    metroville_id = channels.channels_create(MrIncredible_token, "PublicChannel", True)['channel_id']
+    nomanisn_id = channels.channels_create(MrsIncredible_token, "PrivateChannel", True)['channel_id']
+    channel.channel_join(Violet_token, metroville_id)
+    channel.channel_join(Jack_token, metroville_id)
+    channel.channel_join(Dash_token, nomanisn_id)
+
+    # Channel ID is invalid
+    with pytest.raises(InputError):
+        channel.channel_messages(MrIncredible_token, 1232123)
+    
+    with pytest.raises(InputError):
+        channel.channel_messages(MrsIncredible_token, 1232129472)
+
+    # Authorised user is not part of the channel
+    with pytest.raises(AccessError):
+        channel.channel_messages(MrsIncredible_token, metroville_id) # owner and not part of the channel
+    
+    with pytest.raises(AccessError):
+        channel.channel_messages(Violet_token, nomanisn_id) # not owner and not part of the channel
+        
+    # Check start is greater than 
     
 
 # channel_leave returns a dictionary {is_success: True/False}

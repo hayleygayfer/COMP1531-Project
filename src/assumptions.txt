@@ -12,6 +12,9 @@ CHANNEL.PY
 - The only ways to be in a private channel is if the user is the creator, or they got invited by a member
 - A user trying to join a private channel is denied (AccessError)
 - If a user has been invited to a private channel and they leave, then they cannot join that channel (AccessError)
+- Messages are not stored in the main data 
+- For remove owner, Flocker owners can change owner permissions even if they are not in that channel
+
 
 * Possible assumptions but haven't been implemented *
 - You cannot leave a channel if you are the only owner (InputError)
