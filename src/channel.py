@@ -4,19 +4,34 @@ from error import InputError, AccessError
 
 def channel_invite(token, channel_id, u_id):
     # If you invite someone (yourself included) to a channel that the user already exists in then raise InputError
+    # Matching the user and the token
+    for user in data['users']:
+        if user['token'] == token:
+            u_id = user['u_id']
+            name_first = user['name_first']
+            name_last = user['name_last']
+    
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
     
     if validate_user(user_id) == False:
         raise InputError(f"The User ID: {u_id} entered is not a valid user ")
 
+    if exists_in_channel(channel_id, u_id) == False:
+        raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
+
+    if invited_exists_in_channel(channel_id, token) == True:
+        raise InputError(f"The User already exists in this Channel ")
+
+    # Append the user to 'all_members' of the channel
     return {
     }
 
 def channel_details(token, channel_id):
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
-
+    
+    # Loop through all members of a channel, if not a member, cannot view details
     return {
         'name': 'Hayden',
         'owner_members': [
@@ -133,6 +148,15 @@ def exists_in_channel(channel_id, u_id):
         if channel['channel_id'] == channel_id:
             for user in channel['all_members']:
                 if user['u_id'] == u_id:
+                    return True
+    return False
+
+# Needs to be revised
+def invited_exists_in_channel(channel_id, token):
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            for user in channel['all_members']:
+                if user['token'] == token:
                     return True
     return False
    
