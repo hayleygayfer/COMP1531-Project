@@ -157,6 +157,8 @@ def test_channel_details():
 
 def test_channel_messages():
     clear()
+    # Create Users
+    
 
 # channel_leave returns a dictionary {is_success: True/False}
 def test_channel_leave():
