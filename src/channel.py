@@ -44,6 +44,26 @@ def channel_details(token, channel_id):
 
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
+
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            return {
+                'name': 'Hayden',
+                'owner_members': [
+                    {
+                        'u_id': 1,
+                        'name_first': 'Hayden',
+                        'name_last': 'Jacobs',
+                    }
+                ],
+                'all_members': [
+                    {
+                        'u_id': 1,
+                        'name_first': 'Hayden',
+                        'name_last': 'Jacobs',
+                    }
+                ],
+            }
     
     return {
         'name': 'Hayden',
@@ -111,6 +131,7 @@ def channel_leave(token, channel_id):
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
 
     return {
+        'is_success': True
     }
 
 def channel_join(token, channel_id):
