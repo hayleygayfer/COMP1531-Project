@@ -159,7 +159,7 @@ def test_channel_messages():
     clear()
     # Create Users
     MrIncredible_id = auth.auth_register("MrIncredible@theincredibles.com", "strength", "MrIncredible", "theincredibles")['u_id']
-    MrIncredible_token = auth.auth_login("tom@theincredibles.com", "chasingmice")['token']
+    MrIncredible_token = auth.auth_login("MrIncredible@theincredibles.com", "strength")['token']
 
     MrsIncredible_id = auth.auth_register("MrsIncredible@theincredibles.com", "shapeshifting", "MrsIncredible", "theincredibles")['u_id']
     MrsIncredible_token = auth.auth_login("MrsIncredible@theincredibles.com", "shapeshifting")['token']
@@ -175,24 +175,24 @@ def test_channel_messages():
 
     # Create channels
     metroville_id = channels.channels_create(MrIncredible_token, "PublicChannel", True)['channel_id']
-    nomanisn_id = channels.channels_create(MrsIncredible_token, "PrivateChannel", True)['channel_id']
+    nomanisn_id = channels.channels_create(MrsIncredible_token, "PrivateChannel", False)['channel_id']
     channel.channel_join(Violet_token, metroville_id)
     channel.channel_join(Jack_token, metroville_id)
     channel.channel_join(Dash_token, nomanisn_id)
 
     # Channel ID is invalid
     with pytest.raises(InputError):
-        channel.channel_messages(MrIncredible_token, 1232123)
+        channel.channel_messages(MrIncredible_token, 1232123, 0)
     
     with pytest.raises(InputError):
-        channel.channel_messages(MrsIncredible_token, 1232129472)
+        channel.channel_messages(MrsIncredible_token, 1232129472, 0)
 
     # Authorised user is not part of the channel
     with pytest.raises(AccessError):
-        channel.channel_messages(MrsIncredible_token, metroville_id) # owner and not part of the channel
+        channel.channel_messages(MrsIncredible_token, metroville_id, 0) # owner and not part of the channel
     
     with pytest.raises(AccessError):
-        channel.channel_messages(Violet_token, nomanisn_id) # not owner and not part of the channel
+        channel.channel_messages(Violet_token, nomanisn_id, 0) # not owner and not part of the channel
 
     # Check start is greater than 
     
