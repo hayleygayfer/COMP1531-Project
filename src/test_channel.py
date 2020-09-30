@@ -158,19 +158,19 @@ def test_channel_details():
 def test_channel_messages():
     clear()
     # Create Users
-    MrIncredible_id = auth.auth_register("MrIncredible@theincredibles.com", "strength", "MrIncredible", "theincredibles")['u_id']
+    auth.auth_register("MrIncredible@theincredibles.com", "strength", "MrIncredible", "theincredibles")
     MrIncredible_token = auth.auth_login("MrIncredible@theincredibles.com", "strength")['token']
 
-    MrsIncredible_id = auth.auth_register("MrsIncredible@theincredibles.com", "shapeshifting", "MrsIncredible", "theincredibles")['u_id']
+    auth.auth_register("MrsIncredible@theincredibles.com", "shapeshifting", "MrsIncredible", "theincredibles")
     MrsIncredible_token = auth.auth_login("MrsIncredible@theincredibles.com", "shapeshifting")['token']
 
-    Violet_id = auth.auth_register("Violet@theincredibles.com", "invisible", "Violet", "theincredibles")['u_id']
+    auth.auth_register("Violet@theincredibles.com", "invisible", "Violet", "theincredibles")
     Violet_token = auth.auth_login("Violet@theincredibles.com", "invisible")['token']
 
-    Jack_id = auth.auth_register("Jack@theincredibles.com", "multiplication", "Jack", "theincredibles")['u_id']
+    auth.auth_register("Jack@theincredibles.com", "multiplication", "Jack", "theincredibles")
     Jack_token = auth.auth_login("Jack@theincredibles.com", "multiplication")['token']
 
-    Dash_id = auth.auth_register("Dash@theincredibles.com", "speed", "Dash", "theincredibles")['u_id']
+    auth.auth_register("Dash@theincredibles.com", "speed", "Dash", "theincredibles")
     Dash_token = auth.auth_login("Dash@theincredibles.com", "speed")['token']
 
     # Create channels
@@ -412,13 +412,13 @@ def test_channel_removeowner():
     buttercup_id = auth.auth_register("buttercup@powerpuff.com", "colourgreen", "buttercup", "powerpuff")['u_id']
     buttercup_token = auth.auth_login("buttercup@powerpuff.com", "colourgreen")['token']
 
-    person1_id = auth.auth_register("person1@people.com", "humannumber1", "person1", "human")['u_id']
+    auth.auth_register("person1@people.com", "humannumber1", "person1", "human")
     person1_token = auth.auth_login("person1@people.com", "humannumber1")['token']
 
     person2_id = auth.auth_register("person2@people.com", "humannumber2", "person2", "human")['u_id']
     person2_token = auth.auth_login("person2@people.com", "humannumber2")['token']
 
-    person3_id = auth.auth_register("person3@people.com", "humannumber3", "person3", "human")['u_id']
+    auth.auth_register("person3@people.com", "humannumber3", "person3", "human")
     person3_token = auth.auth_login("person3@people.com", "humannumber3")['token']
 
     # Create channel 
