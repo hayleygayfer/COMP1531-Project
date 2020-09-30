@@ -2,29 +2,36 @@
 from data import data
 from error import InputError, AccessError
 
-def channel_invite(token, channel_id, u_id):
+def channel_invite(token_inviter, channel_id, u_id_invitee):
     # If you invite someone (yourself included) to a channel that the user already exists in then raise InputError
-    # Matching the user and the token
-    for user in data['users']:
-        if user['token'] == token:
-            u_id = user['u_id']
-            name_first = user['name_first']
-            name_last = user['name_last']
     
+    if validate_token(token_inviter) == False:
+        raise AccessError(f"Not a valid token ")
+
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
-    
-    if validate_user(user_id) == False:
+
+    if validate_user(u_id_invitee) == False:
         raise InputError(f"The User ID: {u_id} entered is not a valid user ")
+    
+    # Matching the inviter and the token
+    for user in data['users']:
+        if user['token'] == token_inviter:
+            u_id_inviter = user['u_id']
+            name_first = user['name_first']
+            name_last = user['name_last']
 
-    if exists_in_channel(channel_id, u_id) == False:
-        raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
-
-    if invited_exists_in_channel(channel_id, token) == True:
+    if exists_in_channel(channel_id, u_id_invitee) == True:
         raise InputError(f"The User already exists in this Channel ")
+    
+    if exists_in_channel(channel_id, u_id_inviter) == False:
+        raise AccessError("User is not a part of the Channel ")
 
-    # Append the user to 'all_members' of the channel
+    # Append the user to 'all_members' of the channel after all tests are passed
+    append_data(channel_id, u_id, name_first, name_last)
+
     return {
+        'is_success': True
     }
 
 def channel_details(token, channel_id):
@@ -34,7 +41,6 @@ def channel_details(token, channel_id):
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
     
-    # Loop through all members of a channel, if not a member, cannot view details
     return {
         'name': 'Hayden',
         'owner_members': [
@@ -96,6 +102,10 @@ def channel_leave(token, channel_id):
     }
 
 def channel_join(token, channel_id):
+    
+    if validate_token(token_inviter) == False:
+        raise AccessError(f"Not a valid token ")
+
     # Matching the user and the token
     for user in data['users']:
         if user['token'] == token:
@@ -135,6 +145,14 @@ def channel_removeowner(token, channel_id, u_id):
     return {
     }
 
+
+
+def validate_token(token):
+    for users in data['users']:
+        if token == users['token']:
+            return True
+    return False
+
 def validate_channel(channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -159,15 +177,6 @@ def exists_in_channel(channel_id, u_id):
         if channel['channel_id'] == channel_id:
             for user in channel['all_members']:
                 if user['u_id'] == u_id:
-                    return True
-    return False
-
-# Needs to be revised
-def invited_exists_in_channel(channel_id, token):
-    for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
-            for user in channel['all_members']:
-                if user['token'] == token:
                     return True
     return False
    
