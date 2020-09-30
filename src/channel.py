@@ -35,6 +35,10 @@ def channel_invite(token_inviter, channel_id, u_id_invitee):
     }
 
 def channel_details(token, channel_id):
+
+    if validate_token(token) == False:
+        raise AccessError(f"Not a valid token ")
+
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
@@ -60,6 +64,10 @@ def channel_details(token, channel_id):
     }
 
 def channel_messages(token, channel_id, start):
+
+    if validate_token(token) == False:
+        raise AccessError(f"Not a valid token ")
+
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
@@ -82,6 +90,10 @@ def channel_messages(token, channel_id, start):
     }
 
 def channel_leave(token, channel_id):
+
+    if validate_token(token) == False:
+        raise AccessError(f"Not a valid token ")
+
     for user in data['users']:
         if user['token'] == token:
             u_id = user['u_id']
@@ -131,6 +143,10 @@ def channel_join(token, channel_id):
     }
 
 def channel_addowner(token, channel_id, u_id):
+
+    if validate_token(token) == False:
+        raise AccessError(f"Not a valid token ")
+
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
@@ -139,14 +155,17 @@ def channel_addowner(token, channel_id, u_id):
 
 def channel_removeowner(token, channel_id, u_id):
     # You are allowed to remove yourself as an owner
+
+    if validate_token(token) == False:
+        raise AccessError(f"Not a valid token ")
+
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
     return {
     }
 
-
-
+# Validation functions
 def validate_token(token):
     for users in data['users']:
         if token == users['token']:
@@ -165,6 +184,7 @@ def validate_user(u_id):
             return True
     return False
 
+# Check if channel is private
 def private_channel(channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -172,6 +192,7 @@ def private_channel(channel_id):
                 return False
     return True
 
+# Check if user exists within the channel
 def exists_in_channel(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -179,7 +200,8 @@ def exists_in_channel(channel_id, u_id):
                 if user['u_id'] == u_id:
                     return True
     return False
-   
+
+# Append data of user to channel where all members can see
 def append_data(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
