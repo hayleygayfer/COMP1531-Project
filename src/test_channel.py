@@ -193,7 +193,7 @@ def test_channel_messages():
     
     with pytest.raises(AccessError):
         channel.channel_messages(Violet_token, nomanisn_id) # not owner and not part of the channel
-        
+
     # Check start is greater than 
     
 
@@ -398,6 +398,11 @@ def test_channel_addowner():
 def test_channel_removeowner():
     clear()
     # Create users
+    # token -> remover 
+    # the ID is the person you are removing 
+    # The token belogs to either the owner of the channel or a global owner(Flockr owner)
+    # first owner is the owner of flocker 
+
     blossom_id = auth.auth_register("blossom@powerpuff.com", "colourpink", "blossom", "powerpuff")['u_id']
     blossom_token = auth.auth_login("blossom@powerpuff.com", "colourpink")['token']
 
@@ -407,10 +412,26 @@ def test_channel_removeowner():
     buttercup_id = auth.auth_register("buttercup@powerpuff.com", "colourgreen", "buttercup", "powerpuff")['u_id']
     buttercup_token = auth.auth_login("buttercup@powerpuff.com", "colourgreen")['token']
 
+    person1_id = auth.auth_register("person1@people.com", "humannumber1", "person1", "human")['u_id']
+    person1_token = auth.auth_login("person1@people.com", "humannumber1")['token']
+
+    person2_id = auth.auth_register("person2@people.com", "humannumber2", "person2", "human")['u_id']
+    person2_token = auth.auth_login("person2@people.com", "humannumber2")['token']
+
+    person3_id = auth.auth_register("person3@people.com", "humannumber3", "person3", "human")['u_id']
+    person3_token = auth.auth_login("person3@people.com", "humannumber3")['token']
+
     # Create channel 
     girls_channel_id = channels.channels_create(blossom_token, "girls_channel", True)['channel_id']
     power_channel_id = channels.channels_create(bubbles_token, "power_channel", True)['channel_id']
     channel.channel_join(buttercup_token, girls_channel_id)
+    channel.channel_join(person1_token, girls_channel_id)
+    channel.channel_join(person2_token, power_channel_id)
+    channel.channel_join(person3_token, power_channel_id)
+
+    # add new owners
+    channel.channel_addowner(blossom_token, girls_channel_id, buttercup_id) # Make buttercup an owner of girls 
+    channel.channel_addowner(bubbles_token, power_channel_id, person2_id) # make person 2 an owner of power 
 
     # Channel ID is not valid and invalid channel and invalid token
     with pytest.raises(InputError):
@@ -419,9 +440,9 @@ def test_channel_removeowner():
     with pytest.raises(InputError):
         channel.channel_removeowner(blossom_token, 13579, blossom_id)
 
-    # User id u_id is not an owner of the channel
+    # User id u_id is not an owner of the channel or flocker owner 
     with pytest.raises(InputError):
-        channel.channel_removeowner(buttercup_token, girls_channel_id, buttercup_id)
+        channel.channel_removeowner(person3_token, girls_channel_id, buttercup_id) # person 3 is not an owner 
 
     # Removing someone not in the channel
     with pytest.raises(InputError):
@@ -432,7 +453,6 @@ def test_channel_removeowner():
         channel.channel_removeowner(buttercup_token, girls_channel_id, blossom_id)
 
     # Checking that the removal works
-    channel.channel_addowner(blossom_token, girls_channel_id, buttercup_id)
     assert channel.channel_removeowner(buttercup_token, girls_channel_id, blossom_id)['is_success'] == True
     assert channel.channel_removeowner(buttercup_token, girls_channel_id, buttercup_id)['is_success'] == True
     assert channel.channel_removeowner(bubbles_token, power_channel_id, bubbles_id)['is_success'] == True
