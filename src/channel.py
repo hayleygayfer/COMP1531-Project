@@ -30,6 +30,9 @@ def channel_invite(token, channel_id, u_id):
 def channel_details(token, channel_id):
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
+    if exists_in_channel(channel_id, u_id) == False:
+        raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
     
     # Loop through all members of a channel, if not a member, cannot view details
     return {
@@ -53,6 +56,11 @@ def channel_details(token, channel_id):
 def channel_messages(token, channel_id, start):
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
+    # InputError (start is greater than the total number of messages in the channel)
+
+    if exists_in_channel(channel_id, u_id) == False:
+        raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
 
     return {
         'messages': [
@@ -80,6 +88,9 @@ def channel_leave(token, channel_id):
 
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
+    if exists_in_channel(channel_id, u_id) == False:
+        raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
 
     return {
     }
