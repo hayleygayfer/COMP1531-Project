@@ -168,6 +168,9 @@ def channel_addowner(token, channel_id, u_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    if is_token_owner(token, channel_id) == False:
+        raise AccessError("User is not an owner ")
+
     for user in data['users']:
         if user['token'] == token:
             u_id = user['u_id']
@@ -192,6 +195,9 @@ def channel_removeowner(token, channel_id, u_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    if is_token_owner(token, channel_id) == False:
+        raise AccessError("User is not an owner ")
+
     for user in data['users']:
         if user['token'] == token:
             u_id = user['u_id']
@@ -207,6 +213,7 @@ def channel_removeowner(token, channel_id, u_id):
     clear_user_owner(channel_id, u_id, name_first, name_last)
 
     return {
+        'is_success': True
     }
 
 # Validation functions
@@ -282,4 +289,15 @@ def clear_user_owner(channel_id, u_id, name_first, name_last):
             for owners in channel['owner_members']:
                 if owners['u_id'] == u_id:
                     owners.clear()
-                    
+
+def is_token_owner(token, channel_id):
+    for user in data['users']:
+        if token == users['token']:
+            owner_member_u_id = users['u_id']
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            for owners in channel['owner_members']:
+                if owner_member_u_id == owners['u_id']:
+                    return True
+    return False
+
