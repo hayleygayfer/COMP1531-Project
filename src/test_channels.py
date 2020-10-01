@@ -368,7 +368,7 @@ def test_public_private():
     assert channels.channels_listall(token1) == [
         {
             'channel_id': cpublic_id, 
-            'name': "channel_public", 
+            'name': "channels_public", 
             'all_members': [
                 {
                     'u_id': u1_id,
@@ -387,7 +387,7 @@ def test_public_private():
         },  
         {
             'channel_id': cprivate_id, 
-            'name': "channel_private", 
+            'name': "channels_private", 
             'all_members': [
                 {
                     'u_id': u1_id,
