@@ -13,6 +13,11 @@ CHANNEL.PY
 - The only ways to be in a private channel is if the user is the creator, or they got invited by a member
 - A user trying to join a private channel is denied (AccessError)
 - If a user has been invited to a private channel and they leave, then they cannot join that channel (AccessError)
+- If you are an owner you cannot remove yourself
+- If you are teh owner of Flockr you can remove another owner even if you are not in the channel 
+- If there is only one owner in the channel, that owner cannot leave or be removed - all channels must have at least one owner 
+- You can be an owner of one channel and a member of another channel 
+- 
 
 CHANNELS.PY
 - channels_listall does not require any authentication.
