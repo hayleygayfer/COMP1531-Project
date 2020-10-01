@@ -43,8 +43,6 @@ def channel_details(token, channel_id):
     for user in data['users']:
         if user['token'] == token:
             u_id = user['u_id']
-            name_first = user['name_first']
-            name_last = user['name_last']
 
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
@@ -316,7 +314,7 @@ def is_token_owner(token, channel_id):
     owner_member_u_id = 0
     for user in data['users']:
         if token == user['token']:
-            owner_member_u_id = users['u_id']
+            owner_member_u_id = user['u_id']
 
     if owner_member_u_id == 0:
         return False
