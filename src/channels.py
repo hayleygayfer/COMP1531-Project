@@ -1,5 +1,6 @@
 from data import data
 from error import InputError, AccessError
+import auth
 
 def channels_list(token):
     
@@ -22,9 +23,7 @@ def channels_list(token):
             if member['u_id'] == u_id:
                 channels.append(channel)
     
-    return {
-        'channels': channels
-    }
+    return channels
 
 def channels_listall(token):
 
@@ -38,9 +37,7 @@ def channels_listall(token):
         raise AccessError('Invalid Token')
 
     # List all channels (regardless of authentication)
-    return {
-        'channels': data['channels']
-    }
+    return data['channels']
 
 def channels_create(token, name, is_public):
 
@@ -66,9 +63,9 @@ def channels_create(token, name, is_public):
     channel = {
         'channel_id': len(data['channels']),
         'name': name,
-        'is_public': is_public,
         'all_members': [ channel_creator ],
-        'owner_members': [ channel_creator ]
+        'owner_members': [ channel_creator ],
+        'is_public': is_public,
     }
 
     data['channels'].append(channel)
