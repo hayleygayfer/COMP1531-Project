@@ -204,7 +204,7 @@ def test_channel_leave():
     auth.auth_register("diglett@pokemon.com", "arenatrap", "Diglett", "Pokemon")
     diglett_token = auth.auth_login("diglett@pokemon.com", "arenatrap")['token']
 
-    auth.auth_register("ponyta@pokemon.com", "horndrillXD", "Ponyta", "Pokemon")['u_id']
+    ponyta_id = auth.auth_register("ponyta@pokemon.com", "horndrillXD", "Ponyta", "Pokemon")['u_id']
     ponyta_token = auth.auth_login("ponyta@pokemon.com", "horndrillXD")['token']
 
     auth.auth_register("gyarados@pokemon.com", "notadragontype", "Gyarados", "Pokemon")
@@ -244,15 +244,12 @@ def test_channel_leave():
         channel.channel_leave(ponyta_token, 82372873)
     with pytest.raises(InputError):
         channel.channel_leave(dratini_token, 9374)
-    '''
-    ONLY USE THIS CODE IF WE DECIDE TO INCLUDE THE POSSIBLE ASSUMPTIONS IN THE .TXT FILE
 
     # Owners leaving channels
     with pytest.raises(InputError):
         channel.channel_leave(diglett_token, moleID) # If diglett leaves there are no owners
     channel.channel_addowner(diglett_token, moleID, ponyta_id)
     assert channel.channel_leave(diglett_token, moleID)['is_success'] == True # NOW Diglett can leave since Ponyta is an owner
-    '''
 
     '''
     MoleChannel: Ponyta (O)
