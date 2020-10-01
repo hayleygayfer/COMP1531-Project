@@ -112,6 +112,7 @@ def channel_leave(token, channel_id):
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
 
+    # Member leaves the channel and is cleared from all_members
     clear_user_member(channel_id, u_id, name_first, name_last)
 
     return {
@@ -278,6 +279,13 @@ def clear_user_member(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for members in channel['all_members']:
+                if members['u_id'] == u_id:
+                    members.clear()
+
+    # IF they are an owner they need to be cleared from owner_members
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            for members in channel['owner_members']:
                 if members['u_id'] == u_id:
                     members.clear()
 
