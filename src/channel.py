@@ -39,6 +39,13 @@ def channel_details(token, channel_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    # Matching the user and the token
+    for user in data['users']:
+        if user['token'] == token:
+            u_id = user['u_id']
+            name_first = user['name_first']
+            name_last = user['name_last']
+
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
@@ -70,6 +77,11 @@ def channel_messages(token, channel_id, start):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    # Matching the user and the token
+    for user in data['users']:
+        if user['token'] == token:
+            u_id = user['u_id']
+
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
@@ -96,15 +108,12 @@ def channel_leave(token, channel_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    # Matching the user and the token
     for user in data['users']:
         if user['token'] == token:
             u_id = user['u_id']
-
-    for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
-            for user in channel['all_members']:
-                if user['u_id'] == u_id:
-                    pass
+            name_first = user['name_first']
+            name_last = user['name_last']
 
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
@@ -121,7 +130,7 @@ def channel_leave(token, channel_id):
 
 def channel_join(token, channel_id):
 
-    if validate_token(token_inviter) == False:
+    if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
     # Matching the user and the token
@@ -153,6 +162,13 @@ def channel_addowner(token, channel_id, u_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    # Matching the user and the token
+    for user in data['users']:
+        if user['token'] == token:
+            u_id = user['u_id']
+            name_first = user['name_first']
+            name_last = user['name_last']
+
     if is_token_owner(token, channel_id) == False:
         raise AccessError("User is not an owner ")
 
@@ -179,6 +195,13 @@ def channel_removeowner(token, channel_id, u_id):
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
+
+    # Matching the user and the token
+    for user in data['users']:
+        if user['token'] == token:
+            u_id = user['u_id']
+            name_first = user['name_first']
+            name_last = user['name_last']
 
     if is_token_owner(token, channel_id) == False:
         raise AccessError("User is not an owner ")
@@ -224,7 +247,7 @@ def validate_user(u_id):
 def private_channel(channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            if status == channel['is_public']:
+            if channel['is_public'] is True:
                 return False
     return True
 
@@ -290,14 +313,18 @@ def clear_user_member(channel_id, u_id, name_first, name_last):
                     members.clear()
 
 def is_token_owner(token, channel_id):
+    owner_member_u_id = 0
     for user in data['users']:
-        if token == users['token']:
+        if token == user['token']:
             owner_member_u_id = users['u_id']
+
+    if owner_member_u_id == 0:
+        return False
             
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
                 if owner_member_u_id == owners['u_id']:
                     return True
-    return False
+    
 
