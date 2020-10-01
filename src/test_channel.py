@@ -91,12 +91,10 @@ def test_channel_invite_AccessErrors():
 
     # Regular members inviting other users
     with pytest.raises(AccessError):
-        channel.channel_invite(rudd_token, prv_id, gillard_id) # Rudd cannot invite Gillard to private
-    with pytest.raises(AccessError):
-        channel.channel_invite(rudd_token, prv_id, abbott_id) # Rudd cannot invite Abbott to public (since Rudd is not a member)
+        channel.channel_invite(rudd_token, pub_id, abbott_id) # Rudd cannot invite Abbott to public (since Rudd is not a member)
     
     assert channel.channel_invite(gillard_token, pub_id, rudd_id)['is_success'] == True # Gillard can invite Rudd to public
-    assert channel.channel_invite(rudd_token, prv_id, abbott_id)['is_success'] == True # NOW Rudd can invite Abbott
+    assert channel.channel_invite(rudd_token, pub_id, abbott_id)['is_success'] == True # NOW Rudd can invite Abbott
 
     '''
     Users: Scomo, Abbott, Rudd, Gillard
@@ -121,7 +119,7 @@ def test_channel_details():
     dorothy_token = auth.auth_login("dorothy@wizardofoz.com", "wantshome")['token']
 
     # Create channels 
-    yellowbrickroadID = channels.channels_create(scarecrow_token, "YellowBrickRoadChannel", True)['channel_id']
+    yellowbrickroadID = channels.channels_create(scarecrow_token, "YellowBrickRoad", True)['channel_id']
     emeraldcityID = channels.channels_create(tinman_token, "EmeraldCityChannel", True)['channel_id']
     channel.channel_join(cowardylion_token, yellowbrickroadID)
     channel.channel_join(dorothy_token, emeraldcityID)
@@ -141,7 +139,7 @@ def test_channel_details():
         channel.channel_details(cowardylion_token, emeraldcityID) # Not part of the channel just joining
     
     # Check return when valid 
-    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['name'] == 'YellowBrickRoadChannel'
+    assert channel.channel_details(scarecrow_token, yellowbrickroadID)['name'] == 'YellowBrickRoad'
     assert channel.channel_details(scarecrow_token, yellowbrickroadID)['owner_members'][0]['u_id'] == scarecrow_ID
     assert channel.channel_details(scarecrow_token, yellowbrickroadID)['owner_members'][0]['name_first'] == 'scarecrow'
     assert channel.channel_details(scarecrow_token, yellowbrickroadID)['owner_members'][0]['name_last'] == 'wizardofoz'
@@ -158,20 +156,20 @@ def test_channel_details():
 def test_channel_messages():
     clear()
     # Create Users
-    auth.auth_register("MrIncredible@theincredibles.com", "strength", "MrIncredible", "theincredibles")
-    MrIncredible_token = auth.auth_login("MrIncredible@theincredibles.com", "strength")['token']
+    auth.auth_register("mrincredible@theincredibles.com", "strength", "MrIncredible", "theincredibles")
+    MrIncredible_token = auth.auth_login("mrincredible@theincredibles.com", "strength")['token']
 
-    auth.auth_register("MrsIncredible@theincredibles.com", "shapeshifting", "MrsIncredible", "theincredibles")
-    MrsIncredible_token = auth.auth_login("MrsIncredible@theincredibles.com", "shapeshifting")['token']
+    auth.auth_register("mrsincredible@theincredibles.com", "shapeshifting", "MrsIncredible", "theincredibles")
+    MrsIncredible_token = auth.auth_login("mrsincredible@theincredibles.com", "shapeshifting")['token']
 
-    auth.auth_register("Violet@theincredibles.com", "invisible", "Violet", "theincredibles")
-    Violet_token = auth.auth_login("Violet@theincredibles.com", "invisible")['token']
+    auth.auth_register("violet@theincredibles.com", "invisible", "Violet", "theincredibles")
+    Violet_token = auth.auth_login("violet@theincredibles.com", "invisible")['token']
 
-    auth.auth_register("Jack@theincredibles.com", "multiplication", "Jack", "theincredibles")
-    Jack_token = auth.auth_login("Jack@theincredibles.com", "multiplication")['token']
+    auth.auth_register("jack@theincredibles.com", "multiplication", "Jack", "theincredibles")
+    Jack_token = auth.auth_login("jack@theincredibles.com", "multiplication")['token']
 
-    auth.auth_register("Dash@theincredibles.com", "speed", "Dash", "theincredibles")
-    Dash_token = auth.auth_login("Dash@theincredibles.com", "speed")['token']
+    auth.auth_register("dash@theincredibles.com", "speedyboi", "Dash", "theincredibles")
+    Dash_token = auth.auth_login("dash@theincredibles.com", "speedyboi")['token']
 
     # Create channels
     metroville_id = channels.channels_create(MrIncredible_token, "PublicChannel", True)['channel_id']
@@ -335,7 +333,7 @@ def test_channel_addowner():
 
     # Creating channels and adding users
     gods_channel_id = channels.channels_create(comp_token, "TheGods", True)['channel_id']
-    alt_channel_id = channels.channels_create(math_id, "Alternate", True)['channel_id']
+    alt_channel_id = channels.channels_create(math_token, "Alternate", True)['channel_id']
     channel.channel_invite(comp_token, gods_channel_id, math_id)
     channel.channel_invite(comp_token, gods_channel_id, engg_id)
     channel.channel_invite(math_token, gods_channel_id, engg_id)
@@ -409,13 +407,13 @@ def test_channel_removeowner():
     buttercup_id = auth.auth_register("buttercup@powerpuff.com", "colourgreen", "buttercup", "powerpuff")['u_id']
     buttercup_token = auth.auth_login("buttercup@powerpuff.com", "colourgreen")['token']
 
-    auth.auth_register("person1@people.com", "humannumber1", "person1", "human")
+    auth.auth_register("person1@people.com", "humannumber1", "person", "one")
     person1_token = auth.auth_login("person1@people.com", "humannumber1")['token']
 
-    person2_id = auth.auth_register("person2@people.com", "humannumber2", "person2", "human")['u_id']
+    person2_id = auth.auth_register("person2@people.com", "humannumber2", "person", "two")['u_id']
     person2_token = auth.auth_login("person2@people.com", "humannumber2")['token']
 
-    auth.auth_register("person3@people.com", "humannumber3", "person3", "human")
+    auth.auth_register("person3@people.com", "humannumber3", "person", "three")
     person3_token = auth.auth_login("person3@people.com", "humannumber3")['token']
 
     # Create channel 

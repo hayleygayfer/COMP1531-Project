@@ -71,7 +71,7 @@ def validate_email(email):
         return False
 
 def validate_first_name(name_first):
-    if not 0 < len(name_first) < 50:
+    if not 0 <= len(name_first) <= 50:
         return False
 
     for character in name_first:
@@ -80,7 +80,7 @@ def validate_first_name(name_first):
 
 
 def validate_last_name(name_last):
-    if not 0 < len(name_last) < 50:
+    if not 0 <= len(name_last) <= 50:
         return False
 
     for character in name_last:
