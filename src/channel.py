@@ -103,7 +103,7 @@ def channel_leave(token, channel_id):
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
 
-    if SIZE_OWNERS(channel_id) < 2:
+    if SIZE_OWNERS(channel_id) < 2 and is_token_owner(token, channel_id): 
         raise InputError("You are the only admin left in this channel. You cannot leave if you are the only admin")
 
     # Member leaves the channel and is cleared from all_members
@@ -113,7 +113,7 @@ def channel_leave(token, channel_id):
         'is_success': True
     }
 
-def channel_join(token, channel_id):
+def channel_join(token, channel_id):    
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -148,7 +148,7 @@ def channel_addowner(token, channel_id, u_id):
         raise AccessError(f"Not a valid token ")
 
     if exists_in_channel(channel_id, u_id) == False:
-        raise AccessError(f"The User is not a member of the Channel ID: {channel_id} ")
+        raise InputError(f"The User is not a member of the Channel ID: {channel_id} ")
 
     # Matching the user and the token
     for user in data['users']:
@@ -178,7 +178,7 @@ def channel_removeowner(token, channel_id, u_id):
         raise AccessError(f"Not a valid token ")
 
     if exists_in_channel(channel_id, u_id) == False:
-        raise AccessError(f"The User is not a member of the Channel ID: {channel_id} ")
+        raise InputError(f"The User is not a member of the Channel ID: {channel_id} ")
 
     # Matching the user and the token
     for user in data['users']:

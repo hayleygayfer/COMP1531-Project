@@ -373,7 +373,7 @@ def test_channel_addowner():
         channel.channel_addowner(math_token, alt_channel_id, comp_id) # Comp is not in AltChannel
 
     # After they join, then the above step is successful
-    channel.channel_join(comp_id, alt_channel_id)
+    channel.channel_join(comp_token, alt_channel_id)
     assert channel.channel_addowner(math_token, alt_channel_id, comp_id)['is_success'] == True
 
     # Testing with invalid channels/users
@@ -444,21 +444,26 @@ def test_channel_removeowner():
 
     # Removing someone not in the channel
     with pytest.raises(InputError):
-        channel.channel_removeowner(bubbles_token, girls_channel_id, blossom_id)
+        channel.channel_removeowner(bubbles_token, power_channel_id, blossom_id)
 
     # Removing someone without access permission
     with pytest.raises(AccessError):
-        channel.channel_removeowner(buttercup_token, girls_channel_id, blossom_id)
+        channel.channel_removeowner(person1_token, girls_channel_id, buttercup_id)
 
     # Checking that the removal works
     assert channel.channel_removeowner(blossom_token, girls_channel_id, buttercup_id)['is_success'] == True
-    assert channel.channel_removeowner(blossom_token, girls_channel_id, blossom_id)['is_success'] == True
     assert channel.channel_removeowner(bubbles_token, power_channel_id, bubbles_id)['is_success'] == True
 
     '''
-    Girls Channel: Person1
+    Girls Channel: Blossom (O), Person1
     Power Channel: Person2 (O), Person3
     '''
+
+    # Last owner in a channel
+    with pytest.raises(InputError):
+        channel.channel_removeowner(blossom_token, girls_channel_id, blossom_id)
+    with pytest.raises(InputError):
+        channel.channel_removeowner(person2_token, girls_channel_id, person2_id)
 
 def test_invalid_tokens():
     clear()
