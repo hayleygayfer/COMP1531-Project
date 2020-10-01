@@ -151,8 +151,6 @@ def test_channel_details():
     assert channel.channel_details(scarecrow_token, yellowbrickroadID)['all_members'][1]['name_last'] == 'wizardofoz'
 
 
-    
-
 def test_channel_messages():
     clear()
     # Create Users
@@ -336,7 +334,7 @@ def test_channel_addowner():
     alt_channel_id = channels.channels_create(math_token, "Alternate", True)['channel_id']
     channel.channel_invite(comp_token, gods_channel_id, math_id)
     channel.channel_invite(comp_token, gods_channel_id, engg_id)
-    channel.channel_invite(math_token, gods_channel_id, engg_id)
+    channel.channel_invite(math_token, alt_channel_id, engg_id)
 
     '''
     GodsChannel: Comp (O), Math, Eng
@@ -494,6 +492,10 @@ def test_invalid_tokens():
     with pytest.raises(AccessError):
         channel.channel_messages(232414, channel_id, 0)
 
+
+# TODO: Write tests for the admin privileges of the SlackR owner
+def test_slackr_owner():
+    pass
 
 # IGNORE THIS
 if __name__ == "__main__":

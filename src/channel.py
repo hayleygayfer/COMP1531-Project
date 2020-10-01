@@ -52,23 +52,7 @@ def channel_details(token, channel_id):
 
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            return {
-                'name': 'Hayden',
-                'owner_members': [
-                    {
-                        'u_id': 1,
-                        'name_first': 'Hayden',
-                        'name_last': 'Jacobs',
-                    }
-                ],
-                'all_members': [
-                    {
-                        'u_id': 1,
-                        'name_first': 'Hayden',
-                        'name_last': 'Jacobs',
-                    }
-                ],
-            }
+            return channel
 
 def channel_messages(token, channel_id, start):
 
@@ -160,21 +144,16 @@ def channel_addowner(token, channel_id, u_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    #TODO: exists in channel
+
     # Matching the user and the token
     for user in data['users']:
-        if user['token'] == token:
-            u_id = user['u_id']
+        if user['u_id'] == u_id:
             name_first = user['name_first']
             name_last = user['name_last']
 
     if is_token_owner(token, channel_id) == False:
         raise AccessError("User is not an owner ")
-
-    for user in data['users']:
-        if user['token'] == token:
-            u_id = user['u_id']
-            name_first = user['name_first']
-            name_last = user['name_last']
 
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
@@ -193,6 +172,8 @@ def channel_removeowner(token, channel_id, u_id):
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
+
+    # TODO: exists in channel
 
     # Matching the user and the token
     for user in data['users']:
@@ -225,19 +206,19 @@ def channel_removeowner(token, channel_id, u_id):
 # Validation functions
 def validate_token(token):
     for users in data['users']:
-        if token == users['token']:
+        if token == users.get('token'):
             return True
     return False
 
 def validate_channel(channel_id):
     for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
+        if channel.get('channel_id') == channel_id:
             return True
     return False
 
 def validate_user(u_id):
     for users in data['users']:
-        if users['u_id'] == u_id:
+        if users.get('u_id') == u_id:
             return True
     return False
 
@@ -245,7 +226,7 @@ def validate_user(u_id):
 def private_channel(channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            if channel['is_public'] is True:
+            if channel.get('is_public') is True:
                 return False
     return True
 
@@ -254,7 +235,7 @@ def exists_in_channel(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for user in channel['all_members']:
-                if user['u_id'] == u_id:
+                if user.get('u_id') == u_id:
                     return True
     return False
 
@@ -274,7 +255,7 @@ def user_is_owner(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owners['u_id'] == u_id:
+                if owners.get('u_id') == u_id:
                     return True
     return False
 
@@ -293,27 +274,27 @@ def clear_user_owner(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owners['u_id'] == u_id:
+                if owners.get('u_id') == u_id:
                     owners.clear()
 
 def clear_user_member(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for members in channel['all_members']:
-                if members['u_id'] == u_id:
+                if members.get('u_id') == u_id:
                     members.clear()
 
     # IF they are an owner they need to be cleared from owner_members
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for members in channel['owner_members']:
-                if members['u_id'] == u_id:
+                if members.get('u_id') == u_id:
                     members.clear()
 
 def is_token_owner(token, channel_id):
     owner_member_u_id = 0
     for user in data['users']:
-        if token == user['token']:
+        if token == user.get('token'):
             owner_member_u_id = user['u_id']
 
     if owner_member_u_id == 0:
@@ -322,6 +303,6 @@ def is_token_owner(token, channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owner_member_u_id == owners['u_id']:
+                if owner_member_u_id == owners.get('u_id'):
                     return True
     return False
