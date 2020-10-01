@@ -12,7 +12,7 @@ def channel_invite(token_inviter, channel_id, u_id_invitee):
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
     if validate_user(u_id_invitee) == False:
-        raise InputError(f"The User ID: {u_id} entered is not a valid user ")
+        raise InputError(f"The User ID: {u_id_invitee} entered is not a valid user ")
     
     # Matching the inviter and the token
     for user in data['users']:
@@ -254,7 +254,7 @@ def user_is_owner(channel_id, u_id):
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
                 if owners['u_id'] == u_id:
-                    return True:
+                    return True
     return False
 
 def append_user_owner(channel_id, u_id, name_first, name_last):
