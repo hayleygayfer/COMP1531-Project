@@ -103,6 +103,9 @@ def channel_leave(token, channel_id):
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
 
+    if SIZE_OWNERS(channel_id) < 2:
+        raise InputError("You are the only admin left in this channel. You cannot leave if you are the only admin")
+
     # Member leaves the channel and is cleared from all_members
     clear_user_member(channel_id, u_id, name_first, name_last)
 
@@ -144,7 +147,8 @@ def channel_addowner(token, channel_id, u_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
-    #TODO: exists in channel
+    if exists_in_channel(channel_id, u_id) == False:
+        raise AccessError(f"The User is not a member of the Channel ID: {channel_id} ")
 
     # Matching the user and the token
     for user in data['users']:
@@ -173,7 +177,8 @@ def channel_removeowner(token, channel_id, u_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
-    # TODO: exists in channel
+    if exists_in_channel(channel_id, u_id) == False:
+        raise AccessError(f"The User is not a member of the Channel ID: {channel_id} ")
 
     # Matching the user and the token
     for user in data['users']:
@@ -306,3 +311,11 @@ def is_token_owner(token, channel_id):
                 if owner_member_u_id == owners.get('u_id'):
                     return True
     return False
+
+
+def SIZE_OWNERS(channel_id):
+    owner_members = 0
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            owner_members = len(channel['owner_members'])
+    return owner_members
