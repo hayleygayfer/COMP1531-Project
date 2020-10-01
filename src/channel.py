@@ -204,7 +204,7 @@ def channel_removeowner(token, channel_id, u_id):
     if user_is_owner(channel_id, u_id) == False:
         raise InputError(f"User {u_id} is not an owner of the channel ")
 
-    remove_user_owner(channel_id, u_id, name_first, name_last)
+    clear_user_owner(channel_id, u_id, name_first, name_last)
 
     return {
     }
@@ -261,7 +261,7 @@ def user_is_owner(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owner_members['u_id'] == u_id:
+                if owners['u_id'] == u_id:
                     return True:
     return False
 
@@ -276,16 +276,10 @@ def append_user_owner(channel_id, u_id, name_first, name_last):
                 }
             )
 
-def remove_user_owner(channel_id, u_id, name_first, name_last):
+def clear_user_owner(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owner_members['u_id'] == u_id:
-                    channel['owner_members'].remove(
-                        {
-                            'u_id': u_id,
-                            'name_first': name_first,
-                            'name_last': name_last,
-                        }
-                    )
+                if owners['u_id'] == u_id:
+                    owners.clear()
                     
