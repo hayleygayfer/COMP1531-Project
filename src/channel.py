@@ -64,24 +64,6 @@ def channel_details(token, channel_id):
                     }
                 ],
             }
-    
-    return {
-        'name': 'Hayden',
-        'owner_members': [
-            {
-                'u_id': 1,
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-            }
-        ],
-        'all_members': [
-            {
-                'u_id': 1,
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-            }
-        ],
-    }
 
 def channel_messages(token, channel_id, start):
 
@@ -91,7 +73,7 @@ def channel_messages(token, channel_id, start):
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
-    # InputError (start is greater than the total number of messages in the channel)
+    # TODO: InputError (start is greater than the total number of messages in the channel)
 
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
@@ -129,6 +111,8 @@ def channel_leave(token, channel_id):
 
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
+
+    clear_user_member(channel_id, u_id, name_first, name_last)
 
     return {
         'is_success': True
@@ -290,10 +274,18 @@ def clear_user_owner(channel_id, u_id, name_first, name_last):
                 if owners['u_id'] == u_id:
                     owners.clear()
 
+def clear_user_member(channel_id, u_id, name_first, name_last):
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            for members in channel['all_members']:
+                if members['u_id'] == u_id:
+                    members.clear()
+
 def is_token_owner(token, channel_id):
     for user in data['users']:
         if token == users['token']:
             owner_member_u_id = users['u_id']
+            
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
