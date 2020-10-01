@@ -8,7 +8,6 @@ AUTH.PY ASSUMPTIONS
 
 CHANNEL.PY
 - You cannot invite someone (yourelf included) to a channel if the user already exists (InputError)
-- You cannot leave a channel if you are the only owner (InputError)
 - The only ways to be in a private channel is if the user is the creator, or they got invited by a member
 - A user trying to join a private channel is denied (AccessError)
 - If a user has been invited to a private channel and they leave, then they cannot join that channel (AccessError)

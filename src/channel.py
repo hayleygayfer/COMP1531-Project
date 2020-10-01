@@ -300,4 +300,3 @@ def is_token_owner(token, channel_id):
                 if owner_member_u_id == owners['u_id']:
                     return True
     return False
-
