@@ -15,7 +15,7 @@ def test_no_channels():
     auth.auth_register("person1@email.com", "password", "Person", "One")
     token1 = auth.auth_login("person1@email.com", "password")['token']
     # no channels created / joined
-    assert channels.channels_list(token1) == {}
+    assert channels.channels_list(token1) == []
 
 def test_user_in_no_channels():
     clear()
@@ -363,7 +363,9 @@ def test_public_private():
     token1 = auth.auth_login("person1@email.com", "password")['token']
 
     cpublic_id = channels.channels_create(token1, "channels_public", True)['channel_id']
+    print(cpublic_id)
     cprivate_id = channels.channels_create(token1, "channels_private", False)['channel_id']
+    print(cprivate_id)
 
     assert channels.channels_listall(token1) == [
         {
