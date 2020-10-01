@@ -168,15 +168,15 @@ def test_channel_messages():
     auth.auth_register("jack@theincredibles.com", "multiplication", "Jack", "theincredibles")
     Jack_token = auth.auth_login("jack@theincredibles.com", "multiplication")['token']
 
-    auth.auth_register("dash@theincredibles.com", "speedyboi", "Dash", "theincredibles")
-    Dash_token = auth.auth_login("dash@theincredibles.com", "speedyboi")['token']
+    Dash_id = auth.auth_register("dash@theincredibles.com", "speedyboi", "Dash", "theincredibles")['u_id']
+    auth.auth_login("dash@theincredibles.com", "speedyboi")
 
     # Create channels
     metroville_id = channels.channels_create(MrIncredible_token, "PublicChannel", True)['channel_id']
     nomanisn_id = channels.channels_create(MrsIncredible_token, "PrivateChannel", False)['channel_id']
     channel.channel_join(Violet_token, metroville_id)
     channel.channel_join(Jack_token, metroville_id)
-    channel.channel_join(Dash_token, nomanisn_id)
+    channel.channel_invite(MrsIncredible_token, nomanisn_id, Dash_id)
 
     # Channel ID is invalid
     with pytest.raises(InputError):
@@ -192,7 +192,7 @@ def test_channel_messages():
     with pytest.raises(AccessError):
         channel.channel_messages(Violet_token, nomanisn_id, 0) # not owner and not part of the channel
 
-    # Check start is greater than 
+    # TODO: Tests involving start and outputting messages
     
 
 # channel_leave returns a dictionary {is_success: True/False}
@@ -491,10 +491,8 @@ def test_invalid_tokens():
         channel.channel_addowner(23141, channel_id, jerry_id)
     with pytest.raises(AccessError):
         channel.channel_removeowner(23141, channel_id, tom_id)
-    '''
     with pytest.raises(AccessError):
-        channel.channel_messages(232414, channel_id, start)
-    '''
+        channel.channel_messages(232414, channel_id, 0)
 
 
 # IGNORE THIS
