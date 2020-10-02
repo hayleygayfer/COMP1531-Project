@@ -18,6 +18,10 @@ def channel_invite(token_inviter, channel_id, u_id_invitee):
     for user in data['users']:
         if user['token'] == token_inviter:
             u_id_inviter = user['u_id']
+
+    # Find name and last name of invitee
+    for user in data['users']:
+        if user['u_id'] == u_id_invitee:
             name_first = user['name_first']
             name_last = user['name_last']
 
