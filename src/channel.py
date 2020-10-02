@@ -12,7 +12,7 @@ def channel_invite(token_inviter, channel_id, u_id_invitee):
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
     if validate_user(u_id_invitee) == False:
-        raise InputError(f"The User ID: {u_id} entered is not a valid user ")
+        raise InputError(f"The User ID: {u_id_invitee} entered is not a valid user ")
     
     # Matching the inviter and the token
     for user in data['users']:
@@ -39,6 +39,11 @@ def channel_details(token, channel_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    # Matching the user and the token
+    for user in data['users']:
+        if user['token'] == token:
+            u_id = user['u_id']
+
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
@@ -47,28 +52,17 @@ def channel_details(token, channel_id):
 
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            return {
-                'name': 'Hayden',
-                'owner_members': [
-                    {
-                        'u_id': 1,
-                        'name_first': 'Hayden',
-                        'name_last': 'Jacobs',
-                    }
-                ],
-                'all_members': [
-                    {
-                        'u_id': 1,
-                        'name_first': 'Hayden',
-                        'name_last': 'Jacobs',
-                    }
-                ],
-            }
+            return channel
 
 def channel_messages(token, channel_id, start):
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
+
+    # Matching the user and the token
+    for user in data['users']:
+        if user['token'] == token:
+            u_id = user['u_id']
 
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
@@ -96,21 +90,21 @@ def channel_leave(token, channel_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    # Matching the user and the token
     for user in data['users']:
         if user['token'] == token:
             u_id = user['u_id']
-
-    for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
-            for user in channel['all_members']:
-                if user['u_id'] == u_id:
-                    pass
+            name_first = user['name_first']
+            name_last = user['name_last']
 
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
+
+    if SIZE_OWNERS(channel_id) < 2 and is_token_owner(token, channel_id): 
+        raise InputError("You are the only admin left in this channel. You cannot leave if you are the only admin")
 
     # Member leaves the channel and is cleared from all_members
     clear_user_member(channel_id, u_id, name_first, name_last)
@@ -119,9 +113,9 @@ def channel_leave(token, channel_id):
         'is_success': True
     }
 
-def channel_join(token, channel_id):
+def channel_join(token, channel_id):    
 
-    if validate_token(token_inviter) == False:
+    if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
     # Matching the user and the token
@@ -153,14 +147,17 @@ def channel_addowner(token, channel_id, u_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
-    if is_token_owner(token, channel_id) == False:
-        raise AccessError("User is not an owner ")
+    if exists_in_channel(channel_id, u_id) == False:
+        raise InputError(f"The User is not a member of the Channel ID: {channel_id} ")
 
+    # Matching the user and the token
     for user in data['users']:
-        if user['token'] == token:
-            u_id = user['u_id']
+        if user['u_id'] == u_id:
             name_first = user['name_first']
             name_last = user['name_last']
+
+    if is_token_owner(token, channel_id) == False:
+        raise AccessError("User is not an owner ")
 
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
@@ -179,6 +176,16 @@ def channel_removeowner(token, channel_id, u_id):
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
+
+    if exists_in_channel(channel_id, u_id) == False:
+        raise InputError(f"The User is not a member of the Channel ID: {channel_id} ")
+
+    # Matching the user and the token
+    for user in data['users']:
+        if user['token'] == token:
+            u_id = user['u_id']
+            name_first = user['name_first']
+            name_last = user['name_last']
 
     if is_token_owner(token, channel_id) == False:
         raise AccessError("User is not an owner ")
@@ -204,19 +211,19 @@ def channel_removeowner(token, channel_id, u_id):
 # Validation functions
 def validate_token(token):
     for users in data['users']:
-        if token == users['token']:
+        if token == users.get('token'):
             return True
     return False
 
 def validate_channel(channel_id):
     for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
+        if channel.get('channel_id') == channel_id:
             return True
     return False
 
 def validate_user(u_id):
     for users in data['users']:
-        if users['u_id'] == u_id:
+        if users.get('u_id') == u_id:
             return True
     return False
 
@@ -224,7 +231,7 @@ def validate_user(u_id):
 def private_channel(channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            if status == channel['is_public']:
+            if channel.get('is_public') is True:
                 return False
     return True
 
@@ -233,7 +240,7 @@ def exists_in_channel(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for user in channel['all_members']:
-                if user['u_id'] == u_id:
+                if user.get('u_id') == u_id:
                     return True
     return False
 
@@ -253,8 +260,8 @@ def user_is_owner(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owners['u_id'] == u_id:
-                    return True:
+                if owners.get('u_id') == u_id:
+                    return True
     return False
 
 def append_user_owner(channel_id, u_id, name_first, name_last):
@@ -272,31 +279,43 @@ def clear_user_owner(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owners['u_id'] == u_id:
+                if owners.get('u_id') == u_id:
                     owners.clear()
 
 def clear_user_member(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for members in channel['all_members']:
-                if members['u_id'] == u_id:
+                if members.get('u_id') == u_id:
                     members.clear()
 
     # IF they are an owner they need to be cleared from owner_members
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for members in channel['owner_members']:
-                if members['u_id'] == u_id:
+                if members.get('u_id') == u_id:
                     members.clear()
 
 def is_token_owner(token, channel_id):
+    owner_member_u_id = 0
     for user in data['users']:
-        if token == users['token']:
-            owner_member_u_id = users['u_id']
+        if token == user.get('token'):
+            owner_member_u_id = user['u_id']
+
+    if owner_member_u_id == 0:
+        return False
             
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owner_member_u_id == owners['u_id']:
+                if owner_member_u_id == owners.get('u_id'):
                     return True
     return False
+
+
+def SIZE_OWNERS(channel_id):
+    owner_members = 0
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            owner_members = len(channel['owner_members'])
+    return owner_members
