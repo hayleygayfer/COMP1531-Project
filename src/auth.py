@@ -64,7 +64,7 @@ def auth_register(email, password, name_first, name_last):
     }
 
 def validate_email(email):
-    regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+    regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
     if search(regex, email):  
         return True    
     else:  
