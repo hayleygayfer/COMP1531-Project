@@ -30,7 +30,6 @@ def channels_listall(token):
     # Check for authentication
     for user in data['users']:
         if user['token'] == token:
-            u_id = user['u_id']
             validated = True
     
     if not validated:
