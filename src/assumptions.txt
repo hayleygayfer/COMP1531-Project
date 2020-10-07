@@ -11,7 +11,11 @@ CHANNEL.PY
 - The only ways to be in a private channel is if the user is the creator, or they got invited by a member
 - A user trying to join a private channel is denied (AccessError)
 - If a user has been invited to a private channel and they leave, then they cannot join that channel (AccessError)
-- If you are an owner you can remove yourself
+- If you are an owner you cannot remove yourself
+- You cannot have a channel without an owner in it
+- The Flock owner has to be present in the channel, either as owner or not to remove another owner
+- If the Flock owner leaves, the second user becomes the new Flock owner 
+
 
 CHANNELS.PY
 - channels_listall does not require any authentication.
