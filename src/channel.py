@@ -158,7 +158,7 @@ def channel_addowner(token, channel_id, u_id):
             name_first = user['name_first']
             name_last = user['name_last']
 
-    if (is_token_owner(token, channel_id) == False) or (is_token_flockr_owner(token) == False):
+    if (is_token_owner(token, channel_id) == False) and (is_token_flockr_owner(token) == False):
         raise AccessError("User is not an owner or owner of the Flockr")
 
     if validate_channel(channel_id) == False:
