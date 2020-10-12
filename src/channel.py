@@ -286,21 +286,21 @@ def clear_user_owner(channel_id, u_id, name_first, name_last):
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
                 if owners.get('u_id') == u_id:
-                    owners.clear()
+                    channel['owner_members'].remove(owners)
 
 def clear_user_member(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for members in channel['all_members']:
                 if members.get('u_id') == u_id:
-                    members.clear()
+                    channel['all_members'].remove(members)
 
     # IF they are an owner they need to be cleared from owner_members
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for members in channel['owner_members']:
                 if members.get('u_id') == u_id:
-                    members.clear()
+                    channel['owner_members'].remove(members)
 
 def is_token_owner(token, channel_id):
     owner_member_u_id = 0
