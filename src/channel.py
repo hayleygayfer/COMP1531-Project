@@ -189,8 +189,16 @@ def channel_removeowner(token, channel_id, u_id):
             name_first = user['name_first']
             name_last = user['name_last']
 
-    if is_token_owner(token, channel_id) == False:
+    if (is_token_owner(token, channel_id) == False):
         raise AccessError("User is not an owner of the channel")
+
+        # TODO: If we are to make these changes, we fail two more tests
+    '''
+    
+    if (is_token_owner(token, channel_id) == False) and (is_token_flockr_owner(token) == False):
+        raise AccessError("User is not an owner of the channel")
+
+    '''
 
     for user in data['users']:
         if user['token'] == token:
