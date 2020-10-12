@@ -328,6 +328,6 @@ def SIZE_OWNERS(channel_id):
 
 def is_token_flockr_owner(token):
     for users in data['users']:
-        if token == users[0]['token']:
+        if token == users[0].get('token'):
             return True
     return False
