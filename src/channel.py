@@ -43,6 +43,9 @@ def channel_details(token, channel_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    if validate_channel(channel_id) == False:
+        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
     # Matching the user and the token
     for user in data['users']:
         if user['token'] == token:
@@ -182,6 +185,9 @@ def channel_removeowner(token, channel_id, u_id):
     if exists_in_channel(channel_id, u_id) == False:
         raise InputError(f"The User is not a member of the Channel ID: {channel_id} ")
 
+    if user_is_owner(channel_id, u_id) == False:
+        raise InputError(f"User {u_id} is already an owner of the channel ")
+
     # Matching the user and the token
     for user in data['users']:
         if user['token'] == token:
@@ -191,20 +197,15 @@ def channel_removeowner(token, channel_id, u_id):
 
     if (is_token_owner(token, channel_id) == False):
         raise AccessError("User is not an owner of the channel")
+    
 
-        # TODO: If we are to make these changes, we fail two more tests
+    # TODO: If we are to make these changes, we fail two more tests
     '''
     
     if (is_token_owner(token, channel_id) == False) and (is_token_flockr_owner(token) == False):
         raise AccessError("User is not an owner of the channel")
 
     '''
-
-    for user in data['users']:
-        if user['token'] == token:
-            u_id = user['u_id']
-            name_first = user['name_first']
-            name_last = user['name_last']
 
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")

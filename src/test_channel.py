@@ -106,8 +106,7 @@ def test_view_details(data):
     assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][0]['u_id'] == data['p1_id']
     assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][0]['name_first'] == 'Personone'
     assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][0]['name_last'] == 'One'
-    assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][1] == {} # Person2 left
-    assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][2]['u_id'] == data['p5_id']
+    assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][1]['u_id'] == data['p5_id'] # Person2 left
 
     # View details of private channel
     assert ch.channel_details(data['p2_token'], data['private_id'])['name'] == 'PrivateChannel'
