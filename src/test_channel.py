@@ -419,7 +419,7 @@ def test_flockr_leaving_channel(data):
     assert ch.channel_leave(data['flockr_owner_token'], data['public_id'])
 
     # Leaving a channel with no owners
-    ch.channel_invite(data['p1_id'], data['public_id'], data['p3_token'])
+    ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
     ch.channel_join(data['flockr_owner_token'], data['public_id'])
     ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
     
