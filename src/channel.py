@@ -131,9 +131,7 @@ def channel_join(token, channel_id):
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
     
     if private_channel(channel_id) == True:
-        if is_token_flockr_owner(token) == True:
-            break
-        else:
+        if is_token_flockr_owner(token) == False:
             raise AccessError(f"The Channel ID: {channel_id} entered is a private channel ")
 
     if exists_in_channel(channel_id, u_id) == True:
@@ -204,9 +202,7 @@ def channel_removeowner(token, channel_id, u_id):
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
     if user_is_owner(channel_id, u_id) == False:
-        if is_token_flockr_owner(token) == True:
-            break
-        else:
+        if is_token_flockr_owner(token) == False:
             raise InputError(f"User {u_id} is not an owner of the channel ")
 
     clear_user_owner(channel_id, u_id, name_first, name_last)
