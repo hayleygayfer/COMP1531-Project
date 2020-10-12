@@ -48,9 +48,6 @@ def channel_details(token, channel_id):
         if user['token'] == token:
             u_id = user['u_id']
 
-    if validate_channel(channel_id) == False:
-        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
-
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
 
