@@ -363,6 +363,13 @@ def test_invalid_tokens(data):
         ch.channel_messages(232414, data['public_id'], 0)
 
 
+# The FlockR owner is allowed to add standard users as owners
+# even if they are not an owner of the channel
+def test_flockr_addowner_success(data):
+    ch.channel_join(data['flockr_owner_token'], data['public_id'])
+    ch.channel_join(data['p3_token'], data['public_id'])
+    assert ch.channel_addowner(data['flockr_onwer_token'], data['public_id'], data['p3_id'])
+
 
 # FlockR owner must to be a member of the channel to remove an owner
 # They don't necessarily have to be a channel owner 
@@ -386,6 +393,13 @@ def test_flockr_join_private(data):
     assert ch.channel_join(data['flockr_owner_token'], data['private_id'])
     assert ch.channel_leave(data['flockr_owner_token'], data['private_id'])
     assert ch.channel_join(data['flockr_owner_token'], data['private_id'])
+
+
+# FlockR owners are allowed to invite anyone who is not currently in the private channel
+# even when they are not an owner of the channel
+def test_flockr_invite_private(data):
+    ch.channel_invite(data['p2_token'], data['private_id'], data['flockr_owner_id'])
+    assert ch.channel_invite(data['flockr_owner_token'], data['private_id'], data['p3_id'])
 
 
 # Adding the FlockR owner as a channel owner doesn't change much
