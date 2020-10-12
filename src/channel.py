@@ -157,8 +157,8 @@ def channel_addowner(token, channel_id, u_id):
             name_first = user['name_first']
             name_last = user['name_last']
 
-    if is_token_owner(token, channel_id) == False:
-        raise AccessError("User is not an owner ")
+    if (is_token_owner(token, channel_id) == False) or (is_token_flockr_owner(token) == False):
+        raise AccessError("User is not an owner or owner of the Flockr")
 
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
@@ -189,7 +189,7 @@ def channel_removeowner(token, channel_id, u_id):
             name_last = user['name_last']
 
     if is_token_owner(token, channel_id) == False:
-        raise AccessError("User is not an owner ")
+        raise AccessError("User is not an owner of the channel")
 
     for user in data['users']:
         if user['token'] == token:
@@ -201,13 +201,19 @@ def channel_removeowner(token, channel_id, u_id):
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
     if user_is_owner(channel_id, u_id) == False:
-        raise InputError(f"User {u_id} is not an owner of the channel ")
+        if is_token_flockr_owner(token) == True:
+            return
+        else:
+            raise InputError(f"User {u_id} is not an owner of the channel ")
 
     clear_user_owner(channel_id, u_id, name_first, name_last)
 
     return {
         'is_success': True
     }
+
+# TODO: Function prototypes currently working on
+
 
 # Validation functions
 def validate_token(token):
@@ -320,3 +326,9 @@ def SIZE_OWNERS(channel_id):
         if channel['channel_id'] == channel_id:
             owner_members = len(channel['owner_members'])
     return owner_members
+
+def is_token_flockr_owner(token):
+    for users in data['users']:
+        if token == users[0]['token']:
+            return True
+    return False
