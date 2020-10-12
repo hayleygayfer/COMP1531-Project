@@ -131,7 +131,10 @@ def channel_join(token, channel_id):
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
     
     if private_channel(channel_id) == True:
-        raise AccessError(f"The Channel ID: {channel_id} entered is a private channel ")
+        if is_token_flockr_owner(token) == True:
+            return
+        else:
+            raise AccessError(f"The Channel ID: {channel_id} entered is a private channel ")
 
     if exists_in_channel(channel_id, u_id) == True:
         raise InputError(f"You are already a member of the Channel ID: {channel_id} ")
