@@ -1,6 +1,7 @@
 import pytest
 import auth
 import user
+
 from error import InputError, AccessError
 from other import clear
 from data import data
@@ -136,6 +137,51 @@ def test_duplicate_email(userObject):
     # Checks for duplicate email
     with pytest.raises(InputError):
         user.user_setemail(userObject['token'], 'steverodgers@avengers.com')
+
+ def test_invalid_token_set_email(userObject):
+    # Invalid Token
+    with pytest.raises(AccessError):
+        user.user_setemail('invalidtoken', 'tony@avengers.com')
+
+
+###### User Profile Sethandle ######
+
+# Valid Cases
+
+def test_valid_set_handle(userObject):
+    initialUser = retrieveUser(userObject['u_id'])
+
+    # Tests initial name
+    assert initialUser['handle_str'] == 'tonystark'
+    user.user_sethandle(userObject['token'], 'tony')
+    updatedUser = retrieveUser(userObject['u_id'])
+
+    # Tests changed name
+    assert updatedUser['handle_str'] == 'tony'
+
+# Invalid Cases
+
+
+def test_invalid_set_handle(userObject):
+
+    # Handle Already Exists
+    auth.auth_register("steverodgers@avengers.com", "password", "Steve", "Rodgers")
+    with pytest.raises(InputError):
+        user.user_sethandle(userObject['token'], 'steverodgers')
+    
+    # Edge Case: 3 characters handle (not inclusive)
+    with pytest.raises(InputError):
+        user.user_sethandle(userObject['token'], 'ton')
+
+    # Edge Case: 20 Characters
+    with pytest.raises(InputError):
+        user.user_sethandle(userObject['token'], 'tony1234567891011121')
+
+    
+def test_invalid_token_set_handle(userObject):
+    # Invalid Token
+    with pytest.raises(AccessError):
+        user.user_sethandle('invalidtoken', 'tony')
 
 
 ###### Helper Functions ######
