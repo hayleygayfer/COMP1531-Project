@@ -90,10 +90,11 @@ def test_view_details(data):
     ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
     ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
     ch.channel_join(data['p5_token'], data['public_id'])
+    ch.channel_removeowner(data['p3_token'], data['private_id'], data['p2_id'])
 
     '''
     Public: Person1 (O), Person2, Person5
-    Private: Person2 (O), Person3 (O), Person4
+    Private: Person2, Person3 (O), Person4
     '''
     ch.channel_leave(data['p2_token'], data['public_id'])
 
@@ -110,10 +111,9 @@ def test_view_details(data):
 
     # View details of private channel
     assert ch.channel_details(data['p2_token'], data['private_id'])['name'] == 'PrivateChannel'
-    assert ch.channel_details(data['p2_token'], data['private_id'])['owner_members'][0]['u_id'] == data['p2_id']
-    assert ch.channel_details(data['p2_token'], data['private_id'])['owner_members'][0]['name_first'] == 'Persontwo'
-    assert ch.channel_details(data['p2_token'], data['private_id'])['owner_members'][0]['name_last'] == 'Two'
-    assert ch.channel_details(data['p2_token'], data['private_id'])['owner_members'][1]['u_id'] == data['p3_id']
+    assert ch.channel_details(data['p2_token'], data['private_id'])['owner_members'][0]['u_id'] == data['p3_id'] # Since Person2 got removed
+    assert ch.channel_details(data['p2_token'], data['private_id'])['owner_members'][0]['name_first'] == 'Personthree'
+    assert ch.channel_details(data['p2_token'], data['private_id'])['owner_members'][0]['name_last'] == 'Three'
 
     assert ch.channel_details(data['p2_token'], data['private_id'])['all_members'][0]['u_id'] == data['p2_id']
     assert ch.channel_details(data['p2_token'], data['private_id'])['all_members'][0]['name_first'] == 'Persontwo'
@@ -380,6 +380,15 @@ def test_flockr_removeowner_success(data):
 
 
 # If the flockR owner is not part of the channel, they don't get any piviledges
+def test_flockr_addowner_but_not_member(data):
+    ch.channel_join(data['p3_token'], data['public_id'])
+    ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
+    with pytest.raises(AccessError):
+        ch.channel_addowner(data['flockr_owner_token'], data['public_id'], data['p3_id'])
+        ch.channel_addowner(data['flockr_owner_token'], data['private_id'], data['p4_id'])
+
+
+# If the flockR owner is not part of the channel, they don't get any piviledges
 def test_flockr_removeowner_but_not_member(data):
     with pytest.raises(AccessError):
         ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
@@ -408,7 +417,7 @@ def test_add_flockr_as_owner(data):
         ch.channel_addowner(data['p1_token'], data['public_id'], data['flockr_owner_id'])
 
     assert ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
 
 
