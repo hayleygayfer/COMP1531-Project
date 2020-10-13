@@ -111,6 +111,31 @@ def test_valid_set_email(userObject):
 
 # Invalid Cases
 
+def test_invalid_set_email(userObject):
+    # Invalid Email Formats
+
+    # Missing @ in email
+    with pytest.raises(InputError):
+        user.user_setemail(userObject['token'], 'tonystark.com')
+        
+    # Missing domain in email
+    with pytest.raises(InputError):
+        user.user_setemail(userObject['token'], 'tonystark@.com')
+        
+    # Invalid character in email username
+    with pytest.raises(InputError):
+        user.user_setemail(userObject['token'], 'tony$tark@avengers.com')
+        
+    # Missing email username
+    with pytest.raises(InputError):
+        user.user_setemail(userObject['token'], '@avengers.com')
+
+def test_duplicate_email(userObject):
+    auth.auth_register("steverodgers@avengers.com", "password", "Steve", "Rodgers")
+
+    # Checks for duplicate email
+    with pytest.raises(InputError):
+        user.user_setemail(userObject['token'], 'steverodgers@avengers.com')
 
 
 ###### Helper Functions ######
