@@ -41,7 +41,11 @@ OUTPUT: { message_id }
 
 # VALID CASES #
 def test_message_user_owner(flockr_state):
-    pass
+    
+    message1 = message_send(token1, c1_id, "This is the first message in the channel")
+    message_in_channel = channel.channel_message(token1, c1_id, 0)['messages']
+    message_id_at_index_zero = message_in_channel[0]['message_id']
+    assert message1 == message_id_at_index_zero
 
 def test_message_user_member(flockr_state):
     pass
