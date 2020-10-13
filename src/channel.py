@@ -191,14 +191,17 @@ def channel_removeowner(token, channel_id, u_id):
     # Matching the user and the token
     for user in data['users']:
         if user['token'] == token:
+            if u_id == user['u_id']:
+                raise InputError("You cannot remove yourself as owner")
             u_id = user['u_id']
             name_first = user['name_first']
             name_last = user['name_last']
 
-    if (is_token_owner(token, channel_id) == False):
+    if (is_token_owner(token, channel_id) == False) and (is_token_flockr_owner(token) == False):
         raise AccessError("User is not an owner of the channel")
     
-
+    # TODO: If the flockr owner removes the only owner, he/she becomes the new owner
+    
     # TODO: If we are to make these changes, we fail two more tests
     '''
     

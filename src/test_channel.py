@@ -298,7 +298,6 @@ def test_self_removeowner(data):
     with pytest.raises(InputError):
         ch.channel_removeowner(data['p1_token'], data['public_id'], data['p1_id']) # Can't remove yourself
     
-    ch.channel_removeowner(data['p3_token'], data['public_id'], data['p3_id'])
     with pytest.raises(InputError):
         ch.channel_removeowner(data['p3_token'], data['public_id'], data['p3_id']) # Can't remove yourself (last owner)
 
