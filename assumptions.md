@@ -24,9 +24,12 @@
 * A user cannot join a private channel unless they are the FlockR owner
     * The only way for them to enter a private channel is to be invited by an owner of that channel
 * An owner is not allowed to remove themselves
-* A channel without a channel owner cannot exist
-    * However, an exception to this is if the FlockR owner is a part of that channel
 * For the FlockR owner to have channel permissions, then they must be a part of that channel
+    * This means that they don't have to be a channel owner to do so
+* A channel without a channel owner cannot exist (FlockR owner excepted - see below)
+* The Flockr owner has the right to remove any owner
+    * If the Flockr owner removes the last owner of a channel, then they automatically become a channel owner
+
 
 ## CHANNELS.PY
 
