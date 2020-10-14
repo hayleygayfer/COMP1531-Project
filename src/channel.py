@@ -110,6 +110,14 @@ def channel_leave(token, channel_id):
     if SIZE_OWNERS(channel_id) < 2 and is_token_owner(token, channel_id): 
         raise InputError("You are the only admin left in this channel. You cannot leave if you are the only admin")
 
+    ####
+    # Test for flockr owner leaving channel
+    if (is_token_flockr_owner(token) == True):
+        if (is_token_owner(token, channel_id) == True):
+            if (SIZE_OWNERS(channel_id) == 1):
+                raise InputError("There are no other owners left in this channel")
+    ####
+
     # Member leaves the channel and is cleared from all_members
     clear_user_member(channel_id, u_id, name_first, name_last)
 
@@ -223,10 +231,18 @@ def channel_removeowner(token, channel_id, u_id):
             name_last = user['name_last']
 
     # If the flockr owner removes the only owner, he/she becomes the new owner
-    if is_token_flockr_owner(token) == True:
+    
+    ####
+    if token == data['users'][0].get('token'):
+        flockr_owner_u_id = user['u_id']
+        flockr_owner_name_first = user['name_first']
+        flockr_owner_name_last = user['name_last']
+
+    if is_token_flockr_owner(token) == True and is_token_owner(token, channel_id) == False:
         if user_is_owner(channel_id, u_id) == True:
             if SIZE_OWNERS(channel_id) == 1:
-                append_user_owner(channel_id, u_id, name_first, name_last)
+                append_user_owner(channel_id, flockr_owner_u_id, flockr_owner_name_first, flockr_owner_name_last)
+    ####
 
     clear_user_owner(channel_id, u_id, name_first, name_last)
 
