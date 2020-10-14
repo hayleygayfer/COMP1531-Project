@@ -233,14 +233,13 @@ def channel_removeowner(token, channel_id, u_id):
     # If the flockr owner removes the only owner, he/she becomes the new owner
     
     ####
-    if token == data['users'][0].get('token'):
-        flockr_owner_u_id = user['u_id']
-        flockr_owner_name_first = user['name_first']
-        flockr_owner_name_last = user['name_last']
+    flockr_owner_u_id = data['users'][0].get('u_id')
+    flockr_owner_name_first = data['users'][0].get('name_first')
+    flockr_owner_name_last = data['users'][0].get('name_last')
 
     if is_token_flockr_owner(token) == True and is_token_owner(token, channel_id) == False:
         if user_is_owner(channel_id, u_id) == True:
-            if SIZE_OWNERS(channel_id) == 1:
+            if SIZE_OWNERS(channel_id) == 1:    
                 append_user_owner(channel_id, flockr_owner_u_id, flockr_owner_name_first, flockr_owner_name_last)
     ####
 
