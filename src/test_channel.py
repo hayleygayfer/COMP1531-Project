@@ -191,6 +191,7 @@ def test_join_public(data):
 def test_join_private(data):
     with pytest.raises(AccessError):
         ch.channel_join(data['p1_token'], data['private_id'])
+    with pytest.raises(AccessError):
         ch.channel_join(data['p3_token'], data['private_id'])
 
 
