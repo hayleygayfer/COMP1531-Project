@@ -54,6 +54,7 @@ def test_invite_existing(data):
 
     with pytest.raises(InputError):
         ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id']) # already in channel
+    with pytest.raises(InputError):
         ch.channel_invite(data['p1_token'], data['public_id'], data['p1_id']) # inviter inviting themselves
 
 
@@ -76,6 +77,7 @@ def test_details_authorisation(data):
 
     with pytest.raises(AccessError):
         ch.channel_details(data['p2_token'], data['public_id']) # p2 not in public channel
+    with pytest.raises(AccessError):
         ch.channel_details(data['p1_token'], data['private_id']) # p1 not in private channel
     
     ch.channel_invite(data['p2_token'], data['private_id'], data['p1_id'])
@@ -129,6 +131,7 @@ def test_view_messages_authorisation(data):
 
     with pytest.raises(AccessError):
         ch.channel_messages(data['p2_token'], data['public_id'], 0) # p2 not in public channel
+    with pytest.raises(AccessError):
         ch.channel_messages(data['p1_token'], data['private_id'], 0) # p1 not in private channel
     
     ch.channel_invite(data['p2_token'], data['private_id'], data['p1_id'])
@@ -200,6 +203,7 @@ def test_join_but_existing(data):
     ch.channel_join(data['p4_token'], data['public_id'])
     with pytest.raises(InputError):
         ch.channel_join(data['p3_token'], data['public_id'])
+    with pytest.raises(InputError):
         ch.channel_join(data['p4_token'], data['public_id'])
 
 
@@ -236,6 +240,7 @@ def test_addowner_when_already_owner(data):
     ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id'])
     with pytest.raises(InputError):
         ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id']) # Person3 is already an owner
+    with pytest.raises(InputError):
         ch.channel_addowner(data['p3_token'], data['private_id'], data['p2_id']) # Person2 is already an owner
 
 
@@ -246,6 +251,7 @@ def test_addowner_but_not_in_channel(data):
 
     with pytest.raises(InputError):
         ch.channel_addowner(data['p1_token'], data['public_id'], data['p4_id']) # Person4 is not in public
+    with pytest.raises(InputError):
         ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id']) # Person3 is not in private
 
 
@@ -385,6 +391,7 @@ def test_flockr_addowner_but_not_member(data):
     ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
     with pytest.raises(AccessError):
         ch.channel_addowner(data['flockr_owner_token'], data['public_id'], data['p3_id'])
+    with pytest.raises(AccessError):
         ch.channel_addowner(data['flockr_owner_token'], data['private_id'], data['p4_id'])
 
 
@@ -392,6 +399,7 @@ def test_flockr_addowner_but_not_member(data):
 def test_flockr_removeowner_but_not_member(data):
     with pytest.raises(AccessError):
         ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
+    with pytest.raises(AccessError):
         ch.channel_removeowner(data['flockr_owner_token'], data['private_id'], data['p2_id'])
 
 
