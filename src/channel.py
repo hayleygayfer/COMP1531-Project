@@ -3,8 +3,7 @@ from data import data
 from error import InputError, AccessError
 
 def channel_invite(token_inviter, channel_id, u_id_invitee):
-    # If you invite someone (yourself included) to a channel that the user already exists in then raise InputError
-    
+
     if validate_token(token_inviter) == False:
         raise AccessError(f"Not a valid token ")
 
@@ -15,15 +14,10 @@ def channel_invite(token_inviter, channel_id, u_id_invitee):
         raise InputError(f"The User ID: {u_id_invitee} entered is not a valid user ")
     
     # Matching the inviter and the token
-    for user in data['users']:
-        if user['token'] == token_inviter:
-            u_id_inviter = user['u_id']
+    u_id_inviter = token_to_u_id(token_inviter)['u_id']
 
     # Find name and last name of invitee
-    for user in data['users']:
-        if user['u_id'] == u_id_invitee:
-            name_first = user['name_first']
-            name_last = user['name_last']
+    name_first, name_last = u_id_to_name(u_id_invitee)
 
     if exists_in_channel(channel_id, u_id_invitee) == True:
         raise InputError(f"The User already exists in this Channel ")
@@ -47,9 +41,7 @@ def channel_details(token, channel_id):
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
     # Matching the user and the token
-    for user in data['users']:
-        if user['token'] == token:
-            u_id = user['u_id']
+    u_id = token_to_u_id(token)['u_id']
 
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
@@ -63,18 +55,16 @@ def channel_messages(token, channel_id, start):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
-    # Matching the user and the token
-    for user in data['users']:
-        if user['token'] == token:
-            u_id = user['u_id']
-
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
-    # TODO: InputError (start is greater than the total number of messages in the channel)
+    # Matching the user and the token
+    u_id = token_to_u_id(token)['u_id']
 
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
+
+    # TODO: finish off this function
 
     return {
         'messages': [
@@ -94,32 +84,23 @@ def channel_leave(token, channel_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
-    # Matching the user and the token
-    for user in data['users']:
-        if user['token'] == token:
-            u_id = user['u_id']
-            name_first = user['name_first']
-            name_last = user['name_last']
-
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
+    # Matching the user and the token
+    user_details = token_to_u_id(token)
+    u_id = user_details['u_id']
+    name_first = user_details['name_first']
+    name_last = user_details['name_last']
 
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
 
-    if SIZE_OWNERS(channel_id) < 2 and is_token_owner(token, channel_id): 
+    if size_owners(channel_id) < 2 and is_token_owner(token, channel_id): 
         raise InputError("You are the only admin left in this channel. You cannot leave if you are the only admin")
 
-    ####
-    # Test for flockr owner leaving channel
-    if (is_token_flockr_owner(token) == True):
-        if (is_token_owner(token, channel_id) == True):
-            if (SIZE_OWNERS(channel_id) == 1):
-                raise InputError("There are no other owners left in this channel")
-    ####
-
     # Member leaves the channel and is cleared from all_members
-    clear_user_member(channel_id, u_id, name_first, name_last)
+    rem_user_member(channel_id, u_id, name_first, name_last)
 
     return {
         'is_success': True
@@ -130,17 +111,16 @@ def channel_join(token, channel_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
-    # Matching the user and the token
-    for user in data['users']:
-        if user['token'] == token:
-            u_id = user['u_id']
-            name_first = user['name_first']
-            name_last = user['name_last']
-
-    # Raising input and access errors
     if validate_channel(channel_id) == False:
         raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
+    # Matching the user and the token
+    user_details = token_to_u_id(token)
+    u_id = user_details['u_id']
+    name_first = user_details['name_first']
+    name_last = user_details['name_last']
     
+    # Only Flockr owners can join private channels
     if private_channel(channel_id) == True:
         if is_token_flockr_owner(token) == False:
             raise AccessError(f"The Channel ID: {channel_id} entered is a private channel ")
@@ -160,31 +140,28 @@ def channel_addowner(token, channel_id, u_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    if validate_channel(channel_id) == False:
+        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
     if exists_in_channel(channel_id, u_id) == False:
         raise InputError(f"The User is not a member of the Channel ID: {channel_id} ")
 
     # Matching the user and the token
-    for user in data['users']:
-        if user['u_id'] == u_id:
-            name_first = user['name_first']
-            name_last = user['name_last']
+    token_uid = token_to_u_id(token)['u_id']
 
-    for user in data['users']:
-        if user['token'] == token:
-            token_uid = user['u_id']
-
+    # Flockr owner needs to be in the channel to add owners
     if exists_in_channel(channel_id, token_uid) == False and (is_token_flockr_owner(token) == True):
         raise AccessError(f"You as the Flockr owner, must be in the channel: {channel_id} to add an owner")
-
+    
+    # You must be an owner to add
     if (is_token_owner(token, channel_id) == False) and (is_token_flockr_owner(token) == False):
         raise AccessError("User is not an owner or owner of the Flockr")
 
-    if validate_channel(channel_id) == False:
-        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
-
     if user_is_owner(channel_id, u_id) == True:
         raise InputError(f"User {u_id} is already an owner of the channel ")
-    
+
+    # Matching the u_id to their name
+    name_first, name_last = u_id_to_name(u_id)
     append_user_owner(channel_id, u_id, name_first, name_last)
 
     return {
@@ -192,7 +169,6 @@ def channel_addowner(token, channel_id, u_id):
     }
 
 def channel_removeowner(token, channel_id, u_id):
-    # You are allowed to remove yourself as an owner
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -207,10 +183,9 @@ def channel_removeowner(token, channel_id, u_id):
         raise InputError(f"User {u_id} is not an owner of the channel ")
 
     # Matching the user and the token
-    for user in data['users']:
-        if user['token'] == token:
-            token_uid = user['u_id']
+    token_uid = token_to_u_id(token)['u_id']
     
+    # You cannot remove yourself as an owner
     if u_id == token_uid:
         raise InputError("You cannot remove yourself as owner")
 
@@ -218,41 +193,33 @@ def channel_removeowner(token, channel_id, u_id):
     if exists_in_channel(channel_id, token_uid) == False and (is_token_flockr_owner(token) == True):
         raise AccessError(f"You as the Flockr owner, must be in the channel: {channel_id} to remove an owner")
 
+    # You can only remove owners
     if (is_token_owner(token, channel_id) == False) and (is_token_flockr_owner(token) == False):
-        raise AccessError("User is not an owner of the channel")
+        raise AccessError(f"User {u_id} is not an owner of the channel")
 
-    if user_is_owner(channel_id, token_uid) == False:
-        if is_token_flockr_owner(token) == False:
-            raise InputError(f"User {token_uid} is not an owner of the channel ")
-
-    for user in data['users']:
-        if user['u_id'] == u_id:
-            name_first = user['name_first']
-            name_last = user['name_last']
+    # Match the users u_id to their name
+    name_first, name_last = u_id_to_name(u_id)
 
     # If the flockr owner removes the only owner, he/she becomes the new owner
-    
-    ####
     flockr_owner_u_id = data['users'][0].get('u_id')
     flockr_owner_name_first = data['users'][0].get('name_first')
     flockr_owner_name_last = data['users'][0].get('name_last')
-
+    ####
     if is_token_flockr_owner(token) == True and is_token_owner(token, channel_id) == False:
         if user_is_owner(channel_id, u_id) == True:
-            if SIZE_OWNERS(channel_id) == 1:    
+            if size_owners(channel_id) == 1:
                 append_user_owner(channel_id, flockr_owner_u_id, flockr_owner_name_first, flockr_owner_name_last)
     ####
 
-    clear_user_owner(channel_id, u_id, name_first, name_last)
+    rem_user_owner(channel_id, u_id, name_first, name_last)
 
     return {
         'is_success': True
     }
 
-# TODO: Function prototypes currently working on
-
-
+#################################################################################
 # Validation functions
+
 def validate_token(token):
     for users in data['users']:
         if token == users.get('token'):
@@ -270,6 +237,22 @@ def validate_user(u_id):
         if users.get('u_id') == u_id:
             return True
     return False
+
+# Converts a token to the users id
+def token_to_u_id(token):
+    for user in data['users']:
+        if user['token'] == token:
+            return {
+                'u_id': user['u_id'],
+                'name_first': user['name_first'],
+                'name_last': user['name_last']
+            }
+
+# Obtains the users name from their id
+def u_id_to_name(u_id):
+    for user in data['users']:
+        if user['u_id'] == u_id:
+            return user['name_first'], user['name_last']
 
 # Check if channel is private
 def private_channel(channel_id):
@@ -300,6 +283,7 @@ def append_data(channel_id, u_id, name_first, name_last):
                 }
             )
 
+# Is the current u_id stored in the owners section of the channel
 def user_is_owner(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -308,6 +292,7 @@ def user_is_owner(channel_id, u_id):
                     return True
     return False
 
+# Append user data to the owner members section of the channel
 def append_user_owner(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -319,14 +304,16 @@ def append_user_owner(channel_id, u_id, name_first, name_last):
                 }
             )
 
-def clear_user_owner(channel_id, u_id, name_first, name_last):
+# Remove the user data from owner members
+def rem_user_owner(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
                 if owners.get('u_id') == u_id:
                     channel['owner_members'].remove(owners)
 
-def clear_user_member(channel_id, u_id, name_first, name_last):
+# Remove user data from channel
+def rem_user_member(channel_id, u_id, name_first, name_last):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for members in channel['all_members']:
@@ -334,36 +321,27 @@ def clear_user_member(channel_id, u_id, name_first, name_last):
                     channel['all_members'].remove(members)
 
     # IF they are an owner they need to be cleared from owner_members
-    for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
-            for members in channel['owner_members']:
-                if members.get('u_id') == u_id:
-                    channel['owner_members'].remove(members)
+    rem_user_owner(channel_id, u_id, name_first, name_last)
 
-def is_token_owner(token, channel_id):
-    owner_member_u_id = 0
-    for user in data['users']:
-        if token == user.get('token'):
-            owner_member_u_id = user['u_id']
-
-    if owner_member_u_id == 0:
-        return False
-            
+# Is the authenticated user an owner of the channel
+def is_token_owner(token, channel_id):      
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owner_member_u_id == owners.get('u_id'):
+                # match the u_id of the authenticated user to the ids of all owners
+                if token_to_u_id(token)['u_id'] == owners.get('u_id'):
                     return True
     return False
 
-
-def SIZE_OWNERS(channel_id):
+# Determine the number of owners in a channel
+def size_owners(channel_id):
     owner_members = 0
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             owner_members = len(channel['owner_members'])
     return owner_members
 
+# Determine if the authenticated user is the flockr owner
 def is_token_flockr_owner(token):
     if token == data['users'][0].get('token'):
         return True
