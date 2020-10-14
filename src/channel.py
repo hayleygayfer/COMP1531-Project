@@ -189,6 +189,9 @@ def channel_removeowner(token, channel_id, u_id):
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
 
+    if validate_channel(channel_id) == False:
+        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
+
     if exists_in_channel(channel_id, u_id) == False:
         raise InputError(f"The User is not a member of the Channel ID: {channel_id} ")
 
@@ -203,26 +206,12 @@ def channel_removeowner(token, channel_id, u_id):
     if u_id == token_uid:
         raise InputError("You cannot remove yourself as owner")
 
-    # TODO: Remove this Joel
-    # I added this test to check that the Flockr owner must be in the channel to remove owners
+    # Test to check that the Flockr owner must be in the channel to remove owners
     if exists_in_channel(channel_id, token_uid) == False and (is_token_flockr_owner(token) == True):
         raise AccessError(f"You as the Flockr owner, must be in the channel: {channel_id} to remove an owner")
 
     if (is_token_owner(token, channel_id) == False) and (is_token_flockr_owner(token) == False):
         raise AccessError("User is not an owner of the channel")
-    
-    # TODO: If the flockr owner removes the only owner, he/she becomes the new owner
-    
-    # TODO: If we are to make these changes, we fail two more tests
-    '''
-    
-    if (is_token_owner(token, channel_id) == False) and (is_token_flockr_owner(token) == False):
-        raise AccessError("User is not an owner of the channel")
-
-    '''
-
-    if validate_channel(channel_id) == False:
-        raise InputError(f"The Channel ID: {channel_id} entered is not valid ")
 
     if user_is_owner(channel_id, token_uid) == False:
         if is_token_flockr_owner(token) == False:
@@ -232,6 +221,12 @@ def channel_removeowner(token, channel_id, u_id):
         if user['u_id'] == u_id:
             name_first = user['name_first']
             name_last = user['name_last']
+
+    # If the flockr owner removes the only owner, he/she becomes the new owner
+    if is_token_flockr_owner(token) == True:
+        if user_is_owner(channel_id, u_id) == True:
+            if SIZE_OWNERS(channel_id) == 1:
+                append_user_owner(channel_id, u_id, name_first, name_last)
 
     clear_user_owner(channel_id, u_id, name_first, name_last)
 
