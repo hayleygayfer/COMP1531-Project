@@ -3,6 +3,7 @@ from data import data
 from error import InputError, AccessError
 
 def channel_invite(token_inviter, channel_id, u_id_invitee):
+    '''A token belonging to a user in a channel is used to invite another user who is not part of that channel.'''
 
     if validate_token(token_inviter) == False:
         raise AccessError(f"Not a valid token ")
@@ -33,6 +34,7 @@ def channel_invite(token_inviter, channel_id, u_id_invitee):
     }
 
 def channel_details(token, channel_id):
+    '''A token is used to view the details of a channel the corresponding user in.'''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -51,6 +53,9 @@ def channel_details(token, channel_id):
             return channel
 
 def channel_messages(token, channel_id, start):
+    '''A token is used to access messages in a channel that the corresponding user is in.
+    
+    The system will return back up to 50 messages after the start value in a similar way that many websites use pagination to display small chunks of data at a time.'''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -80,6 +85,7 @@ def channel_messages(token, channel_id, start):
     }
 
 def channel_leave(token, channel_id):
+    '''A token is used to leave a channel that the corresponding user are in.'''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -106,7 +112,8 @@ def channel_leave(token, channel_id):
         'is_success': True
     }
 
-def channel_join(token, channel_id):    
+def channel_join(token, channel_id):
+    '''A token from a user is used to join a channel they are not currently in.'''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -136,6 +143,7 @@ def channel_join(token, channel_id):
     }
 
 def channel_addowner(token, channel_id, u_id):
+    '''A token from a channel owner is used to add another member as an owner of that channel.'''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -169,6 +177,7 @@ def channel_addowner(token, channel_id, u_id):
     }
 
 def channel_removeowner(token, channel_id, u_id):
+    '''A token from a channel owner is used to remove owner status from another member in that channel.'''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
