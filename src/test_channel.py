@@ -2,6 +2,7 @@ import auth
 import channel as ch
 import channels
 import pytest
+import message as msg
 
 from error import InputError, AccessError
 from other import clear
@@ -136,12 +137,75 @@ def test_view_messages_authorisation(data):
     
     ch.channel_invite(data['p2_token'], data['private_id'], data['p1_id'])
     assert ch.channel_messages(data['p1_token'], data['private_id'], 0) # now person1 can view the messages
-    
 
-# TODO: loading and reading channel messages (checking start/end)
-def test_temp(data):
-    pass
+
+# checking for valid start values
+def test_invalid_messages_start(data):
+    for x in range(1, 10 + 1):
+        msg.message_send(data['p1_token'], data['public_id'], f"Message {x}")
+
+    # number of messages = 4
+    with pytest.rasies(InputError):
+        ch.channel_messages(data['p1_token'], data['public_id'], 5)
+    with pytest.rasies(InputError):
+        ch.channel_messages(data['p1_token'], data['public_id'], 4)
+
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 3)
+
+# checking return values after adding a few messages to a channel
+def test_message_less_than_50(data):
+    # add 4 messages to the public channel
+    for x in range(1, 4 + 1):
+        msg.message_send(data['p1_token'], data['public_id'], f"Message {x}")
+
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == -1
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'] == [
+        'Message 4', 'Message 3', 'Message 2', 'Message 1'
+    ]
+
+# checking return values after adding exactly 50 messages to a channel
+def test_message_exactly_50(data):
+    # add 50 messages to the public channel
+    for x in range(1, 50 + 1):
+        msg.message_send(data['p1_token'], data['public_id'], f"Message {x}")
+
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == -1
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0] == "Message 50"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][49] == "Message 1"
+
+
+# pagination with 150 messages by modifying start values
+def test_150_messages(data):
+    # add 150 messages to the public channel
+    for x in range(1, 150 + 1):
+        msg.message_send(data['p1_token'], data['public_id'], f"Message {x}")
+
+    # start value of 0:
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == 50
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0] == "Message 150"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][49] == "Message 101"
     
+    # start value of 50:
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['start'] == 50
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['end'] == 100
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['messages'][0] == "Message 100"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['messages'][49] == "Message 51"
+
+    # start value of 100:
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['start'] == 100
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['end'] == -1 # the last message has been displayed
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['messages'][0] == "Message 50"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['messages'][49] == "Message 1"
+
+
+# Negative start values revert to 0
+def test_negative_start(data):
+    msg.message_send(data['p1_token'], data['public_id'], "Message 1")
+    assert ch.channel_messages(data['p1_token'], data['public_id'], -1) == ch.channel_messages(data['p1_token'], data['public_id'], 0)
+
 
 # leaving a channel
 def test_leave_success(data):
