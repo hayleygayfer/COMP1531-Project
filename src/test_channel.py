@@ -145,12 +145,12 @@ def test_invalid_messages_start(data):
         msg.message_send(data['p1_token'], data['public_id'], f"Message {x}")
 
     # number of messages = 4
-    with pytest.rasies(InputError):
-        ch.channel_messages(data['p1_token'], data['public_id'], 5)
-    with pytest.rasies(InputError):
-        ch.channel_messages(data['p1_token'], data['public_id'], 4)
+    with pytest.raises(InputError):
+        ch.channel_messages(data['p1_token'], data['public_id'], 11)
+    with pytest.raises(InputError):
+        ch.channel_messages(data['p1_token'], data['public_id'], 10)
 
-    assert ch.channel_messages(data['p1_token'], data['public_id'], 3)
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 9)
 
 # checking return values after adding a few messages to a channel
 def test_message_less_than_50(data):
@@ -160,9 +160,10 @@ def test_message_less_than_50(data):
 
     assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
     assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == -1
-    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'] == [
-        'Message 4', 'Message 3', 'Message 2', 'Message 1'
-    ]
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0]['message'] == 'Message 4'
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][1]['message'] == 'Message 3'
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][2]['message'] == 'Message 2'
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][3]['message'] == 'Message 1'
 
 # checking return values after adding exactly 50 messages to a channel
 def test_message_exactly_50(data):
@@ -172,8 +173,8 @@ def test_message_exactly_50(data):
 
     assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
     assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == -1
-    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0] == "Message 50"
-    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][49] == "Message 1"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0]['message'] == "Message 50"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][49]['message'] == "Message 1"
 
 
 # pagination with 150 messages by modifying start values
@@ -185,20 +186,20 @@ def test_150_messages(data):
     # start value of 0:
     assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
     assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == 50
-    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0] == "Message 150"
-    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][49] == "Message 101"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0]['message'] == "Message 150"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][49]['message'] == "Message 101"
     
     # start value of 50:
     assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['start'] == 50
     assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['end'] == 100
-    assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['messages'][0] == "Message 100"
-    assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['messages'][49] == "Message 51"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['messages'][0]['message'] == "Message 100"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['messages'][49]['message'] == "Message 51"
 
     # start value of 100:
     assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['start'] == 100
     assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['end'] == -1 # the last message has been displayed
-    assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['messages'][0] == "Message 50"
-    assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['messages'][49] == "Message 1"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['messages'][0]['message'] == "Message 50"
+    assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['messages'][49]['message'] == "Message 1"
 
 
 # Negative start values revert to 0
