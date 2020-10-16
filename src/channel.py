@@ -71,11 +71,10 @@ def channel_messages(token, channel_id, start):
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
 
     # TODO: finish off this function
-
+    
     if invalid_messages_start(channel_id, start) == True:
         raise InputError("Start is greater than the total messages in the channel")
-
-
+        
     return {
         'messages': [
             {
