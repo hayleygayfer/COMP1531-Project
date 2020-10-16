@@ -54,6 +54,7 @@ def append_msg_to_channel(channel_id, msg_string, msg_id):
                     'message_id': msg_id
                 }
             )
+            channel['message_count'] += 1
 
 
 
