@@ -66,7 +66,7 @@ def channels_create(token, name, is_public):
         'owner_members': [ channel_creator ],
         'is_public': is_public,
         'messages': [],
-        'msg_count': 0
+        'message_count': 0
     }
 
     data['channels'].append(channel)
