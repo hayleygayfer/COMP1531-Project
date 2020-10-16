@@ -66,10 +66,15 @@ def channel_messages(token, channel_id, start):
     # Matching the user and the token
     u_id = token_to_u_id(token)['u_id']
 
-    if exists_in_channel(channel_id, u_id) == False:
+    # Must be a member of the channel to view message ##TEST
+    if (exists_in_channel(channel_id, u_id) == False):
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
 
     # TODO: finish off this function
+
+    if invalid_messages_start(channel_id, start) == True:
+        raise InputError("Start is greater than the total messages in the channel")
+
 
     return {
         'messages': [
@@ -355,3 +360,13 @@ def is_token_flockr_owner(token):
     if token == data['users'][0].get('token'):
         return True
     return False
+
+#### TODO: Message functions currently working on
+
+def invalid_messages_start(channel_id, start):
+    for channel in data['channels']:
+        if channel_id == channel['channel_id']:
+            if channel['message_count'] <= start:
+                return True
+    return False
+    
