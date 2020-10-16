@@ -127,6 +127,9 @@ def test_view_details(data):
 
 # must be a member of the channel to view messages
 def test_view_messages_authorisation(data):
+    msg.message_send(data['p1_token'], data['public_id'], "public msg")
+    msg.message_send(data['p2_token'], data['private_id'], "private msg")
+
     assert ch.channel_messages(data['p1_token'], data['public_id'], 0)
     assert ch.channel_messages(data['p2_token'], data['private_id'], 0)
 
