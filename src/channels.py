@@ -20,7 +20,7 @@ def channels_list(token):
     # Loop through channels, and associated users to find matches -> inefficient?
     for channel in data['channels']:
         for member in channel['all_members']:
-            if member['u_id'] == u_id:
+            if member == u_id:
                 channels.append(channel)
     
     return channels
@@ -30,6 +30,7 @@ def channels_listall(token):
     # Check for authentication
     for user in data['users']:
         if user['token'] == token:
+            u_id = user['u_id']
             validated = True
     
     if not validated:
@@ -62,8 +63,8 @@ def channels_create(token, name, is_public):
     channel = {
         'channel_id': len(data['channels']),
         'name': name,
-        'all_members': [ channel_creator ],
-        'owner_members': [ channel_creator ],
+        'all_members': [ channel_creator['u_id'] ],
+        'owner_members': [ channel_creator['u_id'] ],
         'is_public': is_public,
     }
 
