@@ -152,16 +152,42 @@ OUTPUT: {}
 
 # VALID CASES #
 def test_edit_user_owner(flockr_state):
-    pass
+    # Send a message 
+    message_id = message_send(token1, c1_id, "This message was sent by the owner of flocker")
+    # Edit the message 
+    assert message_edit(token1, message_id, "This is the new message we just changed it completely but same same hey")
 
 def test_edit_user_member(flockr_state):
-    pass
+    # Add another person 2 to channel 1
+    channels.channel_join(token2, c1_id)
+    # Make them owner so they can remove message 
+    channels.channel_addowner(token1, c1_id, u2_id)
+    # user two - owner - send message
+    message_id = message_send(token2, c1_id, "This message was sent by an owner of this channel")
+
+    assert message_edit(token2, message_id, "This message should be able to be edited")
+
 
 # INVALID CASES #
 def test_not_valid_user(flockr_state):
-    pass
+    # Join as a member now owner
+    channels.channel_join(token2, c1_id)
+    # Send message
+    message_id = message_send(token2, c1_id, "This message was sent by not an owner")
+    # edited by 
+    with pytest.raises(AccessError):
+        message_edit(token2, message_id, "This message should not be able to be edited")
 
-def test_edit_not_in_channel(flockr_state):
-    pass
-
+def test_edit_not_by_person_who_sent(flockr_state):
+    # Add another person 2 to channel 1
+    channels.channel_join(token2, c1_id)
+    # Make them owner so they can remove message 
+    channels.channel_addowner(token1, c1_id, u2_id)
+    # user two - owner - send message
+    message_id = message_send(token2, c1_id, "This message was sent by an owner of this channel")   
+    # user one try and edit 
+    with pytest.raises(AccessError):
+        message_edit(token1, message_id, "This message should not be able to be edited")
+        
+# TODO: Check that if empty string the message gets deleted 
 
