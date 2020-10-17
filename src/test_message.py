@@ -39,19 +39,31 @@ message_send(token, channel_id, message)
 OUTPUT: { message_id }
 """
 
+#### MESSAGE 0 IS THE MOST RECENT MESSAGE IN THE CHANNEL ####
+
 # VALID CASES #
 def test_message_user_owner(flockr_state):
-    
+    # Send the message 
     message1 = message_send(token1, c1_id, "This is the first message in the channel")
+    # Find the message in the channel through channel messages - returns dictionary specifically a list of messages
     message_in_channel = channel.channel_message(token1, c1_id, 0)['messages']
+    # Find the message ID
     message_id_at_index_zero = message_in_channel[0]['message_id']
+    # Compare the message sent ID and the channels message ID 
     assert message1 == message_id_at_index_zero
 
 def test_message_user_member(flockr_state):
-    pass
+    message1 = message_send(token2, c2_id, "This is the first message in the channel")
+    message_in_channel = channel.channel_message(token2, c2_id, 0)['messages']
+    message_id_at_index_zero = message_in_channel[0]['message_id']
+    assert message1 == message_id_at_index_zero
 
 def test_message_non_alpha_characters(flockr_state):
-    pass
+    # Flocker owner sending message 
+    message1 = message_send(token1, c1_id, "This message has many non alpha character: !@#$%^&*()")
+    message_in_channel = channel.channel_message(token1, c1_id, 0)['messages']
+    message_id_at_index_zero = message_in_channel[0]['message_id']
+    assert message1 == message_id_at_index_zero
 
 # INVALID CASES #
 def test_message_greater_than_1000(flockr_state):
