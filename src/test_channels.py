@@ -61,54 +61,15 @@ def test_user_is_in_all_channels():
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-                {
-                    'u_id': u2_id,
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                },
-                {
-                    'u_id': u3_id,
-                    'name_first': 'Person',
-                    'name_last': 'Three'                    
-                }
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [u1_id,u2_id,u3_id],
+            'owner_members': [u1_id],
             'is_public': True
         },
         {
             'channel_id': c2_id, 
             'name': "channel_2", 
-            'all_members': [
-                {
-                    'u_id': u2_id,
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                },
-                {
-                    'u_id': u3_id,
-                    'name_first': 'Person',
-                    'name_last': 'Three'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u2_id,
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                }
-            ],
+            'all_members': [u2_id,u3_id],
+            'owner_members': [u2_id],
             'is_public': True
         },
     ]
@@ -137,30 +98,8 @@ def test_user_is_in_some_channels():
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-                {
-                    'u_id': u2_id,
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                },
-                {
-                    'u_id': u3_id,
-                    'name_first': 'Person',
-                    'name_last': 'Three'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [u1_id,u2_id,u3_id],
+            'owner_members': [u1_id],
             'is_public': True
         },
     ]
@@ -197,58 +136,22 @@ def test_total_channels():
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
             'is_public': True
         },  
                 {
             'channel_id': c2_id, 
             'name': "channel_2", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
             'is_public': True
         },   
                 {
             'channel_id': c3_id, 
             'name': "channel_3", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
             'is_public': True
         },   
     ]
@@ -274,58 +177,22 @@ def test_total_channels_not_created_by_user():
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
             'is_public': True
         },  
                 {
             'channel_id': c2_id, 
             'name': "channel_2", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
             'is_public': True
         },   
                 {
             'channel_id': c3_id, 
             'name': "channel_3", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
             'is_public': True
         },   
     ]
@@ -371,39 +238,15 @@ def test_public_private():
         {
             'channel_id': cpublic_id, 
             'name': "channels_public", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
             'is_public': True
         },  
         {
             'channel_id': cprivate_id, 
             'name': "channels_private", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
             'is_public': False
         },   
     ]
