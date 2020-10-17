@@ -102,20 +102,47 @@ OUTPUT: {}
 
 # VALID CASES #
 def test_remove_user_owner(flockr_state):
-    pass
+    # Send message from flocker owner - returns message ID
+    message_id = message_send(token1, c1_id, "This message will be removed")
+    # This message should be removed 
+    assert message_remove(token1, message_id)
 
 def test_remove_request_user_member(flockr_state):
-    pass
+    # Authorised user sending message 
+    message_id = message_send(token2, c2_id, "This message will be removed")
+    # This message should be removed as authorised user making this request
+    assert message_remove(token2, message_id)
 
 # INVALID CASES #
 def test_message_no_longer_exists(flockr_state):
-    pass
+    # Create valid message
+    message_id = message_send(token1, c1_id, "This is a valid message")
+    # Remove message
+    message_remove(token1, message_id)
+    # Try remove it again
+    with pytest.raises(InputError):
+        message_remove(token1, message_id)
 
 def test_not_users_message(flockr_state):
-    pass
+    # Add another person 2 to channel 1
+    channels.channel_join(token2, c1_id)
+    # Make them owner so they can remove message 
+    channels.channel_addowner(token1, c1_id, u2_id)
+    # Create a message sent by user 1 
+    message_id = message_send(token1, c1_id, "This message was sent by one of the owners of the channel")
+    # User 2 try and remove it 
+    with pytest.raises(AccessError):
+        message_remove(token2, message_id)
 
 def test_user_not_owner(flockr_state):
-    pass
+    # Add another person 2 to channel 1 just as member
+    channels.channel_join(token2, c1_id)
+    # Get them to send a message
+    message_id = message_send(token2, c1_id, "This message was sent by one of the members of the channel")
+    # Try to remove it
+    with pytest.raises(AccessError):
+        message_remove(token2, message_id)
+
 
 # test message_edit #
 """
