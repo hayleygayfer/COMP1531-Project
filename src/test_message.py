@@ -67,6 +67,8 @@ def test_message_non_alpha_characters(flockr_state):
 
 # INVALID CASES #
 def test_message_greater_than_1000(flockr_state):
+    # Character length of message - random words but proper length 
+
     # Check that 1000 works 
     message1 = message_send(token1, c1_id, "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N")
     message_in_channel = channel.channel_message(token1, c1_id, 0)['messages']
@@ -77,13 +79,20 @@ def test_message_greater_than_1000(flockr_state):
         message_send(token1, c1_id, "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Na")
 
 def test_user_not_in_channel(flockr_state):
-    pass
+    # Person 3 is not in any channel 
+    # Try them in channel 2 
+    with pytest.raises(AccessError):
+        message_send(token3, c2_id, "This user is not in the channel")
 
 def test_user_logged_out(flockr_state):
-    pass
+    # Log out person 2 
+    if auth.auth_logout(token2)['is_success'] == True:
+        with pytest.raises(AccessError):
+            message_send(token2, c2_id, "This user is logged out")
 
 def test_empty_message(flockr_state):
-    pass
+    with pytest.raises(InputError):
+        message_send(token2, c2_id, "")
 
 # test message_remove #
 """
