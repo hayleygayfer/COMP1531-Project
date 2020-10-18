@@ -9,6 +9,9 @@ def user_profile(token, u_id):
     if user_id == []:
         raise InputError("Not a valid user")
 
+    if user_id[0]['token'] != token:
+        raise AccessError("Not a valid token")
+
     return { user_id[0] }
 
 def user_profile_setname(token, name_first, name_last):
@@ -33,8 +36,10 @@ def user_profile_setemail(token, email):
 
     if find_match('email', email) != []:
         raise InputError("Email already in use")
-
-    u_it = find_user(token)
+    try:
+        u_it = find_user(token)
+    except StopIteration:
+        raise AccessError("Not a valid token")
  
     data['users'][u_it]['email'] = email
 
@@ -47,8 +52,11 @@ def user_profile_sethandle(token, handle_str):
 
     if find_match('handle_str', handle_str) != []:
         raise InputError("handle already in use")
-
-    u_it = find_user(token)
+        
+    try:
+        u_it = find_user(token)
+    except StopIteration:
+        raise AccessError("Not a valid token")
 
     data['users'][u_it]['handle_str'] = handle_str
 
@@ -56,7 +64,7 @@ def user_profile_sethandle(token, handle_str):
     }
 
 def validate_handle_str(handle_str):
-    return 3 < handle_str < 20
+    return 3 < len(handle_str) < 20
         
 def find_match(parameter, match):
     return list(filter(lambda user: user[parameter] == match, data['users']))

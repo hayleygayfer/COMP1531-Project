@@ -55,6 +55,7 @@ def auth_register(email, password, name_first, name_last):
             'password': password,
             'name_first': name_first,
             'name_last': name_last,
+            'handle_str': '',
         }
     )
 
