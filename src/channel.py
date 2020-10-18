@@ -50,7 +50,13 @@ def channel_details(token, channel_id):
 
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            return channel
+            return channel           
+            '''{
+                'name': channel['name'],
+                'all_members': channel['all_members'],
+                'owner_members': channel['owner_members']
+            }'''
+            
 
 def channel_messages(token, channel_id, start):
     '''A token is used to access messages in a channel that the corresponding user is in.
@@ -74,18 +80,36 @@ def channel_messages(token, channel_id, start):
     
     if invalid_messages_start(channel_id, start) == True:
         raise InputError("Start is greater than the total messages in the channel")
-        
+    
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            if channel['message_count'] <= 50:
+                end = -1
+            elif start + 50 >= channel['message_count']:
+                end = -1
+            else:
+                end = start + 50
+
+    return_array = []
+
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            print(channel['message_count'], start)
+            if end == -1:
+                for x in range(channel['message_count'] - 1, start - 1, -1):
+                    return_array.append(channel['messages'][x])
+                break
+            else:
+                y = channel['message_count']
+                for x in range(y - start - 1, y - start - 50 - 1, -1):
+                    #print(x)
+                    return_array.append(channel['messages'][x])
+                break
+
     return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
-        'start': 0,
-        'end': 50,
+        'messages': return_array,
+        'start': start,
+        'end': end
     }
 
 def channel_leave(token, channel_id):
