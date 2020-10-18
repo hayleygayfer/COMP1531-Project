@@ -12,8 +12,8 @@ from data import data
 def userObject():
     clear()
     auth.auth_register("tonystark@avengers.com", "password", "Tony", "Stark")
-    user = auth.auth_login("tonystark@avengers.com", "password")
-    return {'u_id': user['u_id'], 'token': user['token']}
+    flockr_user = auth.auth_login("tonystark@avengers.com", "password")
+    return {'u_id': flockr_user['u_id'], 'token': flockr_user['token']}
 
 ###### User Profile ######
 
@@ -89,7 +89,7 @@ def test_set_invalid_last_name(userObject):
     with pytest.raises(InputError):
         user.user_setname(userObject['token'], 'Tony', 'StarkStarkStarkStarkStarkStarkStarkStarkStarkStarkS')
  
- def test_invalid_token_set_name(userObject):
+def test_invalid_token_set_name(userObject):
     # Invalid Token
     with pytest.raises(AccessError):
         user.user_setname('invalidtoken', 'Anthony', 'Stark')
@@ -138,7 +138,7 @@ def test_duplicate_email(userObject):
     with pytest.raises(InputError):
         user.user_setemail(userObject['token'], 'steverodgers@avengers.com')
 
- def test_invalid_token_set_email(userObject):
+def test_invalid_token_set_email(userObject):
     # Invalid Token
     with pytest.raises(AccessError):
         user.user_setemail('invalidtoken', 'tony@avengers.com')
@@ -188,7 +188,7 @@ def test_invalid_token_set_handle(userObject):
 
 # Retrieves information about a user
 def retrieveUser(u_id):
-    for user in data['users']:
-        if u_id == user['u_id']:
-            return user
+    for f_user in data['users']:
+        if u_id == f_user['u_id']:
+            return f_user
     return None
