@@ -80,6 +80,10 @@ def channel_messages(token, channel_id, start):
     
     if invalid_messages_start(channel_id, start) == True:
         raise InputError("Start is greater than the total messages in the channel")
+
+    # default negative start values to 0
+    if (start <= 0):
+        start = 0
     
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -94,17 +98,14 @@ def channel_messages(token, channel_id, start):
 
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            print(channel['message_count'], start)
+            
             if end == -1:
-                for x in range(channel['message_count'] - 1, start - 1, -1):
+                for x in range(channel['message_count'] - 1 - start, -1, -1):
                     return_array.append(channel['messages'][x])
-                break
             else:
                 y = channel['message_count']
                 for x in range(y - start - 1, y - start - 50 - 1, -1):
-                    #print(x)
                     return_array.append(channel['messages'][x])
-                break
 
     return {
         'messages': return_array,
