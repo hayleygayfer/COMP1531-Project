@@ -48,14 +48,14 @@ def channel_details(token, channel_id):
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
 
+    # only return the channel name and members
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            return channel           
-            '''{
+            return {
                 'name': channel['name'],
                 'all_members': channel['all_members'],
                 'owner_members': channel['owner_members']
-            }'''
+            }
             
 
 def channel_messages(token, channel_id, start):
@@ -75,8 +75,6 @@ def channel_messages(token, channel_id, start):
     # Must be a member of the channel to view message ##TEST
     if (exists_in_channel(channel_id, u_id) == False):
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
-
-    # TODO: finish off this function
     
     if invalid_messages_start(channel_id, start) == True:
         raise InputError("Start is greater than the total messages in the channel")
@@ -85,28 +83,23 @@ def channel_messages(token, channel_id, start):
     if (start <= 0):
         start = 0
     
+    # get the return 'end' depending on the # of messages left
+    return_array = []
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            if channel['message_count'] <= 50:
+            newest = channel['message_count'] - 1 - start
+            if channel['message_count'] <= 50 or start + 50 >= channel['message_count']:
                 end = -1
-            elif start + 50 >= channel['message_count']:
-                end = -1
+                oldest = -1
             else:
                 end = start + 50
+                oldest = channel['message_count'] - start - 51
+                
+            # add messages from newest to oldest
+            for x in range(newest, oldest, -1):
+                return_array.append(channel['messages'][x])
 
-    return_array = []
-
-    for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
-            
-            if end == -1:
-                for x in range(channel['message_count'] - 1 - start, -1, -1):
-                    return_array.append(channel['messages'][x])
-            else:
-                y = channel['message_count']
-                for x in range(y - start - 1, y - start - 50 - 1, -1):
-                    return_array.append(channel['messages'][x])
-
+    # returns the relevant data in a dictionary
     return {
         'messages': return_array,
         'start': start,
