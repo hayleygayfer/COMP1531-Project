@@ -16,9 +16,11 @@ def message_send(token, channel_id, message):
     if not channel_member(u_id, channel_id):
         raise AccessError("User not in channel")
     
-    # message length must be at most 1000
+    # message length must be at most 1000 and at least 1 characters
     if len(message) > 1000:
         raise InputError(f"Message is {len(message) - 1000} characters too long")
+    elif message == "":
+        raise InputError("Message must contain at least 1 character")
     
     # TODO: Calculate current timestamp
     timestamp = 1582426789
