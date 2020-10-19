@@ -1,6 +1,7 @@
 from data import data
 from error import InputError, AccessError
 from re import search # regex for email validation
+from random import random
 
 def auth_login(email, password):
     if validate_email(email) == False:
@@ -67,14 +68,14 @@ def auth_register(email, password, name_first, name_last):
     }
 
 def validate_email(email):
-    regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+    regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
     if search(regex, email):  
         return True    
     else:  
         return False
 
 def validate_first_name(name_first):
-    if not 0 <= len(name_first) <= 50:
+    if not 0 < len(name_first) <= 50:
         return False
 
     for character in name_first:
@@ -83,7 +84,7 @@ def validate_first_name(name_first):
 
 
 def validate_last_name(name_last):
-    if not 0 <= len(name_last) <= 50:
+    if not 0 < len(name_last) <= 50:
         return False
 
     for character in name_last:
@@ -94,9 +95,26 @@ def validate_password(password):
     if len(password) < 6:
         return False
 
+def check_handle_exists(handle):
+    for user in data['users']:
+        if user['handle'] == handle:
+            return True
+    return False
     
+def generate_valid_handle(name_first, name_last):
+    handle = "{0}{1}".format(name_first, name_last).lower()
+    handle = handle[:20]
+    counter = 0
 
-    
+    # Default first_last name
+    if not check_handle_exists(handle):
+        return handle
 
-
-
+    # Iterate to find a valid handle
+    count = 0
+    character = 1
+    while check_handle_exists(handle):
+        id = random()
+        handle = handle[:15]
+        handle = handle + str(int(random()*100000))
+    return handle
