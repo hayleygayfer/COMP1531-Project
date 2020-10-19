@@ -44,7 +44,9 @@ def message_remove(token, message_id):
 
     # Remove the message
     find_and_remove(message_id, channel_id)
-
+    return {
+        'is_success': True
+    }
 
 def message_edit(token, message_id, message):
     '''Given a message_id for a message, update the existing message with the new message.
@@ -63,6 +65,9 @@ def message_edit(token, message_id, message):
 
     # Edit the message
     find_and_edit(message_id, channel_id, message)
+    return {
+        'is_success': True
+    }
 
 #################################################################################
 ## HELPER FUNCTIONS ##
