@@ -39,8 +39,10 @@ def message_remove(token, message_id):
 
     # Find message
     channel_id = get_channel_id(message_id)
-    if not valid_channel(channel_id):
+    if not valid_channel(channel_id) or message_not_found(channel_id, message_id):
         raise InputError("Message not found")
+
+
 
     # Remove the message
     find_and_remove(message_id, channel_id)
@@ -106,6 +108,14 @@ def generate_message_id(channel_id):
 
 def get_channel_id(message_id):
     return int(message_id/MAX_MSG_IN_CH)
+
+def message_not_found(channel_id, msg_id):
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            for msg in channel['messages']:
+                if msg.get('message_id') == msg_id:
+                    return False
+    return True
 
 def append_msg_to_channel(channel_id, msg_string, msg_id, u_id, time):
     for channel in data['channels']:
