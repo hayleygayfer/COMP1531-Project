@@ -47,6 +47,8 @@ def auth_register(email, password, name_first, name_last):
         if user['email'] == email:
             raise InputError("Email address is already being used by another user")
 
+    handle = generate_valid_handle(name_first, name_last)
+
     data['users'].append(
         {
             'u_id': len(data['users']) + 1,
@@ -55,6 +57,7 @@ def auth_register(email, password, name_first, name_last):
             'password': password,
             'name_first': name_first,
             'name_last': name_last,
+            'handle_str': handle
         }
     )
 
