@@ -2,6 +2,8 @@ from data import data
 from error import InputError, AccessError
 
 MAX_MSG_IN_CH = 10000
+EDIT = 1
+REMOVE = 2
 
 def message_send(token, channel_id, message):
     '''Send a message from an authorised user to the channel specified by channel_id'''
@@ -42,10 +44,15 @@ def message_remove(token, message_id):
     if not valid_channel(channel_id) or message_not_found(channel_id, message_id):
         raise InputError("Message not found")
 
+    # Only the user or flockr owner can remove a message
+    msg_sender_id = find(message_id, channel_id, None, 0)
+    flockr_owner_id = get_flockr_owner_id(u_id)
+    if msg_sender_id != u_id and msg_sender_id != flockr_owner_id:
+        raise AccessError("You cannot remove this message")
 
 
     # Remove the message
-    find_and_remove(message_id, channel_id)
+    find(message_id, channel_id, None, REMOVE)
     return {
         'is_success': True
     }
@@ -65,8 +72,14 @@ def message_edit(token, message_id, message):
     if not valid_channel(channel_id):
         raise InputError("Message not found")
 
+    # Only the user or flockr owner can remove a message
+    msg_sender_id = find(message_id, channel_id, None, 0)
+    flockr_owner_id = get_flockr_owner_id(u_id)
+    if msg_sender_id != u_id and msg_sender_id != flockr_owner_id:
+        raise AccessError("You cannot edit this message")
+
     # Edit the message
-    find_and_edit(message_id, channel_id, message)
+    find(message_id, channel_id, message, EDIT)
     return {
         'is_success': True
     }
@@ -130,21 +143,20 @@ def append_msg_to_channel(channel_id, msg_string, msg_id, u_id, time):
             )
             channel['message_count'] += 1
 
-def find_and_remove(msg_id, channel_id):
+def find(msg_id, channel_id, new_msg, mode):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for msg in channel['messages']:
                 if msg.get('message_id') == msg_id:
-                    channel['messages'].remove(msg)
+                    # get mode to determine what to do
+                    if mode == EDIT:
+                        msg['message'] == new_msg
+                    elif mode == REMOVE:
+                        channel['messages'].remove(msg)
+                    else:
+                        return msg['u_id']
 
-def find_and_edit(msg_id, channel_id, new_msg):
-    for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
-            for msg in channel['messages']:
-                if msg.get('message_id') == msg_id:
-                    msg['message'] == new_msg
-
-def is_flockr_owner(token):
-    if token == data['users'][0].get('token'):
+def get_flockr_owner_id(u_id):
+    if u_id == data['users'][0].get('u_id'):
         return True
     return False
