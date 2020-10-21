@@ -170,7 +170,7 @@ def find_channel(msg_id, channel_id):
 def do_edit(channel, msg_id, new_msg):
     for msg in channel['messages']:
         if msg.get('message_id') == msg_id:
-            msg['message'] == new_msg
+            msg['message'] = new_msg
 
 def do_remove(channel, msg_id):
     for msg in channel['messages']:
