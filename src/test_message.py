@@ -126,6 +126,13 @@ def test_remove_user_owner(data):
     message_id = message_send(data['token1'], data['c1_id'], "This message will be removed")
     # This message should be removed 
     assert message_remove(data['token1'], message_id)
+    
+def test_remove_flocker_owner_but_not_owner(data):
+    channels.channel_join(data['token1'], data['c2_id'])
+
+    message_id = message_send(data['token1'], data['c2_id'], "This message will be removed")
+    # This message should be removed 
+    assert message_remove(data['token1'], message_id)
 
 def test_remove_request_user_member(data):
     # u1_id, u2_id, u3_id, token1, token2, token3, c1_id, c2_id = flockr_state
