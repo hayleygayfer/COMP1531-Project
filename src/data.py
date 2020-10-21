@@ -6,7 +6,8 @@ data = {
             'password': 'password',
             'token': '123456',
             'name_first': 'John',
-            'name_last': 'Doe'
+            'name_last': 'Doe',
+            'handle_str': 'handle',
         }
     ],
     'channels': [
