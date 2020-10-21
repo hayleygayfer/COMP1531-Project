@@ -106,7 +106,6 @@ def check_handle_exists(handle):
 def generate_valid_handle(name_first, name_last):
     handle = "{0}{1}".format(name_first, name_last).lower()
     handle = handle[:20]
-    counter = 0
 
     # Default first_last name
     if not check_handle_exists(handle):
