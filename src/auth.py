@@ -32,6 +32,8 @@ def auth_logout(token):
     }
 
 def auth_register(email, password, name_first, name_last):
+
+    
     if validate_email(email) == False:
         raise InputError(f"Email entered is not a valid email ")
 
