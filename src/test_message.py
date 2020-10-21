@@ -232,11 +232,11 @@ def test_empty_string (data):
     message2_id = message_send(data['token1'], data['c1_id'], "This is the second message sent") 
 
     # Edit first message with empty string so should only be one message left 
-    message_edit(data['token1'], message1_id, "")
+    message_edit(data['token1'], message2_id, "")
     # Get the messages from channel
     message = channel.channel_messages(data['token1'], data['c1_id'], 0)['messages']
     # get the message id 
     message_id_at_index_zero = message[0]['message_id']
     # Compare the message sent ID and the channels message ID 
-    assert message2_id == message_id_at_index_zero
+    assert message1_id == message_id_at_index_zero
 
