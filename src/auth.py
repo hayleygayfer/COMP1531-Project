@@ -32,6 +32,8 @@ def auth_logout(token):
     }
 
 def auth_register(email, password, name_first, name_last):
+
+    
     if validate_email(email) == False:
         raise InputError(f"Email entered is not a valid email ")
 
@@ -111,10 +113,7 @@ def generate_valid_handle(name_first, name_last):
         return handle
 
     # Iterate to find a valid handle
-    count = 0
-    character = 1
     while check_handle_exists(handle):
-        id = random()
         handle = handle[:15]
         handle = handle + str(int(random()*100000))
     return handle
