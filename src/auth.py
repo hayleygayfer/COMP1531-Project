@@ -47,7 +47,7 @@ def auth_register(email, password, name_first, name_last):
     for user in data['users']:
         if user['email'] == email:
             raise InputError("Email address is already being used by another user")
-    
+
     handle = generate_valid_handle(name_first, name_last)
 
     data['users'].append(
@@ -58,7 +58,7 @@ def auth_register(email, password, name_first, name_last):
             'password': password,
             'name_first': name_first,
             'name_last': name_last,
-            'handle': handle
+            'handle_str': handle
         }
     )
 
@@ -97,24 +97,20 @@ def validate_password(password):
 
 def check_handle_exists(handle):
     for user in data['users']:
-        if user['handle'] == handle:
+        if user['handle_str'] == handle:
             return True
     return False
-    
+ 
 def generate_valid_handle(name_first, name_last):
     handle = "{0}{1}".format(name_first, name_last).lower()
     handle = handle[:20]
-    counter = 0
 
     # Default first_last name
     if not check_handle_exists(handle):
         return handle
 
     # Iterate to find a valid handle
-    count = 0
-    character = 1
     while check_handle_exists(handle):
-        id = random()
         handle = handle[:15]
         handle = handle + str(int(random()*100000))
     return handle

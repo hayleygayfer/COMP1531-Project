@@ -5,9 +5,9 @@ data = {
             'email': 'random@email.com',
             'password': 'password',
             'token': '123456',
-            'name_first': 'Ethan',
-            'name_last': 'Hansen',
-            'handle': 'ethanhansen'
+            'name_first': 'John',
+            'name_last': 'Doe',
+            'handle_str': 'handle',
         }
     ],
     'channels': [
