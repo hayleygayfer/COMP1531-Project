@@ -94,9 +94,13 @@ def message_edit(token, message_id, message):
         # trying to edit a channel/flockr owner's message
         if msg_creator != u_id:
             raise AccessError("You cannot edit another owner's message")
+    
+    # delete if empty string else, edit
+    if message == "":
+        do_remove(channel, message_id)
+    else:
+        do_edit(channel, message_id, message)
 
-    # Edit the message
-    do_edit(channel, message_id, message)
     return {
         'is_success': True
     }
@@ -176,6 +180,7 @@ def do_remove(channel, msg_id):
     for msg in channel['messages']:
         if msg.get('message_id') == msg_id:
             channel['messages'].remove(msg)
+            channel['message_count'] -= 1
 
 
 def user_is_not_owner(u_id, owners):
