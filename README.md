@@ -7,7 +7,8 @@
 <<<<<<< HEAD
 =======
  * 12/10: Clarified that even if you modify the handle it must remain less than 20 characters
->>>>>>> auth
+<<<<<<< README.md
+
 
 ## Contents
 
@@ -74,12 +75,18 @@ Complete. Please see commit history to view old iteration info.
 
 ### 4.1. Task
 
+<<<<<<< README.md
 **NOTE:** In merging the instructions for this iteration into your repo, you may get a failed pipeline. This is most likely because your code is not pylint compliant. If this is the case, that is the *first* thing you should address for this iteration. It is important you have a *stable* master branch before proceeding to add additional features.
+=======
+>>>>>>> README.md
 
 In this iteration, more features were added to the specification, and the focus has been changed to HTTP endpoints. Many of the theory surrounding iteration 2 will be covered in week 4-6 lectures. Note that there will still be 1 or 2 features of the frontend that will not work because the routes will not appear until iteration 3.
 
 In this iteration, you are expected to:
 
+<<<<<<< README.md
+=======
+>>>>>>> README.md
 1. Implement and test the HTTP Flask server according to the entire interface provided in the specification.
 
     Part of this section may be automarked.
@@ -112,6 +119,10 @@ pip3 install $(curl https://www.cse.unsw.edu.au/~cs1531/20T3/requirements.txt)
 
 A frontend has been built by Sally & Bob that you can use in this iteration, and use your backend to power it (note: an incomplete backend will mean the frontend cannot work). **You can, if you wish, make changes to the frontend code, but it is not required for this iteration.** The source code for the frontend is only provided for your own fun or curiosity.
 
+<<<<<<< README.md
+=======
+>>>>>>> auth
+>>>>>>> README.md
 ### 4.2. Implementing and testing features
 
 You should first approach this project by considering its distinct "features". Each feature should add some meaningful functionality to the project, but still be as small as possible. You should aim to size features as the smallest amount of functionality that adds value without making the project more unstable. For each feature you should:
@@ -139,6 +150,9 @@ Your tests, keep in mind the following:
 * Pushing directly to `master` is not possible for this repo. The only way to get code into master is via a merge request. If you discover you have a bug in `master` that got through testing, create a bugfix branch and merge that in via a merge request.
 
 ### 4.3. Recommended approach
+<<<<<<< README.md
+=======
+<<<<<<< HEAD
 
 Our recommendation with this iteration is that you:
 
@@ -153,6 +167,26 @@ You are not required to store data persistently in this iteration. However, basi
 
 ### 4.5. Submission
 
+=======
+>>>>>>> README.md
+
+Our recommendation with this iteration is that you:
+
+1. Start out trying to implement the new functions the same way you did in iteration 1 (a series of implemented functions, categorised in files, with black-box pytests testing them).
+2. Write another layer of HTTP tests that test the inputs/outputs on routes according to the specific, and while writing tests for each component/feature, write the Flask route/endpoint for that feature too.
+
+This approach means that you can essentially finish the project/testing logic without worrying about HTTP, and then simply wrap the HTTP/Flask layer on top of it at the end.
+
+### 4.4. Storing data
+
+You are not required to store data persistently in this iteration. However, basic persistence will be covered in lectures and you are welcome to implement this if you find it convenient.
+
+### 4.5. Submission
+
+<<<<<<< README.md
+=======
+>>>>>>> auth
+>>>>>>> README.md
 This iteration is due to be submitted at 8pm Monday 26th October (**week 7**). You will then be demonstrating this in your week 7 lab. All team members **must** attend this lab session, or they will not receive a mark.
 
 At the due date provided, we will automatically collect and submit the code that is on the `master` branch of your repository. If the deadline is approaching and you have features that are either untested or failing their tests, **DO NOT MERGE IN THOSE MERGE REQUESTS**. Your tutor will look at unmerged branches and may allocate some reduced marks for incomplete functionality, but `master` should only contain working code.
@@ -211,9 +245,6 @@ These interface specifications come from Sally and Bob, who are building the fro
 |------------|-------------|----------|-----------|----------|----------|
 |auth/login|POST|(email, password)|{ u_id, token }|**InputError** when any of:<ul><li>Email entered is not a valid email using the method provided [here](https://www.geeksforgeeks.org/check-if-email-address-valid-or-not-in-python/) (unless you feel you have a better method)</li><li>Email entered does not belong to a user</li><li>Password is not correct</li></ul> | Given a registered users' email and password and generates a valid token for the user to remain authenticated |
 |auth/logout|POST|(token)|{ is_success }|N/A|Given an active token, invalidates the token to log the user out. If a valid token is given, and the user is successfully logged out, it returns true, otherwise false. |
-<<<<<<< HEAD
-|auth/register|POST|(email, password, name_first, name_last)|{ u_id, token }|**InputError** when any of:<ul><li>Email entered is not a valid email using the method provided [here](https://www.geeksforgeeks.org/check-if-email-address-valid-or-not-in-python/) (unless you feel you have a better method).</li><li>Email address is already being used by another user</li><li>Password entered is less than 6 characters long</li><li>name_first not is between 1 and 50 characters inclusively in length</li><li>name_last is not between 1 and 50 characters inclusively in length</ul>|Given a user's first and last name, email address, and password, create a new account for them and return a new token for authentication in their session. A handle is generated that is the concatentation of a lowercase-only first name and last name. If the concatenation is longer than 20 characters, it is cutoff at 20 characters. If the handle is already taken, you may modify the handle in any way you see fit to make it unique. |
-=======
 |auth/register|POST|(email, password, name_first, name_last)|{ u_id, token }|**InputError** when any of:<ul><li>Email entered is not a valid email using the method provided [here](https://www.geeksforgeeks.org/check-if-email-address-valid-or-not-in-python/) (unless you feel you have a better method).</li><li>Email address is already being used by another user</li><li>Password entered is less than 6 characters long</li><li>name_first not is between 1 and 50 characters inclusively in length</li><li>name_last is not between 1 and 50 characters inclusively in length</ul>|Given a user's first and last name, email address, and password, create a new account for them and return a new token for authentication in their session. A handle is generated that is the concatentation of a lowercase-only first name and last name. If the concatenation is longer than 20 characters, it is cutoff at 20 characters. If the handle is already taken, you may modify the handle in any way you see fit (maintaining the 20 character limit) to make it unique. |
 >>>>>>> auth
 |channel/invite|POST|(token, channel_id, u_id)|{}|**InputError** when any of:<ul><li>channel_id does not refer to a valid channel.</li><li>u_id does not refer to a valid user</li></ul>**AccessError** when<ul><li>the authorised user is not already a member of the channel</li>|Invites a user (with user id u_id) to join a channel with ID channel_id. Once invited the user is added to the channel immediately|
@@ -234,7 +265,14 @@ These interface specifications come from Sally and Bob, who are building the fro
 |user/profile/setemail|PUT|(token, email)|{}|**InputError** when any of:<ul><li>Email entered is not a valid email using the method provided [here](https://www.geeksforgeeks.org/check-if-email-address-valid-or-not-in-python/) (unless you feel you have a better method).</li><li>Email address is already being used by another user</li>|Update the authorised user's email address|
 |user/profile/sethandle|PUT|(token, handle_str)|{}|**InputError** when any of:<ul><li>handle_str must be between 3 and 20 characters</li><li>handle is already used by another user</li></ul>|Update the authorised user's handle (i.e. display name)|
 |users/all|GET|(token)|{ users}|N/A|Returns a list of all users and their associated details|
+<<<<<<< README.md
 |admin/userpermission/change|POST|(token, u_id, permission_id)|{}|**InputError** when any of:<ul><li>u_id does not refer to a valid user<li>permission_id does not refer to a value permission</li></ul>**AccessError** when<ul><li>The authorised user is not an owner</li></ul>|Given a User by their user ID, set their permissions to new permissions described by permission_id|Given a User by their user ID, set their permissions to new permissions described by permission_id|
+=======
+<<<<<<< HEAD
+|admin/userpermission/change|POST|(token, u_id, permission_id)|{}|**InputError** when any of:<ul><li>u_id does not refer to a valid user<li>permission_id does not refer to a value permission</li></ul>**AccessError** when<ul><li>The authorised user is not an admin or owner</li></ul>|Given a User by their user ID, set their permissions to new permissions described by permission_id|Given a User by their user ID, set their permissions to new permissions described by permission_id|
+=======
+>>>>>>> auth
+>>>>>>> README.md
 |search|GET|(token, query_str)|{ messages }|N/A|Given a query string, return a collection of messages in all of the channels that the user has joined that match the query|
 |clear|DELETE|()|{}|N/A|Resets the internal data of the application to it's initial state|
 
@@ -303,10 +341,17 @@ The descriptions will not be assessed, they are just there for the frontend to h
 
 The types in error.py have been modified appropriately for you.
 
+<<<<<<< README.md
+=======
+>>>>>>> README.md
 ### 6.8. Other Points
 
 * Each message should have it's own unique ID. I.E. No messages should share an ID with another message, even if that other message is in a different channel.
 
+<<<<<<< README.md
+=======
+>>>>>>> auth
+>>>>>>> README.md
 ## 7. Due Dates and Weightings
 
 |Iteration|Code and report due                  |Demonstration to tutor(s)      |Assessment weighting of project (%)|
