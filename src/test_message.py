@@ -217,5 +217,19 @@ def test_edit_not_by_person_who_sent(data):
     with pytest.raises(AccessError):
         message_edit(data['token1'], message_id, "This message should not be able to be edited")
 
-# TODO: Check that if empty string the message gets deleted 
+# Check that if empty string the message gets deleted 
+def test_empty_string (data):
+    # Send first message 
+    message1_id = message_send(data['token1'], data['c1_id'], "This is the first message sent")  
+    # Send second message 
+    message2_id = message_send(data['token1'], data['c1_id'], "This is the second message sent") 
+
+    # Edit first message with empty string so should only be one message left 
+    message_edit(data['token1'], message1_id, "")
+    # Get the messages from channel
+    message = channel.channel_message(data['token1'], data['c1_id'], 0)['messages'])
+    # get the message id 
+    message_id_at_index_zero = message[0]['message_id']
+    # Compare the message sent ID and the channels message ID 
+    assert message2_id == message_id_at_index_zero
 
