@@ -12,7 +12,7 @@ def user_profile(token, u_id):
     if user_id[0]['token'] != token:
         raise AccessError("Not a valid token")
 
-    return { user_id[0] }
+    return user_id[0]
 
 def user_profile_setname(token, name_first, name_last):
 
@@ -22,7 +22,10 @@ def user_profile_setname(token, name_first, name_last):
     if validate_last_name(name_last) == False:
         raise InputError("Not a valid last name")
 
-    u_it = find_user(token)
+    try:
+        u_it = find_user(token)
+    except StopIteration:
+        raise AccessError("Not a valid token")
 
     data['users'][u_it]['name_first'] = name_first
     data['users'][u_it]['name_last'] = name_last
