@@ -1,7 +1,7 @@
 import requests
 import json 
 from echo_http_test import url
-import channel
+import channel as ch
 import pytest
 
 ### Fixtures for ccreating Flockr and setting up users + channels
@@ -58,10 +58,15 @@ Private Channel: Person2 (O)
 
 ### Owners in either public or private channel can invite anyone who is not in that channel
 def test_invite_success_http(data):
-    payload = {"token": data['p1_token']['token'], "channel_id":[], "u_id": data['p1_id']['u_id']}
+    # P1 invite P2 to a public channel
+    payload = {"token": data['p1_token']['token'], "channel_id":data['public_id']['channel_id'], "u_id": data['p2_id']['u_id']}
     response = requests.get(url + "channel/invite", json=payload)
     assert response.status_code == 200
-    assert response.json == []
+    
+    # P2 can invite P1 to a private channel since P2 is already in it
+    payload = {"token": data['p2_token']['token'], "channel_id":data['private_id']['channel_id'], "u_id": data['p1_id']['u_id']}
+    response = requests.get(url + "channel/invite", json=payload)
+    assert response.status_code == 200
 
-
+#def test_invite_existing_http(data):
 
