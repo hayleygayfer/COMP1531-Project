@@ -215,7 +215,7 @@ def test_invalid_set_handle(userObject, url):
     assert response.status_code == 400
 
     
-def test_invalid_token_set_handle(userObject):
+def test_invalid_token_set_handle(userObject, url):
     # Invalid Token
     payload = {'token': 'invalidtoken', 'handle_str': 'tony'}
     response = requests.put(url + 'user/profile/sethandle', json=payload)
