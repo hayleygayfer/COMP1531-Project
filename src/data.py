@@ -28,7 +28,20 @@ data = {
                     'name_last': 'Doe'
                 }
             ],
-            'is_public': True
+            'is_public': True,
+            'messages': [
+                {
+                    'u_id': 1,
+                    'message_id': 10001,
+                    'message': "Hi, this is a simple test msg"
+                },
+                {
+                    'u_id': 2,
+                    'message_id': 10002,
+                    'message': "I got it!"
+                }
+            ],
+            'message_count': 2
         }
     ]
 }
