@@ -47,24 +47,24 @@ def test_invalid_token(userObject):
 # Valid Cases
 
 def test_valid_set_first_name(userObject):
-    initialUser = retrieveUser(userObject['u_id'])
+    initialUser = retrieveUser(userObject['token'], userObject['u_id'])
 
     # Tests initial name
     assert initialUser['name_first'] == 'Tony'
     user.user_profile_setname(userObject['token'], 'Anthony', 'Stark')
-    updatedUser = retrieveUser(userObject['u_id'])
+    updatedUser = retrieveUser(userObject['token'], userObject['u_id'])
 
     # Tests changed name
     assert updatedUser['name_first'] == 'Anthony'
 
 
 def test_valid_set_last_name(userObject):
-    initialUser = retrieveUser(userObject['u_id'])
+    initialUser = retrieveUser(userObject['token'], userObject['u_id'])
 
     # Tests initial name
     assert initialUser['name_last'] == 'Stark'
     user.user_profile_setname(userObject['token'], 'Tony', 'Potts')
-    updatedUser = retrieveUser(userObject['u_id'])
+    updatedUser = retrieveUser(userObject['token'], userObject['u_id'])
 
     # Tests changed name
     assert updatedUser['name_last'] == 'Potts'
@@ -100,12 +100,12 @@ def test_invalid_token_set_name(userObject):
 # Valid Cases
 
 def test_valid_set_email(userObject):
-    initialUser = retrieveUser(userObject['u_id'])
+    initialUser = retrieveUser(userObject['token'], userObject['u_id'])
 
     # Tests initial name
     assert initialUser['email'] == 'tonystark@avengers.com'
     user.user_profile_setemail(userObject['token'], 'tony@avengers.com')
-    updatedUser = retrieveUser(userObject['u_id'])
+    updatedUser = retrieveUser(userObject['token'], userObject['u_id'])
 
     # Tests changed name
     assert updatedUser['email'] == 'tony@avengers.com'
@@ -149,12 +149,12 @@ def test_invalid_token_set_email(userObject):
 # Valid Cases
 
 def test_valid_set_handle(userObject):
-    initialUser = retrieveUser(userObject['u_id'])
+    initialUser = retrieveUser(userObject['token'], userObject['u_id'])
 
     # Tests initial name
     assert initialUser['handle_str'] == 'tonystark'
     user.user_profile_sethandle(userObject['token'], 'tony')
-    updatedUser = retrieveUser(userObject['u_id'])
+    updatedUser = retrieveUser(userObject['token'], userObject['u_id'])
 
     # Tests changed name
     assert updatedUser['handle_str'] == 'tony'
@@ -187,8 +187,7 @@ def test_invalid_token_set_handle(userObject):
 ###### Helper Functions ######
 
 # Retrieves information about a user
-def retrieveUser(u_id):
-    for f_user in data['users']:
-        if u_id == f_user['u_id']:
-            return f_user
-    return None
+def retrieveUser(token, u_id):
+    return user.user_profile(token, u_id)
+
+    
