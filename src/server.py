@@ -6,6 +6,7 @@ from error import InputError
 from data import data
 
 from auth import auth_register, auth_login, auth_logout
+import channel
 
 def defaultHandler(err):
     response = err.get_response()
@@ -68,6 +69,28 @@ def http_auth_logout():
     response = auth_logout(token)
     return dumps(response)
 
+### CHANNEL
+
+@APP.route("channel/invite", method=['POST'])
+def http_channel_invite():
+
+@APP.route("channel/details", method=['GET'])
+def http_channel_invite():
+
+@APP.route("channel/messages", method=['GET'])
+def http_channel_invite():
+
+@APP.route("channel/leave", method=['POST'])
+def http_channel_invite():
+
+@APP.route("channel/join", method=['POST'])
+def http_channel_invite():
+
+@APP.route("channel/addowner", method=['POST'])
+def http_channel_invite():
+
+@APP.route("channel/removeowner", method=['POST'])
+def http_channel_invite():
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
