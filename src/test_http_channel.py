@@ -171,4 +171,56 @@ def test_leaving_diff_channel(url, data):
 
     # AccessError ch.channel_leave(data['p3_token'], data['private_id'])
     assert leave(url, data['p3']['token'], data['private_id']) != 200
+
+# channel/join
+# channel_join(token, channel_id):
+def test_join_public(data):
+    # assert ch.channel_join(data['p2_token'], data['public_id'])
+    assert join(url, data['p2']['token'], data['public_id']) == 200
+
+    # assert ch.channel_join(data['p3_token'], data['public_id'])
+    assert join(url, data['p3']['token'], data['public_id']) == 200
+
+    # assert ch.channel_join(data['flockr_owner_token'], data['public_id'])
+    assert join(url, data['flockr_owner']['token'], data['public_id']) == 200
+
+def test_join_private(data):
+    # AccessError ch.channel_join(data['p1_token'], data['private_id'])
+    assert join(url, data['p1']['token'], data['private_id']) != 200
+
+    # AccessError ch.channel_join(data['p3_token'], data['private_id'])
+    assert join(url, data['p3']['token'], data['private_id']) != 200
+
+def test_join_but_existing(data):
+    # InputError ch.channel_join(data['p1_token'], data['public_id'])
+    assert join(url, data['p1']['token'], data['public_id']) != 200
+
+    # Steps:
+    # 1. ch.channel_join(data['p3_token'], data['public_id'])
+    # 2. ch.channel_join(data['p4_token'], data['public_id'])
+    join(url, data['p3']['token'], data['public_id'])
+
+    join(url, data['p4']['token'], data['public_id'])
+
+    # InputError ch.channel_join(data['p3_token'], data['public_id'])
+    assert join(url, data['p3']['token'], data['public_id']) != 200
+
+    # InputError ch.channel_join(data['p4_token'], data['public_id'])
+    assert join(url, data['p4']['token'], data['public_id']) != 200
+
+def test_leave_then_join(data):
+    # ch.channel_join(data['p2_token'], data['public_id'])
+    join(url, data['p2']['token'], data['public_id'])
+
+    # Assert ch.channel_leave(data['p2_token'], data['public_id'])
+    assert leave(url, data['p2']['token'], data['public_id']) == 200
+
+    # join
+    assert join(url, data['p2']['token'], data['public_id']) == 200 == 200
     
+    # leave
+    assert leave(url, data['p2']['token'], data['public_id']) == 200
+
+
+
+
