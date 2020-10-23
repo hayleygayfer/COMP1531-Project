@@ -8,7 +8,7 @@ import auth
 import pytest
 
 @pytest.fixture
-def  user_list():
+def user_list():
     requests.delete(url + 'clear')
     
     payload = {"email":"person1@email.com", "password": "password", "name_first": "Person", "name_last": "One"}
