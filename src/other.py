@@ -1,25 +1,28 @@
 import data
+from user import find_match, find_user
+from error import AccessError, InputError
 
 def clear():
-    data.data = {
-        'users': [],
-        'channels': []
-    }
-
-    
+    global data
+    data['users'].clear()
+    data['channels'].clear()
 
 def users_all(token):
     return {
-        'users': [
-            {
-                'u_id': 1,
-                'email': 'cs1531@cse.unsw.edu.au',
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-                'handle_str': 'hjacobs',
-            },
-        ],
+        data['users']
     }
+
+def admin_userpermission_change(token, u_id, permission_id):
+    if find_match('u_id', u_id) == []:
+        raise InputError("Not a valid u_id")
+
+    if find_match('permission_id', permission_id) == []:
+        raise AccessError("user does not have the correct permissions")
+
+    
+
+    return {}
+
 
 def search(token, query_str):
     return {
