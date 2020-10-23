@@ -6,6 +6,7 @@ from error import InputError
 from data import data
 
 from auth import auth_register, auth_login, auth_logout
+from channels import channels_list, channels_listall, channels_create
 
 def defaultHandler(err):
     response = err.get_response()
@@ -68,6 +69,30 @@ def http_auth_logout():
     response = auth_logout(token)
     return dumps(response)
 
+###### CHANNELS ######
+
+# Channels_list
+@APP.route("/channels/list", methods=['GET'])
+def http_channels_list():
+    token = request.get_json()["token"]
+    response = channels_list(token)
+    return dumps(response)
+
+# Channels_listall
+@APP.route("/channels/listall", methods=['GET'])
+def http_channels_listall():
+    token = request.get_json()["token"]
+    response = channels_listall(token)
+    return dumps(response)
+
+# Channels_create
+@APP.route("/channels/create", methods=['POST'])
+def http_channels_create():
+    token = request.get_json()["token"]
+    name = request.get_json()["name"]
+    is_public = request.get_json()["is_public"]
+    response = channels_create(token, name, is_public)
+    return dumps(response)
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
