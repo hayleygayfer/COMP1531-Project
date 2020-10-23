@@ -32,8 +32,6 @@ def auth_logout(token):
     }
 
 def auth_register(email, password, name_first, name_last):
-
-    
     if validate_email(email) == False:
         raise InputError(f"Email entered is not a valid email ")
 
@@ -51,6 +49,9 @@ def auth_register(email, password, name_first, name_last):
             raise InputError("Email address is already being used by another user")
 
     handle = generate_valid_handle(name_first, name_last)
+    permissions = 'MEMBER'
+    if data['users'] == []:
+        permissions = 'OWNER'
 
     data['users'].append(
         {
@@ -60,7 +61,8 @@ def auth_register(email, password, name_first, name_last):
             'password': password,
             'name_first': name_first,
             'name_last': name_last,
-            'handle_str': handle
+            'handle_str': handle,
+            'permissions': permissions,
         }
     )
 
