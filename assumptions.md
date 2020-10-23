@@ -40,9 +40,13 @@
 * The creator of a channel is automatically assigned as the sole owner of the channel
 * All channel owners are also considered channel members
 
-## MESSEGES.PY
+## MESSAGE.PY
 
-> TODO
+* An empty message cannot be added to a channel
+* When editing a message, details such as time_created and u_id will not be modified even if another user is editing it
+* Users cannot edit/delete their own messages unless they are an owner (or FlockR owner)
+* You must be a channel owner (or FlockR owner) to edit/delete messages
+* A message cannot be deleted/edited if it was created by a channel owner (or FlockR owner)
 
 ## USER.PY
 
