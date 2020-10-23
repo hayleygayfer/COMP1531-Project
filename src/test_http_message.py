@@ -89,18 +89,93 @@ OUTPUT: {}
 
 # VALID CASES #
 def test_remove_user_owner(data):
+    # Send message
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This message will be removed"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
+    # Remove message
+    payload = {'token1': user_list['token1'], 'message_id': message_ID}
+    response = response.post(url + "message/remove", json=payload)
+    assert response.status_code == 200
 
 def test_remove_flocker_owner_but_not_owner(data):
+    # Join channel
+    payload = {'token1': user_list['token1'], 'c2_id': channel_list['c2_id']}
+    response = requests.post(url + "channel/join", json=payload)
+    assert response.status_code == 200
+    # Send message
+    payload = {'token1': user_list['token1'], 'c2_id': channel_list['c2_id'], 'message': "This message will be removed"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
+    # Remove message
+    payload = {'token1': user_list['token1'], 'message_id': message_ID}
+    response = response.post(url + "message/remove", json=payload)
+    assert response.status_code == 200
+
 
 def test_remove_request_user_member(data):
+     # Send message
+    payload = {'token2': user_list['token2'], 'c2_id': channel_list['c2_id'], 'message': "This message will be removed"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
+    # Remove message
+    payload = {'token2': user_list['token2'], 'message_id': message_ID}
+    response = response.post(url + "message/remove", json=payload)
+    assert response.status_code == 200
 
 # INVALID CASES #
 def test_message_no_longer_exists(data):
+    # Send message
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This is a valid message"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
+    # Remove message
+    payload = {'token1': user_list['token1'], 'message_id': message_ID}
+    response = response.post(url + "message/remove", json=payload)
+    assert response.status_code == 200
+    # Remove message again
+    payload = {'token1': user_list['token1'], 'message_id': message_ID}
+    response = response.post(url + "message/remove", json=payload)
+    assert response.status_code == 404
 
 def test_not_users_message(data):
+    # Join channel
+    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
+    response = requests.post(url + "channel/join", json=payload)
+    assert response.status_code == 200
+    # Add owner
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'u2_id': user_list['u2_id']}
+    response = requests.post(url + "channel/addowner", json=payload)
+    assert response.status_code == 200
+    # Send message
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This message was sent by one of the owners of the channel"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
+    # Remove message 
+    payload = {'token2': user_list['token2'], 'message_id': message_ID}
+    response = response.post(url + "message/remove", json=payload)
+    assert response.status_code == 404
 
 def test_user_not_owner(data):
-
+    # Join channel
+    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
+    response = requests.post(url + "channel/join", json=payload)
+    assert response.status_code == 200
+    # Send message
+    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id'], 'message': "This message was sent by one of the members of the channel"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
+    # Remove message 
+    payload = {'token2': user_list['token2'], 'message_id': message_ID}
+    response = response.post(url + "message/remove", json=payload)
+    assert response.status_code == 404
+    
 # test message_edit #
 """
 message_edit(token, message_id, message)
