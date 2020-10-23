@@ -139,21 +139,21 @@ def test_owner_leaving(url, data):
 
     # InputError: ch.channel_leave(data['p1_token'], data['public_id'])
     payload = {"token": data['p1']['token'], "channel_id": data['public_id']}
-    reponse = requests.post(url + "channel/leave", json=payload)
+    response = requests.post(url + "channel/leave", json=payload)
     assert response.status_code != 200
 
     # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id']) 
     payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p3']['u_id']}
     response = requests.post(url + "channel/addowner", json=payload)
 
-    # assert ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id'])  
+    # assert ch.channel_leave(data['p1_token'], data['public_id'])
     payload = {"token": data['p1']['token'], "channel_id": data['public_id']}
-    reponse = requests.post(url + "channel/leave", json=payload)
+    response = requests.post(url + "channel/leave", json=payload)
     assert response.status_code == 200
     
     # InputError ch.channel_leave(data['p3_token'], data['public_id'])
     payload = {"token": data['p3']['token'], "channel_id": data['public_id']}
-    reponse = requests.post(url + "channel/leave", json=payload)
+    response = requests.post(url + "channel/leave", json=payload)
     assert response.status_code != 200
 
 def test_leaving_diff_channel(url, data):
