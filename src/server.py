@@ -6,7 +6,8 @@ from error import InputError
 from data import data
 
 from auth import auth_register, auth_login, auth_logout
-import channel
+import channel as ch
+from channels import channels_list, channels_listall, channels_create
 
 def defaultHandler(err):
     response = err.get_response()
@@ -71,31 +72,56 @@ def http_auth_logout():
 
 ### CHANNEL
 
-@APP.route("channel/invite", method=['POST'])
+@APP.route("/channel/invite", methods=['POST'])
 def http_channel_invite():
-    token = request.get_json()["token_inviter"]
+    token = request.get_json()["token"]
     channel_id = request.get_json()["channel_id"]
-    u_id = request.get_json()["u_id_invitee"]
-    response = channel_invite(toke, channel_id, u_id)
+    u_id = request.get_json()["u_id"]
+    response = ch.channel_invite(token, channel_id, u_id)
+    return dumps(response)
+'''
+@APP.route("channel/details", methods=['GET'])
+def http_channel_invite():
+
+@APP.route("channel/messages", methods=['GET'])
+def http_channel_invite():
+
+@APP.route("channel/leave", methods=['POST'])
+def http_channel_invite():
+
+@APP.route("channel/join", methods=['POST'])
+def http_channel_invite():
+
+@APP.route("channel/addowner", methods=['POST'])
+def http_channel_invite():
+
+@APP.route("channel/removeowner", methods=['POST'])
+def http_channel_invite():
+'''
+###### CHANNELS ######
+
+# Channels_list
+@APP.route("/channels/list", methods=['GET'])
+def http_channels_list():
+    token = request.get_json()["token"]
+    response = channels_list(token)
     return dumps(response)
 
-@APP.route("channel/details", method=['GET'])
-def http_channel_invite():
+# Channels_listall
+@APP.route("/channels/listall", methods=['GET'])
+def http_channels_listall():
+    token = request.get_json()["token"]
+    response = channels_listall(token)
+    return dumps(response)
 
-@APP.route("channel/messages", method=['GET'])
-def http_channel_invite():
-
-@APP.route("channel/leave", method=['POST'])
-def http_channel_invite():
-
-@APP.route("channel/join", method=['POST'])
-def http_channel_invite():
-
-@APP.route("channel/addowner", method=['POST'])
-def http_channel_invite():
-
-@APP.route("channel/removeowner", method=['POST'])
-def http_channel_invite():
+# Channels_create
+@APP.route("/channels/create", methods=['POST'])
+def http_channels_create():
+    token = request.get_json()["token"]
+    name = request.get_json()["name"]
+    is_public = request.get_json()["is_public"]
+    response = channels_create(token, name, is_public)
+    return dumps(response)
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
