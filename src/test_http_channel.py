@@ -407,78 +407,107 @@ def test_invalid_tokens(url, data):
     # TODO: AccessError ch.channel_messages(232414, data['public_id'], 0)
 
 
-'''## Flockr owner tests ##
+## Flockr owner tests ##
 def test_flockr_addowner_success(url, data):
-    ch.channel_join(data['flockr_owner_token'], data['public_id'])
-    ch.channel_join(data['p3_token'], data['public_id'])
-    assert ch.channel_addowner(data['flockr_owner_token'], data['public_id'], data['p3_id'])
+    # ch.channel_join(data['flockr_owner_token'], data['public_id'])
+    join(url, data['flockr_owner']['token'], data['public_id'])
 
+    # ch.channel_join(data['p3_token'], data['public_id'])
+    join(url, data['p3']['token'], data['public_id'])
+    
+    # assert ch.channel_addowner(data['flockr_owner_token'], data['public_id'], data['p3_id'])
+    assert add_owner(url, data['flockr_owner']['token'], data['public_id'], data['p3']['u_id']) == 200
 
 # FlockR owner must to be a member of the channel to remove an owner
 # They don't necessarily have to be a channel owner 
 def test_flockr_removeowner_success(url, data):
-    ch.channel_join(data['flockr_owner_token'], data['public_id'])
-    assert ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
+    # ch.channel_join(data['flockr_owner_token'], data['public_id'])
+    join(url, data['flockr_owner']['token'], data['public_id'])
     
-    ch.channel_invite(data['p2_token'], data['private_id'], data['flockr_owner_id'])
-    assert ch.channel_removeowner(data['flockr_owner_token'], data['private_id'], data['p2_id'])
-
+    # assert ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
+    assert rem_owner(url, data['flockr_owner']['token'], data['public_id'], data['p1']['u_id']) == 200
+    
+    # ch.channel_invite(data['p2_token'], data['private_id'], data['flockr_owner_id'])
+    invite(url, data['p2']['token'], data['private_id'], data['flockr_owner']['u_id'])
+    
+    # assert ch.channel_removeowner(data['flockr_owner_token'], data['private_id'], data['p2_id'])
+    assert rem_owner(url, data['flockr_owner']['token'], data['private_id'], data['p2']['u_id']) == 200
 
 # If the flockR owner is not part of the channel, they don't get any piviledges
 def test_flockr_addowner_but_not_member(url, data):
-    ch.channel_join(data['p3_token'], data['public_id'])
-    ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
-    with pytest.raises(AccessError):
-        ch.channel_addowner(data['flockr_owner_token'], data['public_id'], data['p3_id'])
-    with pytest.raises(AccessError):
-        ch.channel_addowner(data['flockr_owner_token'], data['private_id'], data['p4_id'])
+    # ch.channel_join(data['p3_token'], data['public_id'])
+    join(url, data['p3']['token'], data['public_id'])
 
+    # ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
+    invite(url, data['p2']['token'], data['private_id'], data['p4']['u_id'])
+
+    # AccessError ch.channel_addowner(data['flockr_owner_token'], data['public_id'], data['p3_id'])
+    assert add_owner(url, data['flockr_owner']['token'], data['public_id'], data['p3']['u_id']) != 200
+
+    # AccessError ch.channel_addowner(data['flockr_owner_token'], data['private_id'], data['p4_id'])
+    assert add_owner(url, data['flockr_owner']['token'], data['private_id'], data['p4']['u_id']) != 200
 
 # If the flockR owner is not part of the channel, they don't get any piviledges
 def test_flockr_removeowner_but_not_member(url, data):
-    with pytest.raises(AccessError):
-        ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
-    with pytest.raises(AccessError):
-        ch.channel_removeowner(data['flockr_owner_token'], data['private_id'], data['p2_id'])
-
+    # AccessError ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
+    assert rem_owner(url, data['flockr_owner']['token'], data['public_id'], data['p1']['u_id']) != 200
+    
+    # AccessError ch.channel_removeowner(data['flockr_owner_token'], data['private_id'], data['p2_id'])
+    assert rem_owner(url, data['flockr_owner']['token'], data['private_id'], data['p2']['u_id']) != 200
 
 # FlockR members are allowed to join private channels
 def test_flockr_join_private(url, data):
-    assert ch.channel_join(data['flockr_owner_token'], data['private_id'])
-    assert ch.channel_leave(data['flockr_owner_token'], data['private_id'])
-    assert ch.channel_join(data['flockr_owner_token'], data['private_id'])
-
+    # assert ch.channel_join(data['flockr_owner_token'], data['private_id'])
+    assert join(url, data['flockr_owner']['token'], data['private_id']) == 200
+    
+    # assert ch.channel_leave(data['flockr_owner_token'], data['private_id'])
+    assert leave(url, data['flockr_owner']['token'], data['private_id']) == 200
+    
+    # assert ch.channel_join(data['flockr_owner_token'], data['private_id'])
+    assert join(url, data['flockr_owner']['token'], data['private_id']) == 200
 
 # FlockR owners are allowed to invite anyone who is not currently in the private channel
 # even when they are not an owner of the channel
 def test_flockr_invite_private(url, data):
-    ch.channel_invite(data['p2_token'], data['private_id'], data['flockr_owner_id'])
-    assert ch.channel_invite(data['flockr_owner_token'], data['private_id'], data['p3_id'])
-
+    # ch.channel_invite(data['p2_token'], data['private_id'], data['flockr_owner_id'])
+    invite(url, data['p2']['token'], data['private_id'], data['flockr_owner']['u_id'])
+    
+    # assert ch.channel_invite(data['flockr_owner_token'], data['private_id'], data['p3_id'])
+    assert invite(url, data['flockr_owner']['token'], data['private_id'], data['p3']['u_id']) == 200
 
 # Adding the FlockR owner as a channel owner doesn't change much
 def test_add_flockr_as_owner(url, data):
-    ch.channel_join(data['flockr_owner_token'], data['public_id'])
-    assert ch.channel_addowner(data['p1_token'], data['public_id'], data['flockr_owner_id'])
-    with pytest.raises(InputError):
-        ch.channel_addowner(data['p1_token'], data['public_id'], data['flockr_owner_id'])
+    # ch.channel_join(data['flockr_owner_token'], data['public_id'])
+    join(url, data['flockr_owner'], data['public_id'])
 
-    assert ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
-    with pytest.raises(InputError):
-        ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
+    # assert ch.channel_addowner(data['p1_token'], data['public_id'], data['flockr_owner_id'])
+    add_owner(url, data['p1']['token'], data['public_id'], data['flockr_owner']['u_id'])
 
+    # InputError ch.channel_addowner(data['p1_token'], data['public_id'], data['flockr_owner_id'])
+    assert add_owner(url, data['p1']['token'], data['public_id'], data['flockr_owner']['u_id']) != 200
+
+    # assert ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
+    assert rem_owner(url, data['flockr_owner']['token'], data['public_id'], data['flockr_owner']['u_id']) != 200
+
+    # InputError ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
+    assert rem_owner(url, data['flockr_owner']['token'], data['public_id'], data['p1']['u_id']) != 200
 
 # Flockr members can leave channels but the channels must have an owner
 def test_flockr_leaving_channel(url, data):
-    ch.channel_join(data['flockr_owner_token'], data['public_id'])
-    assert ch.channel_leave(data['flockr_owner_token'], data['public_id'])
+    # ch.channel_join(data['flockr_owner_token'], data['public_id'])
+    join(url, data['flockr_owner']['token'], data['public_id'])
 
-    # Leaving a channel with no owners
-    ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
-    ch.channel_join(data['flockr_owner_token'], data['public_id'])
-    ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
+    # assert ch.channel_leave(data['flockr_owner_token'], data['public_id'])
+    assert leave(url, data['flockr_owner']['token'], data['public_id'])
+
+    # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
+    invite(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
     
-    with pytest.raises(InputError):
-        # If FlockR owner leaves then Person3 is the only member left and there are no owners
-        ch.channel_leave(data['flockr_owner_token'], data['public_id'])
-'''
+    # ch.channel_join(data['flockr_owner_token'], data['public_id'])
+    join(url, data['flockr_owner']['token'], data['public_id'])
+    
+    # ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
+    rem_owner(url, data['flockr_owner']['token'], data['public_id'], data['p1']['u_id'])
+
+    # AccessError ch.channel_leave(data['flockr_owner_token'], data['public_id'])
+    assert leave(url, data['flockr_owner']['token'], data['public_id']) != 200
