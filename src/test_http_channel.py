@@ -174,7 +174,7 @@ def test_leaving_diff_channel(url, data):
 
 # channel/join
 # channel_join(token, channel_id):
-def test_join_public(data):
+def test_join_public(url, data):
     # assert ch.channel_join(data['p2_token'], data['public_id'])
     assert join(url, data['p2']['token'], data['public_id']) == 200
 
@@ -184,14 +184,14 @@ def test_join_public(data):
     # assert ch.channel_join(data['flockr_owner_token'], data['public_id'])
     assert join(url, data['flockr_owner']['token'], data['public_id']) == 200
 
-def test_join_private(data):
+def test_join_private(url, data):
     # AccessError ch.channel_join(data['p1_token'], data['private_id'])
     assert join(url, data['p1']['token'], data['private_id']) != 200
 
     # AccessError ch.channel_join(data['p3_token'], data['private_id'])
     assert join(url, data['p3']['token'], data['private_id']) != 200
 
-def test_join_but_existing(data):
+def test_join_but_existing(url, data):
     # InputError ch.channel_join(data['p1_token'], data['public_id'])
     assert join(url, data['p1']['token'], data['public_id']) != 200
 
@@ -208,7 +208,7 @@ def test_join_but_existing(data):
     # InputError ch.channel_join(data['p4_token'], data['public_id'])
     assert join(url, data['p4']['token'], data['public_id']) != 200
 
-def test_leave_then_join(data):
+def test_leave_then_join(url, data):
     # ch.channel_join(data['p2_token'], data['public_id'])
     join(url, data['p2']['token'], data['public_id'])
 
@@ -217,10 +217,10 @@ def test_leave_then_join(data):
 
     # join
     assert join(url, data['p2']['token'], data['public_id']) == 200 == 200
-    
+
     # leave
     assert leave(url, data['p2']['token'], data['public_id']) == 200
 
-
+# Channel/addowner
 
 
