@@ -6,6 +6,7 @@ from error import InputError
 from data import data
 
 from auth import auth_register, auth_login, auth_logout
+from message import message_send, message_remove, message_edit
 
 def defaultHandler(err):
     response = err.get_response()
@@ -68,6 +69,32 @@ def http_auth_logout():
     response = auth_logout(token)
     return dumps(response)
 
+###### MESSAGES ######
+# Message send
+@APP.route("/message/send", methods=['POST'])
+def http_message_send():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    message = request.get_json()["message"]
+    response = message_send(token, channel_id, message)
+    return dumps(response)
+
+# Message remove
+@APP.route("/message/remove", methods=['DELETE'])
+def http_message_remove():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    response = message_remove(token, channel_id)
+    return dumps(response)
+
+# Message edit
+@APP.route("/message/edit", methods=['PUT'])
+def http_message_edit():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    message = request.get_json()["message"]
+    response = message_edit(token, channel_id, message)
+    return dumps(response)
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
