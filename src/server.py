@@ -73,6 +73,11 @@ def http_auth_logout():
 
 @APP.route("channel/invite", method=['POST'])
 def http_channel_invite():
+    token = request.get_json()["token_inviter"]
+    channel_id = request.get_json()["channel_id"]
+    u_id = request.get_json()["u_id_invitee"]
+    response = channel_invite(toke, channel_id, u_id)
+    return dumps(response)
 
 @APP.route("channel/details", method=['GET'])
 def http_channel_invite():
