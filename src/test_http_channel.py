@@ -1,7 +1,6 @@
 import requests
 import json 
 from echo_http_test import url
-import channel as ch
 import pytest
 
 ### Fixtures for ccreating Flockr and setting up users + channels
@@ -69,99 +68,107 @@ Public Channel: Person1 (O)
 Private Channel: Person2 (O)
 '''
 
+######################################################################
+## HELPER FUNCTIONS
+######################################################################
+
+def invite(url_invite, token, channel_id, u_id):
+    payload = {"token": token, "channel_id": channel_id, "u_id": u_id}
+    response = requests.post(url_invite + "channel/invite", json=payload)
+    return response.status_code
+
+def leave(url_leave, token, channel_id):
+    payload = {"token": token, "channel_id": channel_id}
+    response = requests.post(url_leave + "channel/leave", json=payload)
+    return response.status_code
+
+def join(url_join, token, channel_id):
+    payload = {"token": token, "channel_id": channel_id}
+    response = requests.post(url_join + "channel/join", json=payload)
+    return response.status_code
+
+def add_owner(url_add, token, channel_id, u_id):
+    payload = {"token": token, "channel_id": channel_id, "u_id": u_id}
+    response = requests.post(url_add + "channel/addowner", json=payload)
+    return response.status_code
+
+def rem_owner(url_rem, token, channel_id, u_id):
+    payload = {"token": token, "channel_id": channel_id, "u_id": u_id}
+    response = requests.post(url_rem + "channel/removeowner", json=payload)
+    return response.status_code
+
+######################################################################
+
 # channel/invite
 
 def test_invite_success(url, data):
     # assert channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p2']['u_id']}
-    response = requests.post(url + "channel/invite", json=payload)
-
-    assert response.status_code == 200
+    assert invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id']) == 200
     
     # assert channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p3']['u_id']}
-    response = requests.post(url + "channel/invite", json=payload)
-    assert response.status_code == 200
+    assert invite(url, data['p1']['token'], data['public_id'], data['p3']['u_id']) == 200
 
     # assert ch.channel_invite(data['p2_token'], data['private_id'], data['p3_id'])
-    payload = {"token": data['p2']['token'], "channel_id": data['private_id'], "u_id": data['p3']['u_id']}
-    response = requests.post(url + "channel/invite", json=payload)
-    assert response.status_code == 200
+    assert invite(url, data['p2']['token'], data['private_id'], data['p3']['u_id']) == 200
 
 def test_invite_existing(url, data):
     # ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p2']['u_id']}
-    response = requests.post(url + "channel/invite", json=payload)
+    invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
 
     # InputError: ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p2']['u_id']}
-    response = requests.post(url + "channel/invite", json=payload)
-    assert response.status_code != 200
+    assert invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id']) != 200
     
     # InputError: ch.channel_invite(data['p1_token'], data['public_id'], data['p1_id'])
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p1']['u_id']}
-    response = requests.post(url + "channel/invite", json=payload)
-    assert response.status_code != 200
+    assert invite(url, data['p1']['token'], data['public_id'], data['p1']['u_id']) != 200
 
+def test_not_in_channel_invite(url, data):
+    # AccessError: ch.channel_invite(data['p2_token'], data['public_id'], data['p3_id'])
+    assert invite(url, data['p2']['token'], data['public_id'], data['p3']['u_id']) != 200
+
+    # ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
+    invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
+
+    # assert ch.channel_invite(data['p2_token'], data['public_id'], data['p3_id'])
+    assert invite(url, data['p2']['token'], data['public_id'], data['p3']['u_id']) == 200
 
 #channel/leave
 
 def test_leave_success(url, data):
-    # Steps:
     # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
     # ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
     # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id'])
 
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p3']['u_id']}
-    response = requests.post(url + "channel/invite", json=payload)
-
-    payload = {"token": data['p2']['token'], "channel_id": data['private_id'], "u_id": data['p4']['u_id']}
-    response = requests.post(url + "channel/invite", json=payload)
-
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p3']['u_id']}
-    response = requests.post(url + "channel/addowner", json=payload)
+    invite(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
+    invite(url, data['p2']['token'], data['private_id'], data['p4']['u_id'])
+    add_owner(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
 
     # assert ch.channel_leave(data['p4_token'], data['private_id'])
-    payload = {"token": data['p4']['token'], "channel_id": data['private_id']}
-    response = requests.post(url + "channel/leave", json=payload)
-    assert response.status_code == 200
+    assert leave(url, data['p4']['token'], data['private_id']) == 200
 
-    # assert ch.channel_leave(data['p4_token'], data['private_id'])
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id']}
-    response = requests.post(url + "channel/leave", json=payload)
-    assert response.status_code == 200
+    # assert ch.channel_leave(data['p1_token'], data['public_id'])
+    assert leave(url, data['p1']['token'], data['public_id']) == 200
 
 def test_owner_leaving(url, data):
 
     # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p3']['u_id']}
-    response = requests.post(url + "channel/invite", json=payload)
+    invite(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
 
     # InputError: ch.channel_leave(data['p1_token'], data['public_id'])
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id']}
-    response = requests.post(url + "channel/leave", json=payload)
-    assert response.status_code != 200
+    assert leave(url, data['p1']['token'], data['public_id']) != 200
 
     # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id']) 
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p3']['u_id']}
-    response = requests.post(url + "channel/addowner", json=payload)
+    add_owner(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
 
     # assert ch.channel_leave(data['p1_token'], data['public_id'])
-    payload = {"token": data['p1']['token'], "channel_id": data['public_id']}
-    response = requests.post(url + "channel/leave", json=payload)
-    assert response.status_code == 200
+    assert leave(url, data['p1']['token'], data['public_id']) == 200
     
     # InputError ch.channel_leave(data['p3_token'], data['public_id'])
-    payload = {"token": data['p3']['token'], "channel_id": data['public_id']}
-    response = requests.post(url + "channel/leave", json=payload)
-    assert response.status_code != 200
+    assert leave(url, data['p3']['token'], data['public_id']) != 200
 
 def test_leaving_diff_channel(url, data):
     # ch.channel_join(data['p3_token'], data['public_id'])
-    payload = {"token": data['p3']['token'], "channel_id": data['public_id']}
-    response = requests.post(url + "channel/join", json=payload)
+    join(url, data['p3']['token'], data['public_id'])
 
     # AccessError ch.channel_leave(data['p3_token'], data['private_id'])
-    payload = {"token": data['p3']['token'], "channel_id": data['private_id']}
-    response = requests.post(url + "channel/leave", json=payload)
-    assert response.status_code != 200
+    assert leave(url, data['p3']['token'], data['private_id']) != 200
+    
