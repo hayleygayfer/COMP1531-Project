@@ -75,37 +75,36 @@ def http_auth_logout():
 ###### USER ######
 
 # User/Profile
-
-@App.route("/user/profile", methods=['GET'])
+@APP.route("/user/profile", methods=['GET'])
 def http_user_profile():
     token = request.args.get('token')
     u_id = request.args.get('u_id')
-    response = user_profile(token, u_id)
+    response = user_profile(token, int(u_id))
     return dumps(response)
 
 # User/Profile/Setname
-@App.route("/user/profile/setname", methods=['PUT'])
-def http_user_profile():
-    token = request.args.get('token')
-    name_first = request.args.get('name_first')
-    name_last = request.args.get('name_last')
+@APP.route("/user/profile/setname", methods=['PUT'])
+def http_user_profile_setname():
+    token = request.get_json()['token']
+    name_first = request.get_json()['name_first']
+    name_last = request.get_json()['name_last']
     response = user_profile_setname(token, name_first, name_last)
     return dumps(response)
 
 # User/Profile/Setemail
-@App.route("/user/profile/setemail", methods=['PUT'])
-def http_user_profile():
-    token = request.args.get('token')
-    name_first = request.args.get('email')
-    response = user_profile_setname(token, email)
+@APP.route("/user/profile/setemail", methods=['PUT'])
+def http_user_profile_setemail():
+    token = request.get_json()['token']
+    email = request.get_json()['email']
+    response = user_profile_setemail(token, email)
     return dumps(response)
 
 # User/Profile/Sethandle
-@App.route("/user/profile/sethandle", methods=['PUT'])
-def http_user_profile():
-    token = request.args.get('token')
-    name_first = request.args.get('handle_str')
-    response = user_profile_setname(token, email)
+@APP.route("/user/profile/sethandle", methods=['PUT'])
+def http_user_profile_sethandle():
+    token = request.get_json()['token']
+    handle = request.get_json()['handle_str']
+    response = user_profile_sethandle(token, handle)
     return dumps(response)
 
 ###### CHANNELS ######
