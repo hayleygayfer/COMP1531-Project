@@ -175,10 +175,8 @@ def test_leaving_diff_channel(url, data):
 
     # AccessError ch.channel_leave(data['p3_token'], data['private_id'])
     assert leave(url, data['p3']['token'], data['private_id']) != 200
-<<<<<<< Updated upstream
 
-# channel/join
-# channel_join(token, channel_id):
+## /channel/join ##
 def test_join_public(url, data):
     # assert ch.channel_join(data['p2_token'], data['public_id'])
     assert join(url, data['p2']['token'], data['public_id']) == 200
@@ -238,7 +236,7 @@ def test_addowner_success(url, data):
     assert add_owner(url, data['p1']['token'], data['public_id'], data['p2']['u_id']) == 200
 
     # assert ch.channel_addowner(data['p2_token'], data['private_id'], data['p1_id'])
-    assert add_owner(url, data['p2']['token'], data['private_id'], data['p1']['u_id']) == 400
+    assert add_owner(url, data['p2']['token'], data['private_id'], data['p1']['u_id']) != 200
 
 def test_addowner_but_not_owner(url, data):
     # ch.channel_join(data['p2_token'], data['public_id'])
@@ -282,7 +280,6 @@ def test_addowner_but_not_in_channel(url, data):
     # InputError ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id']) # Person3 is not in private
     assert add_owner(url, data['p2']['token'], data['private_id'], data['p3']['u_id']) != 200
 
-=======
     
 
 ## /channel/removeowner ##
@@ -354,4 +351,3 @@ def test_self_removeowner(url, data):
     
     # InputError: ch.channel_removeowner(data['p3_token'], data['public_id'], data['p3_id'])
     assert rem_owner(url, data['p3']['token'], data['public_id'], data['p3']['u_id']) != 200
->>>>>>> Stashed changes
