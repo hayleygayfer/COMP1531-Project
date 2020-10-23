@@ -59,7 +59,6 @@ def test_valid_set_first_name(userObject, url):
     payload = {'token': userObject['token'], 'name_first': 'Anthony', 'name_last': 'Stark' }
     response = requests.put(url + 'user/profile/setname', json=payload)
     updatedUser = retrieveUser(userObject['token'], userObject['u_id'], url)
-
     # Tests changed name
     assert updatedUser['name_first'] == 'Anthony'
 
@@ -125,6 +124,7 @@ def test_valid_set_email(userObject, url):
     # Changes email
     payload = {'token': userObject['token'], 'email': 'tony@avengers.com'}
     response = requests.put(url + 'user/profile/setemail', json=payload)
+
     updatedUser = retrieveUser(userObject['token'], userObject['u_id'], url)
 
     # Tests changed name
@@ -224,7 +224,7 @@ def test_invalid_token_set_handle(userObject, url):
 ###### Helper Functions ######
 
 # Retrieves information about a user
-def retrieveUser(u_id, token, url):
-    params = {'token': token, 'u_id': u_id}
+def retrieveUser(token, u_id, url):
+    params = {'token': token, 'u_id': int(u_id)}
     response = requests.get(url + 'user/profile', params=params)
     return response.json()
