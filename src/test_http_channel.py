@@ -226,8 +226,61 @@ def test_leave_then_join(url, data):
     # leave
     assert leave(url, data['p2']['token'], data['public_id']) == 200
 
-# Channel/addowner
+## /channel/addowner ##
+def test_addowner_success(url, data):
+    # ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
+    invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
 
+    # ch.channel_invite(data['p2_token'], data['private_id'], data['p1_id'])
+    invite(url, data['p2']['token'], data['private_id'], data['p2']['u_id'])
+
+    # assert ch.channel_addowner(data['p1_token'], data['public_id'], data['p2_id'])
+    assert add_owner(url, data['p1']['token'], data['public_id'], data['p2']['u_id']) == 200
+
+    # assert ch.channel_addowner(data['p2_token'], data['private_id'], data['p1_id'])
+    assert add_owner(url, data['p2']['token'], data['private_id'], data['p1']['u_id']) == 400
+
+def test_addowner_but_not_owner(url, data):
+    # ch.channel_join(data['p2_token'], data['public_id'])
+    join(url, data['p2']['token'], data['public_id'])
+
+    # ch.channel_join(data['p3_token'], data['public_id'])
+    join(url, data['p3']['token'], data['public_id'])
+    
+    # AccessError ch.channel_addowner(data['p2_token'], data['public_id'], data['p3_id'])
+    assert add_owner(url, data['p2']['token'], data['public_id'], data['p3']['u_id']) != 200
+    
+    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p2_id'])
+    add_owner(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
+    
+    # AccessError ch.channel_addowner(data['p2_token'], data['public_id'], data['p3_id'])
+    assert add_owner(url, data['p2']['token'], data['public_id'], data['p3']['u_id']) == 200
+
+def test_addowner_when_already_owner(url, data):
+    # ch.channel_invite(data['p2_token'], data['private_id'], data['p3_id'])
+    invite(url, data['p2']['token'], data['private_id'], data['p3']['u_id'])
+    
+    # ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id'])
+    add_owner(url, data['p2']['token'], data['private_id'], data['p3']['u_id'])
+    
+    # InputError ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id']) 
+    assert add_owner(url, data['p2']['token'], data['private_id'], data['p3']['u_id']) != 200
+    
+    # InputError ch.channel_addowner(data['p3_token'], data['private_id'], data['p2_id']) 
+    assert add_owner(url, data['p3']['token'], data['private_id'], data['p2']['u_id']) != 200
+
+def test_addowner_but_not_in_channel(url, data):
+    # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
+    invite(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
+    
+    # ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
+    invite(url, data['p2']['token'], data['private_id'], data['p4']['u_id'])
+
+    # InputError ch.channel_addowner(data['p1_token'], data['public_id'], data['p4_id']) # Person4 is not in public
+    assert add_owner(url, data['p1']['token'], data['public_id'], data['p4']['u_id']) != 200
+    
+    # InputError ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id']) # Person3 is not in private
+    assert add_owner(url, data['p2']['token'], data['private_id'], data['p3']['u_id']) != 200
 
 =======
     
