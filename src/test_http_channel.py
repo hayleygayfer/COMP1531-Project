@@ -3,63 +3,34 @@ import json
 from echo_http_test import url
 import pytest
 
-### Fixtures for ccreating Flockr and setting up users + channels
+### Fixtures for creating Flockr and setting up users + channels
 @pytest.fixture
 def data(url):
     requests.delete(url + 'clear')
+
     # Flockr owner id and token
-    payload = {"email":"almightygod@unsw.com", "password": "firstuser", "name_first": "Flockr", "name_last": "Owner"}
-    requests.post(url + "auth/register", json=payload)
-    payload = {"email":"almightygod@unsw.com", "password": "firstuser"}
-    response0 = requests.post(url + "auth/login", json=payload)
+    response0 = auth(url, "almightygod@unsw.com", "firstuser", "Flockr", "Owner")
 
-    # Person1 owner id and token
-    payload = {"email":"person1@unsw.com", "password": "pass1234", "name_first": "Personone", "name_last": "One"}
-    requests.post(url + "auth/register", json=payload)
-    payload = {"email":"person1@unsw.com", "password": "pass1234"}
-    response1 = requests.post(url + "auth/login", json=payload)
-
-    # Person2 owner id and token
-    payload = {"email":"person2@unsw.com", "password": "pass1234", "name_first": "Persontwo", "name_last": "Two"}
-    requests.post(url + "auth/register", json=payload)
-    payload = {"email":"person2@unsw.com", "password": "pass1234"}
-    response2 = requests.post(url + "auth/login", json=payload)
-
-    # Person3 owner id and token
-    payload = {"email":"person3@unsw.com", "password": "pass1234", "name_first": "Personthree", "name_last": "Three"}
-    requests.post(url + "auth/register", json=payload)
-    payload = {"email":"person3@unsw.com", "password": "pass1234"}
-    response3 = requests.post(url + "auth/login", json=payload)
-
-    # Person4 owner id and token
-    payload = {"email":"person4@unsw.com", "password": "pass1234", "name_first": "Personfour", "name_last": "Four"}
-    requests.post(url + "auth/register", json=payload)
-    payload = {"email":"person4@unsw.com", "password": "pass1234"}
-    response4 = requests.post(url + "auth/login", json=payload)
-
-    # Person5 owner id and token
-    payload = {"email":"person5@unsw.com", "password": "pass1234", "name_first": "Personfive", "name_last": "Five"}
-    requests.post(url + "auth/register", json=payload)
-    payload = {"email":"person5@unsw.com", "password": "pass1234"}
-    response5 = requests.post(url + "auth/login", json=payload)
+    # Person1 - Person5
+    response1 = auth(url, "person1@unsw.com", "pass1234", "Personone", "One")
+    response2 = auth(url, "person2@unsw.com", "pass1234", "Persontwo", "Two")
+    response3 = auth(url, "person3@unsw.com", "pass1234", "Personthree", "Three")
+    response4 = auth(url, "person4@unsw.com", "pass1234", "Personfour", "Four")
+    response5 = auth(url, "person5@unsw.com", "pass1234", "Personfive", "Five")
 
     # Creatiion of Channels public and private
-    payload = {"token": response1.json()['token'], "name": "PublicChannel", "is_public": True}
-    response6 = requests.post(url + "channels/create", json=payload)
-
-    # channels.channels_create(p1_token, "PublicChannel", True)['channel_id'],
-    payload = {"token": response2.json()['token'], "name": "PrivateChannel", "is_public": False}
-    response7 = requests.post(url + "channels/create", json=payload)
+    response6 = create(url, response1['token'], "PublicChannel", True)
+    response7 = create(url, response2['token'], "PrivateChannel", False)
 
     return {
-        'flockr_owner': response0.json(),
-        'p1': response1.json(),
-        'p2': response2.json(),
-        'p3': response3.json(),
-        'p4': response4.json(),
-        'p5': response5.json(),
-        'public_id': response6.json()['channel_id'],
-        'private_id': response7.json()['channel_id']
+        'flockr_owner': response0,
+        'p1': response1,
+        'p2': response2,
+        'p3': response3,
+        'p4': response4,
+        'p5': response5,
+        'public_id': response6['channel_id'],
+        'private_id': response7['channel_id']
     }
 
 '''
@@ -71,6 +42,18 @@ Private Channel: Person2 (O)
 ######################################################################
 ## HELPER FUNCTIONS
 ######################################################################
+
+def auth(url_str, email, password, n1, n2):
+    payload = {"email": email, "password": password, "name_first": n1, "name_last": n2}
+    requests.post(url_str + "auth/register", json=payload)
+    payload = {"email": email, "password": password}
+    response = requests.post(url_str + "auth/login", json=payload)
+    return response.json()
+
+def create(url_create, token, name, is_pub):
+    payload = {"token": token, "name": name, "is_public": is_pub}
+    response = requests.post(url_create + "channels/create", json=payload)
+    return response.json()
 
 def invite(url_invite, token, channel_id, u_id):
     payload = {"token": token, "channel_id": channel_id, "u_id": u_id}
