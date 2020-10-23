@@ -79,25 +79,52 @@ def http_channel_invite():
     u_id = request.get_json()["u_id"]
     response = ch.channel_invite(token, channel_id, u_id)
     return dumps(response)
-'''
-@APP.route("channel/details", methods=['GET'])
-def http_channel_invite():
 
-@APP.route("channel/messages", methods=['GET'])
-def http_channel_invite():
+@APP.route("/channel/details", methods=['GET'])
+def http_channel_details():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    response = ch.channel_details(token, channel_id)
+    return dumps(response)
 
-@APP.route("channel/leave", methods=['POST'])
-def http_channel_invite():
+@APP.route("/channel/messages", methods=['GET'])
+def http_channel_msgs():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    start = request.get_json()["start"]
+    response = ch.channel_messages(token, channel_id, start)
+    return dumps(response)
 
-@APP.route("channel/join", methods=['POST'])
-def http_channel_invite():
+@APP.route("/channel/leave", methods=['POST'])
+def http_channel_leave():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    response = ch.channel_leave(token, channel_id)
+    return dumps(response)
 
-@APP.route("channel/addowner", methods=['POST'])
-def http_channel_invite():
+@APP.route("/channel/join", methods=['POST'])
+def http_channel_join():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    response = ch.channel_join(token, channel_id)
+    return dumps(response)
 
-@APP.route("channel/removeowner", methods=['POST'])
-def http_channel_invite():
-'''
+@APP.route("/channel/addowner", methods=['POST'])
+def http_channel_add():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    u_id = request.get_json()["u_id"]
+    response = ch.channel_addowner(token, channel_id, u_id)
+    return dumps(response)
+
+@APP.route("/channel/removeowner", methods=['POST'])
+def http_channel_rem():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    u_id = request.get_json()["u_id"]
+    response = ch.channel_removeowner(token, channel_id, u_id)
+    return dumps(response)
+
 ###### CHANNELS ######
 
 # Channels_list
