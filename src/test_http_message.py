@@ -3,6 +3,8 @@ import json
 from echo_http_test import url
 import message
 import channel
+import channels
+import auth
 import pytest
 
 @pytest.fixture
@@ -66,20 +68,89 @@ OUTPUT: { message_id }
 # VALID CASES #
 
 def test_message_user_owner_http(url, user_list, channel_list):
-    payload = {"token1": user_list['token1']['token'], }
+    # Send message
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This is the first message in the channel"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
 
-def test_message_user_member(data):
+    # Get message from channel messages
+    payload = {'token1': user_list['token1'], 'message_id': message_ID, 'start': 0}
+    response = requests.post(url + "channel/messages", json=payload)
+    messages = response.json()['messages']
+    message_id_at_index_zero = messages[0]['message_id']
+    assert message_ID == message_id_at_index_zero
 
-def test_message_non_alpha_characters(data):
+def test_message_user_member(url, user_list, channel_list):
+    # Send message
+    payload = {'token2': user_list['token2'], 'c2_id': channel_list['c2_id'], 'message': "This is the first message in the channel"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
+
+    # Get message from channel messages
+    payload = {'token2': user_list['token2'], 'message_id': message_ID, 'start': 0}
+    response = requests.post(url + "channel/messages", json=payload)
+    messages = response.json()['messages']
+    message_id_at_index_zero = messages[0]['message_id']
+    assert message_ID == message_id_at_index_zero
+
+def test_message_non_alpha_characters(url, user_list, channel_list):
+     # Send message
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This message has many non alpha character: !@#$%^&*()"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
+
+    # Get message from channel messages
+    payload = {'token1': user_list['token1'], 'message_id': message_ID, 'start': 0}
+    response = requests.post(url + "channel/messages", json=payload)
+    messages = response.json()['messages']
+    message_id_at_index_zero = messages[0]['message_id']
+    assert message_ID == message_id_at_index_zero
 
 # INVALID CASES #
-def test_message_greater_than_1000(data):
+def test_message_greater_than_1000(url, user_list, channel_list):
+    # Send message
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID1 = response.json()
+    assert response.status_code == 200
 
-def test_user_not_in_channel(data):
+     # Get message from channel messages
+    payload = {'token1': user_list['token1'], 'message_id': message_ID1, 'start': 0}
+    response = requests.post(url + "channel/messages", json=payload)
+    messages = response.json()['messages']
+    message_id_at_index_zero = messages[0]['message_id']
+    assert message_ID1 == message_id_at_index_zero
 
-def test_user_logged_out(data):
+    # Send message with invalid amount
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Na"}
+    response = requests.post(url + "message/send", json=payload)
+    assert response.status_code == 404
 
-def test_empty_message(data):
+def test_user_not_in_channel(url, user_list, channel_list):
+    # Send message
+    payload = {'token3': user_list['token3'], 'c2_id': channel_list['c2_id'], 'message': "This user is not in the channel"}
+    response = requests.post(url + "message/send", json=payload)
+    assert response.status_code == 400
+
+def test_user_logged_out(url, user_list, channel_list):
+    # Auth logout 
+    payload = {'token2': user_list['token2']}
+    response = requests.post(url + "auth/logout", json=payload)
+    assert response.json() == {'is_success': True}
+
+     # Send message
+    payload = {'token2': user_list['token2'], 'c2_id': channel_list['c2_id'], 'message': "This user is logged out"}
+    response = requests.post(url + "message/send", json=payload)
+    assert response.status_code == 400
+
+def test_empty_message(url, user_list, channel_list):
+    # Send message
+    payload = {'token2': user_list['token2'], 'c2_id': channel_list['c2_id'], 'message': ""}
+    response = requests.post(url + "message/send", json=payload)
+    assert response.status_code == 404
 
 # test message_remove #
 """
@@ -88,7 +159,7 @@ OUTPUT: {}
 """
 
 # VALID CASES #
-def test_remove_user_owner(data):
+def test_remove_user_owner(url, user_list, channel_list):
     # Send message
     payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This message will be removed"}
     response = requests.post(url + "message/send", json=payload)
@@ -99,7 +170,7 @@ def test_remove_user_owner(data):
     response = response.post(url + "message/remove", json=payload)
     assert response.status_code == 200
 
-def test_remove_flocker_owner_but_not_owner(data):
+def test_remove_flocker_owner_but_not_owner(url, user_list, channel_list):
     # Join channel
     payload = {'token1': user_list['token1'], 'c2_id': channel_list['c2_id']}
     response = requests.post(url + "channel/join", json=payload)
@@ -115,7 +186,7 @@ def test_remove_flocker_owner_but_not_owner(data):
     assert response.status_code == 200
 
 
-def test_remove_request_user_member(data):
+def test_remove_request_user_member(url, user_list, channel_list):
      # Send message
     payload = {'token2': user_list['token2'], 'c2_id': channel_list['c2_id'], 'message': "This message will be removed"}
     response = requests.post(url + "message/send", json=payload)
@@ -127,7 +198,7 @@ def test_remove_request_user_member(data):
     assert response.status_code == 200
 
 # INVALID CASES #
-def test_message_no_longer_exists(data):
+def test_message_no_longer_exists(url, user_list, channel_list):
     # Send message
     payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This is a valid message"}
     response = requests.post(url + "message/send", json=payload)
@@ -142,7 +213,7 @@ def test_message_no_longer_exists(data):
     response = response.post(url + "message/remove", json=payload)
     assert response.status_code == 404
 
-def test_not_users_message(data):
+def test_not_users_message(url, user_list, channel_list):
     # Join channel
     payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
     response = requests.post(url + "channel/join", json=payload)
@@ -161,21 +232,21 @@ def test_not_users_message(data):
     response = response.post(url + "message/remove", json=payload)
     assert response.status_code == 404
 
-def test_user_not_owner(data):
+def test_user_not_owner(url, user_list, channel_list):
     # Join channel
     payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
     response = requests.post(url + "channel/join", json=payload)
     assert response.status_code == 200
     # Send message
     payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id'], 'message': "This message was sent by one of the members of the channel"}
-    response = requests.post(url + "message/send", json=payload)
+    response = requests.post(url + "messages/send", json=payload)
     message_ID = response.json()
     assert response.status_code == 200
     # Remove message 
     payload = {'token2': user_list['token2'], 'message_id': message_ID}
     response = response.post(url + "message/remove", json=payload)
     assert response.status_code == 404
-    
+
 # test message_edit #
 """
 message_edit(token, message_id, message)
@@ -183,7 +254,7 @@ OUTPUT: {}
 """
 
 # VALID CASES #
-def test_edit_user_owner(data):
+def test_edit_user_owner(url, user_list, channel_list):
     # Send message
     payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This message was sent by the owner of flocker"}
     response = requests.post(url + "message/send", json=payload)
@@ -195,7 +266,7 @@ def test_edit_user_owner(data):
     assert response.status_code == 200
 
 
-def test_edit_user_member(data):
+def test_edit_user_member(url, user_list, channel_list):
     # Join channel
     payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
     response = requests.post(url + "channel/join", json=payload)
@@ -215,7 +286,7 @@ def test_edit_user_member(data):
     assert response.status_code == 200
 
 # INVALID CASES #
-def test_not_valid_user(data):
+def test_not_valid_user(url, user_list, channel_list):
     # Join channel
     payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
     response = requests.post(url + "channel/join", json=payload)
@@ -230,7 +301,7 @@ def test_not_valid_user(data):
     response = requests.post(url + "message/edit", json=payload)
     assert response.status_code == 400
 
-def test_edit_not_by_person_who_sent(data):
+def test_edit_not_by_person_who_sent(url, user_list, channel_list):
     # Join channel
     payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
     response = requests.post(url + "channel/join", json=payload)
@@ -249,7 +320,7 @@ def test_edit_not_by_person_who_sent(data):
     response = requests.post(url + "message/edit", json=payload)
     assert response.status_code == 400
 
-def test_empty_string (data):
+def test_empty_string (url, user_list, channel_list):
     # Send message
     payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This is the first message sent"}
     response = requests.post(url + "message/send", json=payload)
@@ -266,7 +337,7 @@ def test_empty_string (data):
     assert response.status_code == 200
     # Get message from channel messages
     payload = {'token1': user_list['token1'], 'message_id': message_ID2, 'start': 0}
-    response = requests.post(url + "channel/message", json=payload)
+    response = requests.post(url + "channel/messages", json=payload)
     messages = response.json()['messages']
     message_id_at_index_zero = message[0]['message_id']
     assert message_ID1 == message_id_at_index_zero
