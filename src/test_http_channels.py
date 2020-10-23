@@ -1,21 +1,27 @@
-import requests
 import json 
+import requests
 from echo_http_test import url
 import pytest
 
 #### login and channel creation fixtures ####
 @pytest.fixture
-def user_list():
+def user_list(url):
     requests.delete(url + 'clear')
     
     payload = {"email":"person1@email.com", "password": "password", "name_first": "Person", "name_last": "One"}
-    response1 = requests.post(url + "auth/register", json=payload)
+    requests.post(url + "auth/register", json=payload)
+    payload = {"email": "person1@email.com", "password": "password"}
+    response1 = requests.post(url + "auth/login", json=payload)
 
     payload = {"email":"person2@email.com", "password": "password", "name_first": "Person", "name_last": "Two"}
-    response2 = requests.post(url + "auth/register", json=payload)
+    requests.post(url + "auth/register", json=payload)
+    payload = {"email": "person2@email.com", "password": "password"}
+    response2 = requests.post(url + "auth/login", json=payload)
 
     payload = {"email":"person3@email.com", "password": "password", "name_first": "Person", "name_last": "Three"}
-    response3 = requests.post(url + "auth/register", json=payload)
+    requests.post(url + "auth/register", json=payload)
+    payload = {"email": "person3@email.com", "password": "password"}
+    response3 = requests.post(url + "auth/login", json=payload)
 
     return {
         'user1': response1.json(),
@@ -24,7 +30,7 @@ def user_list():
     }
 
 @pytest.fixture
-def channel_list(user_list):
+def channel_list(url, user_list):
     # person one creates a channel
     payload = {"token": user_list['user1']['token'], "name": "channel_1", "is_public": True}
     response = requests.post(url + "channels/create", json=payload)
@@ -36,8 +42,8 @@ def channel_list(user_list):
     c_id_2 = response.json()
 
     return {
-        'c_id_1': c_id_1,
-        'c_id_2': c_id_2,
+        'c_id_1': c_id_1['channel_id'],
+        'c_id_2': c_id_2['channel_id'],
     }
 
 ### channels_list ###
@@ -56,7 +62,7 @@ def test_user_in_no_channels_http(url, user_list):
     response = requests.post(url + "channels/create", json=payload)
     assert response.status_code == 200
     c_id = response.json()
-
+ 
     # person one invites person 3
     payload = {"token": user_list['user1']['token'], "channel_id": c_id['channel_id'], "u_id": user_list['user3']['u_id']}
     response = requests.post(url + "channel/invite", json=payload)
@@ -363,7 +369,7 @@ def test_public_private_http(url, user_list):
     assert response.status_code == 200
     assert response.json() == [
         {
-            'channel_id': c_id_private, 
+            'channel_id': c_id_private['channel_id'], 
             'name': "channel_private", 
             'all_members': [
                 {
@@ -384,7 +390,7 @@ def test_public_private_http(url, user_list):
             'message_count': 0
         },
         {
-            'channel_id': c_id_public, 
+            'channel_id': c_id_public['channel_id'], 
             'name': "channel_public", 
             'all_members': [
                 {
