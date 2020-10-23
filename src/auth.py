@@ -55,7 +55,7 @@ def auth_register(email, password, name_first, name_last):
     data['users'].append(
         {
             'u_id': len(data['users']) + 1,
-            'token': '',
+            'token': email,
             'email': email,
             'password': password,
             'name_first': name_first,
