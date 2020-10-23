@@ -135,7 +135,7 @@ def test_owner_leaving(url, data):
 
     # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
     payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p3']['u_id']}
-    response = requests.get(url + "channel/invite", json=payload)
+    response = requests.post(url + "channel/invite", json=payload)
 
     # InputError: ch.channel_leave(data['p1_token'], data['public_id'])
     payload = {"token": data['p1']['token'], "channel_id": data['public_id']}
