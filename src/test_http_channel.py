@@ -68,6 +68,8 @@ Public Channel: Person1 (O)
 Private Channel: Person2 (O)
 '''
 
+# channel/invite
+
 def test_invite_success(url, data):
     # assert channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
     payload = {"token": data['p1']['token'], "channel_id": data['public'], "u_id": data['p2']['u_id']}
@@ -101,3 +103,65 @@ def test_invite_existing(url, data):
 
 ## SINCE I'M FOLLOWING TEST_CHANNEL, I DONT NEED ANY COMMENTS EXPLAINING STUFF
 ## THE ONLY COMMENTS I'M USING ARE THE TEST CODE
+
+#channel/leave
+
+def test_leave_success(url, data):
+    # Steps:
+    # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
+    # ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
+    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id'])
+
+    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p3']['u_id']}
+    response = requests.get(url + "channel/invite", json=payload)
+
+    payload = {"token": data['p2']['token'], "channel_id": data['private_id], "u_id": data['p4']['u_id']}
+    response = requests.get(url + "channel/invite", json=payload)
+
+    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p3']['u_id']}
+    response = requests.post(url + "channel/addowner", json=payload)
+
+    # assert ch.channel_leave(data['p4_token'], data['private_id'])
+    payload = {"token": data['p4']['token'], "channel_id": data['private_id']}
+    response = requests.post(url + "channel/leave", json=payload)
+    assert response.status_code == 200
+
+    # assert ch.channel_leave(data['p4_token'], data['private_id'])
+    payload = {"token": data['p1']['token'], "channel_id": data['public_id']}
+    response = requests.post(url + "channel/leave", json=payload)
+    assert response.status_code == 200
+
+def test_owner_leaving(url, data):
+
+    # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
+    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p3']['u_id']}
+    response = requests.get(url + "channel/invite", json=payload)
+
+    # InputError: ch.channel_leave(data['p1_token'], data['public_id'])
+    payload = {"token": data['p1']['token'], data['public_id']}
+    reponse = requests.post(url + "channel/leave", json=payload)
+    assert response.status_code != 200
+
+    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id']) 
+    payload = {"token": data['p1']['token'], "channel_id": data['public_id'], "u_id": data['p3']['u_id']}
+    response = requests.post(url + "channel/addowner", json=payload)
+
+    # assert ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id'])  
+    payload = {"token": data['p1']['token'], data['public_id']}
+    reponse = requests.post(url + "channel/leave", json=payload)
+    assert response.status_code == 200
+    
+    # InputError ch.channel_leave(data['p3_token'], data['public_id'])
+    payload = {"token": data['p3']['token'], data['public_id']}
+    reponse = requests.post(url + "channel/leave", json=payload)
+    assert response.status_code != 200
+
+def test_leaving_diff_channel(url, data):
+    # ch.channel_join(data['p3_token'], data['public_id'])
+    payload = {"token": data['p3']['token'], "channel_id": data['public_id']}
+    response = requests.post(url + "channel/join", json=payload)
+
+    # AccessError ch.channel_leave(data['p3_token'], data['private_id'])
+    payload = {"token": data['p3']['token'], "channel_id": data['private_id']}
+    response = requests.post(url + "channel/leave", json=payload)
+    assert response.status_code != 200
