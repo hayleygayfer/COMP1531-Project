@@ -30,12 +30,12 @@ def  user_list():
     Logresponse3 = requests.post(url + "auth/login", json=payload)
 
     return {
-        'u1_id': regResponse1.json(),
-        'u2_id': regResponse2.json(),
-        'u3_id': regResponse2.json(),
-        'token1': Logresponse1.json(),
-        'token2': Logresponse2.json(),
-        'token3': Logresponse3.json(),
+        'u1_id': regResponse1.json()['u_id']],
+        'u2_id': regResponse2.json()['u_id'],
+        'u3_id': regResponse2.json()['u_id'],
+        'token1': Logresponse1.json()['token'],
+        'token2': Logresponse2.json()['token'],
+        'token3': Logresponse3.json()['token'],
     }
 
 @pytest.fixture
@@ -51,8 +51,8 @@ def channel_list(user_list):
     c_id_2 = response.json()
 
     return {
-        'c_id_1': c_id_1,
-        'c_id_2': c_id_2,
+        'c_id_1': c_id_1['channel_id'],
+        'c_id_2': c_id_2['channel_id'],
     }
 
 # test message_send #
@@ -109,24 +109,94 @@ OUTPUT: {}
 
 # VALID CASES #
 def test_edit_user_owner(data):
-    payload = {'token1': user_list['token1']['token'], 'c1_id': channel_list['c1_id']['channel_id'], 'message': "This message was sent by the owner of flocker"}
+    # Send message
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This message was sent by the owner of flocker"}
     response = requests.post(url + "message/send", json=payload)
     message_ID = response.json()
     assert response.status_code == 200
-    
-    payload = {'token1': user_list['token1']['token'], 'message_id': message_ID, 'message': "This is the new message we just changed it completely but same same hey"}
+    # Edit message 
+    payload = {'token1': user_list['token1'], 'message_id': message_ID, 'message': "This is the new message we just changed it completely but same same hey"}
     response = requests.post(url + "message/edit", json=payload)
     assert response.status_code == 200
 
 
 def test_edit_user_member(data):
+    # Join channel
+    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
+    response = requests.post(url + "channel/join", json=payload)
+    assert response.status_code == 200
+    # Add owner
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'u1_id': user_list['u1_id']}
+    response = requests.post(url + "channel/addowner", json=payload)
+    assert response.status_code == 200
+    # Send message
+    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id'], 'message': "This message was sent by an owner of this channel"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
+    # Edit message
+    payload = {'token2': user_list['token2'], 'message_id': message_ID, 'message': "This message should be able to be edited"}
+    response = requests.post(url + "message/edit", json=payload)
+    assert response.status_code == 200
 
 # INVALID CASES #
 def test_not_valid_user(data):
+    # Join channel
+    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
+    response = requests.post(url + "channel/join", json=payload)
+    assert response.status_code == 200
+    # Send message
+    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id'], 'message': "This message was sent by not an owner"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
+    # Edit message
+    payload = {'token2': user_list['token2'], 'message_id': message_ID, 'message': "This message should not be able to be edited"}
+    response = requests.post(url + "message/edit", json=payload)
+    assert response.status_code == 400
 
 def test_edit_not_by_person_who_sent(data):
+    # Join channel
+    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
+    response = requests.post(url + "channel/join", json=payload)
+    assert response.status_code == 200
+    # Add owner
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'u2_id': user_list['u2_id']}
+    response = requests.post(url + "channel/addowner", json=payload)
+    assert response.status_code == 200
+    # Edit message
+    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id'], 'message': "This message was sent by an owner of this channel"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID = response.json()
+    assert response.status_code == 200
+    # Edit message again
+    payload = {'token1': user_list['token1'], 'message_id': message_ID, 'message': "This message should not be able to be edited"}
+    response = requests.post(url + "message/edit", json=payload)
+    assert response.status_code == 400
 
 def test_empty_string (data):
+    # Send message
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This is the first message sent"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID1 = response.json()
+    assert response.status_code == 200
+    # Send message
+    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This is the second message sent"}
+    response = requests.post(url + "message/send", json=payload)
+    message_ID2 = response.json()
+    assert response.status_code == 200
+    # Edit message
+    payload = {'token1': user_list['token1'], 'message_id': message_ID2, 'message': ""}
+    response = requests.post(url + "message/edit", json=payload)
+    assert response.status_code == 200
+    # Get message from channel messages
+    payload = {'token1': user_list['token1'], 'message_id': message_ID2, 'start': 0}
+    response = requests.post(url + "channel/message", json=payload)
+    messages = response.json()['messages']
+    message_id_at_index_zero = message[0]['message_id']
+    assert message_ID1 == message_id_at_index_zero
+
+
 
 
 
