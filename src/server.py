@@ -6,8 +6,11 @@ from error import InputError
 from data import data
 
 from auth import auth_register, auth_login, auth_logout
-from user import user_profile, user_profile_setname, user_profile_setemail, user_profile_sethandle
+import channel as ch
 from channels import channels_list, channels_listall, channels_create
+from message import message_send, message_remove, message_edit
+from user import user_profile, user_profile_setname, user_profile_setemail, user_profile_sethandle
+
 
 def defaultHandler(err):
     response = err.get_response()
@@ -72,6 +75,62 @@ def http_auth_logout():
     response = auth_logout(token)
     return dumps(response)
 
+###### CHANNEL ########
+
+@APP.route("/channel/invite", methods=['POST'])
+def http_channel_invite():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    u_id = request.get_json()["u_id"]
+    response = ch.channel_invite(token, channel_id, u_id)
+    return dumps(response)
+
+@APP.route("/channel/details", methods=['GET'])
+def http_channel_details():
+    token = request.args.get("token")
+    channel_id = int(request.args.get("channel_id"))
+    response = ch.channel_details(token, channel_id)
+    return dumps(response)
+
+@APP.route("/channel/messages", methods=['GET'])
+def http_channel_msgs():
+    token = request.args.get("token")
+    channel_id = int(request.args.get("channel_id"))
+    start = int(request.args.get("start"))
+    response = ch.channel_messages(token, channel_id, start)
+    return dumps(response)
+
+@APP.route("/channel/leave", methods=['POST'])
+def http_channel_leave():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    response = ch.channel_leave(token, channel_id)
+    return dumps(response)
+
+@APP.route("/channel/join", methods=['POST'])
+def http_channel_join():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    response = ch.channel_join(token, channel_id)
+    return dumps(response)
+
+@APP.route("/channel/addowner", methods=['POST'])
+def http_channel_add():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    u_id = request.get_json()["u_id"]
+    response = ch.channel_addowner(token, channel_id, u_id)
+    return dumps(response)
+
+@APP.route("/channel/removeowner", methods=['POST'])
+def http_channel_rem():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    u_id = request.get_json()["u_id"]
+    response = ch.channel_removeowner(token, channel_id, u_id)
+    return dumps(response)
+
+
 ###### USER ######
 
 # User/Profile
@@ -131,6 +190,17 @@ def http_channels_create():
     is_public = request.get_json()["is_public"]
     response = channels_create(token, name, is_public)
     return dumps(response)
+
+
+# Message send
+@APP.route("/message/send", methods=['POST'])
+def http_message_send():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["channel_id"]
+    message = request.get_json()["message"]
+    response = message_send(token, channel_id, message)
+    return dumps(response)
+
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
