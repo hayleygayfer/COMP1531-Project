@@ -534,8 +534,11 @@ def test_invalid_channels(url, data):
     # InputError ch.channel_join(data['p3_token'], 24324)
     assert join(url, data['p3']['token'], 24342) != 200
     
-    # TODO: InputError: ch.channel_details(data['p1_token'], 3235325)
-    # TODO: InputError ch.channel_messages(data['p1_token'], 3235325, 0)
+    # InputError: ch.channel_details(data['p1_token'], 3235325)
+    assert details(url, data['p1']['token'], 326532) != 200
+
+    # InputError ch.channel_messages(data['p1_token'], 3235325, 0)
+    assert messages(url, data['p1']['token'], 23762323, 0) != 200
 
     # ch.channel_join(data['p3_token'], data['public_id'])
     join(url, data['p3']['token'], data['public_id'])
@@ -578,8 +581,8 @@ def test_invalid_tokens(url, data):
     # AccessError ch.channel_join(56453, data['public_id'])
     assert join(url, 4353245, data['public_id']) != 200
     
-    # TODO: AccessError ch.channel_details(23532, data['public_id'])
-    
+    # AccessError ch.channel_details(23532, data['public_id'])
+    assert details(url, 2745624, data['public_id']) != 200
     
     # AccessError ch.channel_leave(563464, data['public_id'])
     assert leave(url, 3462623, data['public_id']) != 200
@@ -593,7 +596,8 @@ def test_invalid_tokens(url, data):
     # AccessError ch.channel_removeowner(23141, data['public_id'], data['p2_id'])
     assert rem_owner(url, 534252, data['public_id'], data['p2']['u_id']) != 200
     
-    # TODO: AccessError ch.channel_messages(232414, data['public_id'], 0)
+    # AccessError ch.channel_messages(232414, data['public_id'], 0)
+    assert messages(url, 264323, data['public_id'], 0)
 
 
 ######################################################################
