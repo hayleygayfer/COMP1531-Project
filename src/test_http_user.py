@@ -57,7 +57,7 @@ def test_valid_set_first_name(userObject, url):
 
     # Changes name
     payload = {'token': userObject['token'], 'name_first': 'Anthony', 'name_last': 'Stark' }
-    response = requests.put(url + 'user/profile/setname', json=payload)
+    requests.put(url + 'user/profile/setname', json=payload)
     updatedUser = retrieveUser(userObject['token'], userObject['u_id'], url)
     # Tests changed name
     assert updatedUser['name_first'] == 'Anthony'
@@ -71,7 +71,7 @@ def test_valid_set_last_name(userObject, url):
 
     # Changes name
     payload = {'token': userObject['token'], 'name_first': 'Tony', 'name_last': 'Potts' }
-    response = requests.put(url + 'user/profile/setname', json=payload)
+    requests.put(url + 'user/profile/setname', json=payload)
     updatedUser = retrieveUser(userObject['token'], userObject['u_id'], url)
 
 
@@ -123,7 +123,7 @@ def test_valid_set_email(userObject, url):
 
     # Changes email
     payload = {'token': userObject['token'], 'email': 'tony@avengers.com'}
-    response = requests.put(url + 'user/profile/setemail', json=payload)
+    requests.put(url + 'user/profile/setemail', json=payload)
 
     updatedUser = retrieveUser(userObject['token'], userObject['u_id'], url)
 
@@ -185,7 +185,7 @@ def test_valid_set_handle(userObject, url):
 
     # Changes handle
     payload = {'token': userObject['token'], 'handle_str': 'tony'}
-    response = requests.put(url + 'user/profile/sethandle', json=payload)
+    requests.put(url + 'user/profile/sethandle', json=payload)
     updatedUser = retrieveUser(userObject['token'], userObject['u_id'], url)
 
     # Tests changed name
