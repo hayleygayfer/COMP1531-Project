@@ -105,15 +105,15 @@ def test_user_is_in_all_channels_http(url, user_list, channel_list):
                     'name_last': 'One'
                 },
                 {
+                    'u_id': user_list['user3']['u_id'],
+                    'name_first': 'Person',
+                    'name_last': 'Three'                    
+                },
+                {
                     'u_id': user_list['user2']['u_id'],
                     'name_first': 'Person',
                     'name_last': 'Two'
                 },
-                {
-                    'u_id': user_list['user3']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Three'                    
-                }
             ],
             'owner_members': [
                 {
