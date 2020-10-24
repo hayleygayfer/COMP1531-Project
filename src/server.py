@@ -206,7 +206,7 @@ def http_message_send():
 @APP.route("/message/remove", methods=['DELETE'])
 def http_message_remove():
     token = request.get_json()["token"]
-    channel_id = request.get_json()["channel_id"]
+    channel_id = request.get_json()["message_id"]
     response = message_remove(token, channel_id)
     return dumps(response)
 
@@ -214,7 +214,7 @@ def http_message_remove():
 @APP.route("/message/edit", methods=['PUT'])
 def http_message_edit():
     token = request.get_json()["token"]
-    channel_id = request.get_json()["channel_id"]
+    channel_id = request.get_json()["message_id"]
     message = request.get_json()["message"]
     response = message_edit(token, channel_id, message)
     return dumps(response)
