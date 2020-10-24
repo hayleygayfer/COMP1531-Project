@@ -15,7 +15,7 @@ def test_no_channels():
     auth.auth_register("person1@email.com", "password", "Person", "One")
     token1 = auth.auth_login("person1@email.com", "password")['token']
     # no channels created / joined
-    assert channels.channels_list(token1) == {}
+    assert channels.channels_list(token1) == []
 
 def test_user_in_no_channels():
     clear()
@@ -85,7 +85,9 @@ def test_user_is_in_all_channels():
                     'name_last': 'One'
                 }
             ],
-            'is_public': True
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },
         {
             'channel_id': c2_id, 
@@ -109,7 +111,9 @@ def test_user_is_in_all_channels():
                     'name_last': 'Two'
                 }
             ],
-            'is_public': True
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },
     ]
 
@@ -161,7 +165,9 @@ def test_user_is_in_some_channels():
                     'name_last': 'One'
                 }
             ],
-            'is_public': True
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },
     ]
     # user2 and user3 will not see the same list
@@ -211,7 +217,9 @@ def test_total_channels():
                     'name_last': 'One'
                 }
             ],
-            'is_public': True
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },  
                 {
             'channel_id': c2_id, 
@@ -230,7 +238,9 @@ def test_total_channels():
                     'name_last': 'One'
                 }
             ],
-            'is_public': True
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },   
                 {
             'channel_id': c3_id, 
@@ -249,7 +259,9 @@ def test_total_channels():
                     'name_last': 'One'
                 }
             ],
-            'is_public': True
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },   
     ]
     # check that user1 is in all channels
@@ -288,7 +300,9 @@ def test_total_channels_not_created_by_user():
                     'name_last': 'One'
                 }
             ],
-            'is_public': True
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },  
                 {
             'channel_id': c2_id, 
@@ -307,7 +321,9 @@ def test_total_channels_not_created_by_user():
                     'name_last': 'One'
                 }
             ],
-            'is_public': True
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },   
                 {
             'channel_id': c3_id, 
@@ -326,7 +342,9 @@ def test_total_channels_not_created_by_user():
                     'name_last': 'One'
                 }
             ],
-            'is_public': True
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },   
     ]
     # user1 and user2 see the same list
@@ -363,12 +381,14 @@ def test_public_private():
     token1 = auth.auth_login("person1@email.com", "password")['token']
 
     cpublic_id = channels.channels_create(token1, "channels_public", True)['channel_id']
+    print(cpublic_id)
     cprivate_id = channels.channels_create(token1, "channels_private", False)['channel_id']
+    print(cprivate_id)
 
     assert channels.channels_listall(token1) == [
         {
             'channel_id': cpublic_id, 
-            'name': "channel_public", 
+            'name': "channels_public", 
             'all_members': [
                 {
                     'u_id': u1_id,
@@ -383,11 +403,13 @@ def test_public_private():
                     'name_last': 'One'
                 }
             ],
-            'is_public': True
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },  
         {
             'channel_id': cprivate_id, 
-            'name': "channel_private", 
+            'name': "channels_private", 
             'all_members': [
                 {
                     'u_id': u1_id,
@@ -402,6 +424,8 @@ def test_public_private():
                     'name_last': 'One'
                 }
             ],
-            'is_public': False
+            'is_public': False,
+            'messages': [],
+            'message_count': 0
         },   
     ]
