@@ -10,11 +10,16 @@ def clear():
     data['channels'].clear()
 
 def users_all(token):
+    if valid_token(token) is False:
+        raise AccessError
     return {
         data['users']
     }
 
 def admin_userpermission_change(token, u_id, permission_id):
+    if valid_token(token) is False:
+        raise AccessError
+
     user = find_match('u_id', u_id)
     if user == []:
         raise InputError("Not a valid u_id")
@@ -34,6 +39,9 @@ def admin_userpermission_change(token, u_id, permission_id):
 
 
 def search(token, query_str):
+    if valid_token(token) is False:
+        raise AccessError
+    
     channels = channels_list(token)
     messages = []
 
@@ -43,3 +51,10 @@ def search(token, query_str):
     return {
         messages
     }
+
+# validate token
+def valid_token(token):
+    for users in data['users']:
+        if token == users.get('token'):
+            return True
+    return False
