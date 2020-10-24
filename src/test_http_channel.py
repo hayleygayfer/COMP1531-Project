@@ -84,7 +84,9 @@ def messages(url_msg, token, channel_id, start):
     response = requests.get(url_msg + "channel/messages", params=payload)
     return {
         'status': response.status_code,
-        'msg': response.json()
+        'msgs': response.json().get('messages'),
+        'start': response.json().get('start'),
+        'end': response.json().get('end')
     }
 
 ## OTHER ##
@@ -199,26 +201,105 @@ def test_view_messages_authorisation(url, data):
     # msg.message_send(data['p1_token'], data['public_id'], "public msg")
     # msg.message_send(data['p2_token'], data['private_id'], "private msg")
     send(url, data['p1']['token'], data['public_id'], "public message")
+    send(url, data['p2']['token'], data['private_id'], "private message")
+
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)
+    # assert ch.channel_messages(data['p2_token'], data['private_id'], 0)
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['status'] == 200
+    assert messages(url, data['p2']['token'], data['private_id'], 0)['status'] == 200
+
+    # AccessError: ch.channel_messages(data['p2_token'], data['public_id'], 0)
+    # AccessError: ch.channel_messages(data['p1_token'], data['private_id'], 0)
+    assert messages(url, data['p2']['token'], data['public_id'], 0)['status'] != 200
+    assert messages(url, data['p1']['token'], data['private_id'], 0)['status'] != 200
+
+    # ch.channel_invite(data['p2_token'], data['private_id'], data['p1_id'])
+    invite(url, data['p2']['token'], data['private_id'], data['p1']['u_id'])
+
+    # assert ch.channel_messages(data['p1_token'], data['private_id'], 0)
+    assert messages(url, data['p1']['token'], data['private_id'], 0)['status'] == 200
 
 def test_invalid_messages_start(url, data):
-    # TODO
-    pass
+    for x in range(1, 10 + 1):
+        # msg.message_send(data['p1_token'], data['public_id'], f"Message {x}")
+        send(url, data['p1']['token'], data['public_id'], f"Message {x}")
+    
+    # InputError: ch.channel_messages(data['p1_token'], data['public_id'], 11)
+    # InputError: ch.channel_messages(data['p1_token'], data['public_id'], 10)
+    assert messages(url, data['p1']['token'], data['public_id'], 11)['status'] != 200
+    assert messages(url, data['p1']['token'], data['public_id'], 10)['status'] != 200
+
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 9)
+    assert messages(url, data['p1']['token'], data['public_id'], 9)['status'] == 200
 
 def test_message_less_than_50(url, data):
-    # TODO
-    pass
+    for x in range(1, 4 + 1):
+        # msg.message_send(data['p1_token'], data['public_id'], f"Message {x}")
+        send(url, data['p1']['token'], data['public_id'], f"Message {x}")
+    
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == -1
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0]['message'] == 'Message 4'
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][1]['message'] == 'Message 3'
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][2]['message'] == 'Message 2'
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][3]['message'] == 'Message 1'
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['start'] == 0
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['end'] == -1
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][0]['message'] == 'Message 4'
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][1]['message'] == 'Message 3'
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][2]['message'] == 'Message 2'
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][3]['message'] == 'Message 1'
 
 def test_message_exactly_50(url, data):
-    # TODO
-    pass
+    for x in range(1, 50 + 1):
+        # msg.message_send(data['p1_token'], data['public_id'], f"Message {x}")
+        send(url, data['p1']['token'], data['public_id'], f"Message {x}")
+
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == -1
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0]['message'] == "Message 50"
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][49]['message'] == "Message 1"
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['start'] == 0
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['end'] == -1
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][0]['message'] == 'Message 50'
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][49]['message'] == 'Message 1'
+
 
 def test_150_messages(url, data):
-    # TODO
-    pass
+    for x in range(1, 150 + 1):
+        send(url, data['p1']['token'], data['public_id'], f"Message {x}")
+
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == 50
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0]['message'] == "Message 150"
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][49]['message'] == "Message 101"
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['start'] == 0
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['end'] == 50
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][0]['message'] == 'Message 150'
+    assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][49]['message'] == 'Message 101'
+
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['start'] == 50
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['end'] == 100
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['messages'][0]['message'] == "Message 100"
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['messages'][49]['message'] == "Message 51"
+    assert messages(url, data['p1']['token'], data['public_id'], 50)['start'] == 50
+    assert messages(url, data['p1']['token'], data['public_id'], 50)['end'] == 100
+    assert messages(url, data['p1']['token'], data['public_id'], 50)['msgs'][0]['message'] == 'Message 100'
+    assert messages(url, data['p1']['token'], data['public_id'], 50)['msgs'][49]['message'] == 'Message 51'
+
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['start'] == 100
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['end'] == -1 # the last message has been displayed
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['messages'][0]['message'] == "Message 50"
+    # assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['messages'][49]['message'] == "Message 1"
+    assert messages(url, data['p1']['token'], data['public_id'], 100)['start'] == 100
+    assert messages(url, data['p1']['token'], data['public_id'], 100)['end'] == -1
+    assert messages(url, data['p1']['token'], data['public_id'], 100)['msgs'][0]['message'] == 'Message 50'
+    assert messages(url, data['p1']['token'], data['public_id'], 100)['msgs'][49]['message'] == 'Message 1'
 
 def test_negative_start(url, data):
-    # TODO
-    pass
+    send(url, data['p1']['token'], data['public_id'], "test")
+    assert messages(url, data['p1']['token'], data['public_id'], -1) == messages(url, data['p1']['token'], data['public_id'], 0)
+
 
 #######################################################################
 ## /channel/leave ##
