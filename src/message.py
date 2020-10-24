@@ -1,3 +1,4 @@
+from datetime import datetime
 from data import data
 from error import InputError, AccessError
 
@@ -22,8 +23,8 @@ def message_send(token, channel_id, message):
     elif message == "":
         raise InputError("Message must contain at least 1 character")
     
-    # TODO: Calculate current timestamp
-    timestamp = 1582426789
+    # Calculates current timestamp
+    timestamp = datetime.timestamp(datetime.now())
 
     msg_id = generate_message_id(channel_id)
     append_msg_to_channel(channel_id, message, msg_id, u_id, timestamp)
