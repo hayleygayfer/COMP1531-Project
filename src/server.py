@@ -6,6 +6,7 @@ from error import InputError
 from data import data
 
 from auth import auth_register, auth_login, auth_logout
+from other import search, users_all, admin_userpermission_change
 import channel as ch
 from channels import channels_list, channels_listall, channels_create
 from message import message_send, message_remove, message_edit
@@ -48,7 +49,6 @@ def http_clear():
     data['users'].clear()
     data['channels'].clear()
     return {}
-
 
 # Auth/Register
 @APP.route("/auth/register", methods=['POST'])
@@ -130,7 +130,6 @@ def http_channel_rem():
     response = ch.channel_removeowner(token, channel_id, u_id)
     return dumps(response)
 
-
 ###### USER ######
 
 # User/Profile
@@ -190,6 +189,31 @@ def http_channels_create():
     is_public = request.get_json()["is_public"]
     response = channels_create(token, name, is_public)
     return dumps(response)
+    
+###### OTHER ######
+
+# users_all
+@APP.route("/users/all", methods=['GET'])
+def http_users_all():
+    token = request.get_json()["token"]
+    response = users_all(token)
+    return dumps(response)
+
+# admin_userpermission_change
+@APP.route("/admin/userpermission/change", methods=['POST'])
+def http_admin_userpermission_change():
+    token = request.get_json()["token"]
+    u_id = request.get_json()["u_id"]
+    permission_id = request.get_json()["permission_id"]
+    response = admin_userpermission_change(token, u_id, permission_id)
+    return dumps(response)
+
+# search
+@APP.route("/search", methods=['GET'])
+def http_search():
+    token = request.get_json()["token"]
+    query_str = request.get_json()["query_str"]
+    response = search(token, query_str)
 
 
 # Message send
