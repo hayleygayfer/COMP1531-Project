@@ -31,12 +31,13 @@ def test_invalid_email_http(url):
     payload = {"email":"@avengers.com", "password": "password", "name_first": "Pepper", "name_last": "Potts"}
     response = requests.post(url + "auth/register", json=payload)
     assert (response.status_code == 400)
-    
+
 # Duplicate Email
 def test_duplicate_email_address_http(url):
     requests.delete(url + 'clear')
     payload = {"email":"tonystark@avengers.com", "password": "password", "name_first": "Tony", "name_last": "Stark"}
     response = requests.post(url + "auth/register", json=payload)
+    print(response.json())
     assert (response.status_code == 200)
 
     payload = {"email":"tonystark@avengers.com", "password": "password", "name_first": "Anthony", "name_last": "Stark"}
@@ -99,12 +100,12 @@ def test_alternative_valid_emails_http(url):
     # Underscore in email username
     payload = {"email":"bruce_banner@avengers.com", "password": "password", "name_first": "Bruce", "name_last": "Banner"}
     response = requests.post(url + "auth/register", json=payload)
-    assert response.json() == {'u_id': 1, 'token': 'bruce_banner@avengers.com'}
+    assert response.json()['u_id'] == 1
     
     # Full stop in email username
     payload = {"email":"thor.odinson@avengers.com", "password": "password", "name_first": "Thor", "name_last": "Odinson"}
     response = requests.post(url + "auth/register", json=payload)
-    assert response.json() == {'u_id': 2, 'token': 'thor.odinson@avengers.com'}
+    assert response.json()['u_id'] == 2
 
 
 def test_valid_passwords_http(url):
@@ -113,20 +114,20 @@ def test_valid_passwords_http(url):
     # Password with edge case amount of characters (6) and with all numbers
     payload = {"email":"nickfury@avengers.com", "password": "123456", "name_first": "Nick", "name_last": "Fury"}
     response = requests.post(url + "auth/register", json=payload)
-    assert response.json() == {'u_id': 1, 'token': 'nickfury@avengers.com'}
+    assert response.json()['u_id'] == 1
 
     
     # Password in all uppercase characters
     payload = {"email":"mariahill@avengers.com", "password": "PASSWORD", "name_first": "Maria", "name_last": "Hill"}
     response = requests.post(url + "auth/register", json=payload)
-    assert response.json() == {'u_id': 2, 'token': 'mariahill@avengers.com'}
+    assert response.json()['u_id'] == 2
 
 
     
     # Password with a mix of upper case, lower case and number characters
     payload = {"email":"happyhogan@avengers.com", "password": "123FOURfive6", "name_first": "Happy", "name_last": "Hogan"}
     response = requests.post(url + "auth/register", json=payload)
-    assert response.json() == {'u_id': 3, 'token': 'happyhogan@avengers.com'}
+    assert response.json()['u_id'] == 3
 
     
 
@@ -136,13 +137,13 @@ def test_valid_first_name_http(url):
     # First name with 1 character (edge case)
     payload = {"email":"stanlee@avengers.com", "password": "password", "name_first": "S", "name_last": "Lee"}
     response = requests.post(url + "auth/register", json=payload)
-    assert response.json() == {'u_id': 1, 'token': 'stanlee@avengers.com'}
+    assert response.json()['u_id'] == 1
 
     
     # First name with 50 characters (edge case)
     payload = {"email":"scottlang@avengers.com", "password": "password", "name_first": "ScottScottScottScottScottScottScottScottScottScott", "name_last": "Lang"}
     response = requests.post(url + "auth/register", json=payload)
-    assert response.json() == {'u_id': 2, 'token': 'scottlang@avengers.com'}
+    assert response.json()['u_id'] == 2
 
 
 def test_valid_last_name_http(url):
@@ -151,15 +152,13 @@ def test_valid_last_name_http(url):
     # Last name with 1 character (edge case)
     payload = {"email":"peterparker@avengers.com", "password": "password", "name_first": "Peter", "name_last": "P"}
     response = requests.post(url + "auth/register", json=payload)
-    assert response.json() == {'u_id': 1, 'token': 'peterparker@avengers.com'}
+    assert response.json()['u_id'] == 1
 
     
     # Last name with 50 characters (edge case)
     payload = {"email":"peterquill@avengers.com", "password": "password", "name_first": "Peter", "name_last": "QuillQuillQuillQuillQuillQuillQuillQuillQuillQuill"}
     response = requests.post(url + "auth/register", json=payload)
-    assert response.json() == {'u_id': 2, 'token': 'peterquill@avengers.com'}
-
-
+    assert response.json()['u_id'] == 2
 
 
 ###### Auth Login & Auth Lougout ######
@@ -181,7 +180,7 @@ def test_password_incorrect_http(url):
 
     payload = {"email":"tonystark@avengers.com", "password": "password", "name_first": "Tony", "name_last": "Stark"}
     response = requests.post(url + "auth/register", json=payload)
-    assert response.json() == {'u_id': 1, 'token': 'tonystark@avengers.com'}
+    assert response.json()['u_id'] == 1
 
     payload = {"email":"tonystark@avengers.com", "password": "hello1234"}
     response = requests.post(url + "auth/login", json=payload)
@@ -218,6 +217,6 @@ def test_register_login_logout_http(url):
     assert u_id1 == u_id and token == token1
     
     # Logout
-    payload = {'token': 'tonystark@avengers.com'}
+    payload = {'token': token1}
     response = requests.post(url + 'auth/logout', json=payload)
     assert response.json() == {'is_success': True}

@@ -14,8 +14,10 @@ def test_no_channels():
     # create user1
     auth.auth_register("person1@email.com", "password", "Person", "One")
     token1 = auth.auth_login("person1@email.com", "password")['token']
+    print(token1)
     # no channels created / joined
     assert channels.channels_list(token1) == []
+
 
 def test_user_in_no_channels():
     clear()
