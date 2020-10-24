@@ -56,6 +56,9 @@ def auth_register(email, password, name_first, name_last):
             raise InputError("Email address is already being used by another user")
 
     handle = generate_valid_handle(name_first, name_last)
+    permissions = 'MEMBER'
+    if data['users'] == []:
+        permissions = 'OWNER'
 
     # Hashed password
     hash_password = hashlib.sha256(password.encode()).hexdigest()
@@ -71,7 +74,8 @@ def auth_register(email, password, name_first, name_last):
             'password': hash_password,
             'name_first': name_first,
             'name_last': name_last,
-            'handle_str': handle
+            'handle_str': handle,
+            'permissions': permissions,
         }
     )
 
