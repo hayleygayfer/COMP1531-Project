@@ -111,33 +111,28 @@ def send(url_send, token, channel_id, msg):
 ## /channel/invite ##
 
 def test_invite_success(url, data):
-    # assert channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
-    assert invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id']) == 200
+    '''Owners in either public or private channel can invite anyone who is not a member of the channel'''
     
-    # assert channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
+    assert invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id']) == 200
     assert invite(url, data['p1']['token'], data['public_id'], data['p3']['u_id']) == 200
-
-    # assert ch.channel_invite(data['p2_token'], data['private_id'], data['p3_id'])
     assert invite(url, data['p2']['token'], data['private_id'], data['p3']['u_id']) == 200
 
 def test_invite_existing(url, data):
-    # ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
+    '''Can't invite an existing member'''
+
     invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
 
-    # InputError: ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
+    # InputErrors:
     assert invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id']) != 200
-    
-    # InputError: ch.channel_invite(data['p1_token'], data['public_id'], data['p1_id'])
     assert invite(url, data['p1']['token'], data['public_id'], data['p1']['u_id']) != 200
 
 def test_not_in_channel_invite(url, data):
-    # AccessError: ch.channel_invite(data['p2_token'], data['public_id'], data['p3_id'])
+    '''User must be a member of a channel to invite someone'''
+
+    # AccessError:
     assert invite(url, data['p2']['token'], data['public_id'], data['p3']['u_id']) != 200
 
-    # ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
     invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
-
-    # assert ch.channel_invite(data['p2_token'], data['public_id'], data['p3_id'])
     assert invite(url, data['p2']['token'], data['public_id'], data['p3']['u_id']) == 200
 
 
@@ -145,26 +140,17 @@ def test_not_in_channel_invite(url, data):
 ## /channel/details ##
 
 def test_details_authorisation(url, data):
-    # assert ch.channel_details(data['p1_token'], data['public_id'])
+    '''channel_details requires the person viewing the details to be a member of the channel'''
+
     assert details(url, data['p1']['token'], data['public_id'])['status'] == 200
-    
-    # assert ch.channel_details(data['p2_token'], data['private_id'])
     assert details(url, data['p2']['token'], data['private_id'])['status'] == 200
 
-    # AccessError: ch.channel_details(data['p2_token'], data['public_id'])
+    # AccessErrors: 
     assert details(url, data['p2']['token'], data['public_id'])['status'] != 200
-
-    # AccessError: ch.channel_details(data['p1_token'], data['private_id'])
     assert details(url, data['p1']['token'], data['private_id'])['status'] != 200
 
 def test_view_details(url, data):
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['p3_id'])
-    # ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id'])
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
-    # ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
-    # ch.channel_join(data['p5_token'], data['public_id'])
-    # ch.channel_removeowner(data['p3_token'], data['private_id'], data['p2_id'])
-    # ch.channel_leave(data['p2_token'], data['public_id'])
+    '''Checking whether all the necessary channel details are returned'''
 
     invite(url, data['p2']['token'], data['private_id'], data['p3']['u_id'])
     add_owner(url, data['p2']['token'], data['private_id'], data['p3']['u_id'])
@@ -173,6 +159,11 @@ def test_view_details(url, data):
     join(url, data['p5']['token'], data['public_id'])
     rem_owner(url, data['p3']['token'], data['private_id'], data['p2']['u_id'])
     leave(url, data['p2']['token'], data['public_id'])
+
+    '''
+    Public: Person1 (O), <Person 2 left>, Person5
+    Private: Person2, Person3 (O), Person4
+    '''
 
     assert details(url, data['p1']['token'], data['public_id'])['name'] == 'PublicChannel'
     assert details(url, data['p1']['token'], data['public_id'])['owners'][0]['u_id'] == data['p1']['u_id']
@@ -198,51 +189,39 @@ def test_view_details(url, data):
 ## /channel/messages ##
 
 def test_view_messages_authorisation(url, data):
-    # msg.message_send(data['p1_token'], data['public_id'], "public msg")
-    # msg.message_send(data['p2_token'], data['private_id'], "private msg")
+    '''Must be a member of the channel to view messages'''
+
     send(url, data['p1']['token'], data['public_id'], "public message")
     send(url, data['p2']['token'], data['private_id'], "private message")
 
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)
-    # assert ch.channel_messages(data['p2_token'], data['private_id'], 0)
     assert messages(url, data['p1']['token'], data['public_id'], 0)['status'] == 200
     assert messages(url, data['p2']['token'], data['private_id'], 0)['status'] == 200
 
-    # AccessError: ch.channel_messages(data['p2_token'], data['public_id'], 0)
-    # AccessError: ch.channel_messages(data['p1_token'], data['private_id'], 0)
+    # AccessErrors:
     assert messages(url, data['p2']['token'], data['public_id'], 0)['status'] != 200
     assert messages(url, data['p1']['token'], data['private_id'], 0)['status'] != 200
 
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['p1_id'])
     invite(url, data['p2']['token'], data['private_id'], data['p1']['u_id'])
-
-    # assert ch.channel_messages(data['p1_token'], data['private_id'], 0)
     assert messages(url, data['p1']['token'], data['private_id'], 0)['status'] == 200
 
 def test_invalid_messages_start(url, data):
+    '''Checking for valid start values'''
+
     for x in range(1, 10 + 1):
-        # msg.message_send(data['p1_token'], data['public_id'], f"Message {x}")
         send(url, data['p1']['token'], data['public_id'], f"Message {x}")
     
-    # InputError: ch.channel_messages(data['p1_token'], data['public_id'], 11)
-    # InputError: ch.channel_messages(data['p1_token'], data['public_id'], 10)
+    # InputErrors:
     assert messages(url, data['p1']['token'], data['public_id'], 11)['status'] != 200
     assert messages(url, data['p1']['token'], data['public_id'], 10)['status'] != 200
 
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 9)
     assert messages(url, data['p1']['token'], data['public_id'], 9)['status'] == 200
 
 def test_message_less_than_50(url, data):
+    '''checking return values after adding a few messages to a channel'''
+
     for x in range(1, 4 + 1):
-        # msg.message_send(data['p1_token'], data['public_id'], f"Message {x}")
         send(url, data['p1']['token'], data['public_id'], f"Message {x}")
     
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == -1
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0]['message'] == 'Message 4'
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][1]['message'] == 'Message 3'
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][2]['message'] == 'Message 2'
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][3]['message'] == 'Message 1'
     assert messages(url, data['p1']['token'], data['public_id'], 0)['start'] == 0
     assert messages(url, data['p1']['token'], data['public_id'], 0)['end'] == -1
     assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][0]['message'] == 'Message 4'
@@ -251,14 +230,11 @@ def test_message_less_than_50(url, data):
     assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][3]['message'] == 'Message 1'
 
 def test_message_exactly_50(url, data):
+    '''checking return values after adding exactly 50 messages to a channel'''
+
     for x in range(1, 50 + 1):
-        # msg.message_send(data['p1_token'], data['public_id'], f"Message {x}")
         send(url, data['p1']['token'], data['public_id'], f"Message {x}")
 
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == -1
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0]['message'] == "Message 50"
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][49]['message'] == "Message 1"
     assert messages(url, data['p1']['token'], data['public_id'], 0)['start'] == 0
     assert messages(url, data['p1']['token'], data['public_id'], 0)['end'] == -1
     assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][0]['message'] == 'Message 50'
@@ -266,37 +242,32 @@ def test_message_exactly_50(url, data):
 
 
 def test_150_messages(url, data):
+    '''Pagination with 150 messages by modifying start values'''
+
     for x in range(1, 150 + 1):
         send(url, data['p1']['token'], data['public_id'], f"Message {x}")
 
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['start'] == 0
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['end'] == 50
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][0]['message'] == "Message 150"
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 0)['messages'][49]['message'] == "Message 101"
+    # start = 0
     assert messages(url, data['p1']['token'], data['public_id'], 0)['start'] == 0
     assert messages(url, data['p1']['token'], data['public_id'], 0)['end'] == 50
     assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][0]['message'] == 'Message 150'
     assert messages(url, data['p1']['token'], data['public_id'], 0)['msgs'][49]['message'] == 'Message 101'
 
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['start'] == 50
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['end'] == 100
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['messages'][0]['message'] == "Message 100"
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 50)['messages'][49]['message'] == "Message 51"
+    # start = 50
     assert messages(url, data['p1']['token'], data['public_id'], 50)['start'] == 50
     assert messages(url, data['p1']['token'], data['public_id'], 50)['end'] == 100
     assert messages(url, data['p1']['token'], data['public_id'], 50)['msgs'][0]['message'] == 'Message 100'
     assert messages(url, data['p1']['token'], data['public_id'], 50)['msgs'][49]['message'] == 'Message 51'
 
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['start'] == 100
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['end'] == -1 # the last message has been displayed
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['messages'][0]['message'] == "Message 50"
-    # assert ch.channel_messages(data['p1_token'], data['public_id'], 100)['messages'][49]['message'] == "Message 1"
+    # start = 100
     assert messages(url, data['p1']['token'], data['public_id'], 100)['start'] == 100
     assert messages(url, data['p1']['token'], data['public_id'], 100)['end'] == -1
     assert messages(url, data['p1']['token'], data['public_id'], 100)['msgs'][0]['message'] == 'Message 50'
     assert messages(url, data['p1']['token'], data['public_id'], 100)['msgs'][49]['message'] == 'Message 1'
 
 def test_negative_start(url, data):
+    '''Negative start values revert to 0'''
+
     send(url, data['p1']['token'], data['public_id'], "test")
     assert messages(url, data['p1']['token'], data['public_id'], -1) == messages(url, data['p1']['token'], data['public_id'], 0)
 
@@ -305,42 +276,35 @@ def test_negative_start(url, data):
 ## /channel/leave ##
 
 def test_leave_success(url, data):
-    # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
-    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id'])
+    '''successfully leaving a channel'''
 
     invite(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
     invite(url, data['p2']['token'], data['private_id'], data['p4']['u_id'])
     add_owner(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
 
-    # assert ch.channel_leave(data['p4_token'], data['private_id'])
     assert leave(url, data['p4']['token'], data['private_id']) == 200
-
-    # assert ch.channel_leave(data['p1_token'], data['public_id'])
     assert leave(url, data['p1']['token'], data['public_id']) == 200
 
 def test_owner_leaving(url, data):
+    '''a channel owner cannot leave if they are the last remaining owner'''
 
-    # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
     invite(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
 
-    # InputError: ch.channel_leave(data['p1_token'], data['public_id'])
+    # InputError:
     assert leave(url, data['p1']['token'], data['public_id']) != 200
 
-    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id']) 
     add_owner(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
-
-    # assert ch.channel_leave(data['p1_token'], data['public_id'])
     assert leave(url, data['p1']['token'], data['public_id']) == 200
     
-    # InputError ch.channel_leave(data['p3_token'], data['public_id'])
+    # InputError:
     assert leave(url, data['p3']['token'], data['public_id']) != 200
 
 def test_leaving_diff_channel(url, data):
-    # ch.channel_join(data['p3_token'], data['public_id'])
+    '''a member can't leave a channel that they are not in'''
+
     join(url, data['p3']['token'], data['public_id'])
 
-    # AccessError ch.channel_leave(data['p3_token'], data['private_id'])
+    # AccessError:
     assert leave(url, data['p3']['token'], data['private_id']) != 200
 
 
@@ -348,48 +312,38 @@ def test_leaving_diff_channel(url, data):
 ## /channel/join ##
 
 def test_join_public(url, data):
-    # assert ch.channel_join(data['p2_token'], data['public_id'])
+    '''anyone who is not already in the channel can join a public channel'''
+
     assert join(url, data['p2']['token'], data['public_id']) == 200
-
-    # assert ch.channel_join(data['p3_token'], data['public_id'])
     assert join(url, data['p3']['token'], data['public_id']) == 200
-
-    # assert ch.channel_join(data['flockr_owner_token'], data['public_id'])
     assert join(url, data['flockr_owner']['token'], data['public_id']) == 200
 
 def test_join_private(url, data):
-    # AccessError ch.channel_join(data['p1_token'], data['private_id'])
-    assert join(url, data['p1']['token'], data['private_id']) != 200
+    '''No one can join a private channel'''
 
-    # AccessError ch.channel_join(data['p3_token'], data['private_id'])
+    # AccessError:
+    assert join(url, data['p1']['token'], data['private_id']) != 200
     assert join(url, data['p3']['token'], data['private_id']) != 200
 
 def test_join_but_existing(url, data):
-    # InputError ch.channel_join(data['p1_token'], data['public_id'])
+    '''An existing member can't join again'''
+
+    # InputError:
     assert join(url, data['p1']['token'], data['public_id']) != 200
 
-    # ch.channel_join(data['p3_token'], data['public_id'])
-    # ch.channel_join(data['p4_token'], data['public_id'])
     join(url, data['p3']['token'], data['public_id'])
     join(url, data['p4']['token'], data['public_id'])
 
-    # InputError ch.channel_join(data['p3_token'], data['public_id'])
+    # InputErrors:
     assert join(url, data['p3']['token'], data['public_id']) != 200
-
-    # InputError ch.channel_join(data['p4_token'], data['public_id'])
     assert join(url, data['p4']['token'], data['public_id']) != 200
 
 def test_leave_then_join(url, data):
-    # ch.channel_join(data['p2_token'], data['public_id'])
-    join(url, data['p2']['token'], data['public_id'])
+    '''Users are allowed to leave then join again'''
 
-    # Assert ch.channel_leave(data['p2_token'], data['public_id'])
-    assert leave(url, data['p2']['token'], data['public_id']) == 200
-
-    # join
     assert join(url, data['p2']['token'], data['public_id']) == 200
-
-    # leave
+    assert leave(url, data['p2']['token'], data['public_id']) == 200
+    assert join(url, data['p2']['token'], data['public_id']) == 200
     assert leave(url, data['p2']['token'], data['public_id']) == 200
 
 
@@ -397,58 +351,43 @@ def test_leave_then_join(url, data):
 ## /channel/addowner ##
 
 def test_addowner_success(url, data):
-    # ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['p1_id'])
+    '''A pre-existing owner must add a normal member in that channel to be successful'''
 
     invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
     invite(url, data['p2']['token'], data['private_id'], data['p1']['u_id'])
-
-    # assert ch.channel_addowner(data['p1_token'], data['public_id'], data['p2_id'])
     assert add_owner(url, data['p1']['token'], data['public_id'], data['p2']['u_id']) == 200
-
-    # assert ch.channel_addowner(data['p2_token'], data['private_id'], data['p1_id'])
     assert add_owner(url, data['p2']['token'], data['private_id'], data['p1']['u_id']) == 200
 
 def test_addowner_but_not_owner(url, data):
-    # ch.channel_join(data['p2_token'], data['public_id'])
-    # ch.channel_join(data['p3_token'], data['public_id'])
+    '''you must be an owner to add someone as an owner'''
 
     join(url, data['p2']['token'], data['public_id'])
     join(url, data['p3']['token'], data['public_id'])
     
-    # AccessError ch.channel_addowner(data['p2_token'], data['public_id'], data['p3_id'])
+    # AccessError:
     assert add_owner(url, data['p2']['token'], data['public_id'], data['p3']['u_id']) != 200
     
-    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p2_id'])
     add_owner(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
-    
-    # assert ch.channel_addowner(data['p2_token'], data['public_id'], data['p3_id'])
     assert add_owner(url, data['p2']['token'], data['public_id'], data['p3']['u_id']) == 200
 
 def test_addowner_when_already_owner(url, data):
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['p3_id'])
-    # ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id'])
+    '''You can't make an owner an owner'''
 
     invite(url, data['p2']['token'], data['private_id'], data['p3']['u_id'])
     add_owner(url, data['p2']['token'], data['private_id'], data['p3']['u_id'])
     
-    # InputError ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id']) 
+    # InputErrors:
     assert add_owner(url, data['p2']['token'], data['private_id'], data['p3']['u_id']) != 200
-    
-    # InputError ch.channel_addowner(data['p3_token'], data['private_id'], data['p2_id']) 
     assert add_owner(url, data['p3']['token'], data['private_id'], data['p2']['u_id']) != 200
 
 def test_addowner_but_not_in_channel(url, data):
-    # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
+    '''Both users must be in the same channel'''
 
     invite(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])   
     invite(url, data['p2']['token'], data['private_id'], data['p4']['u_id'])
 
-    # InputError ch.channel_addowner(data['p1_token'], data['public_id'], data['p4_id']) # Person4 is not in public
+    # InputErrors
     assert add_owner(url, data['p1']['token'], data['public_id'], data['p4']['u_id']) != 200
-    
-    # InputError ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id']) # Person3 is not in private
     assert add_owner(url, data['p2']['token'], data['private_id'], data['p3']['u_id']) != 200
 
 
@@ -456,71 +395,55 @@ def test_addowner_but_not_in_channel(url, data):
 ## /channel/removeowner ##
 
 def test_removeowner_success(url, data):
-    # ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['p1_id'])
-    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p2_id'])
-    # ch.channel_addowner(data['p2_token'], data['private_id'], data['p1_id'])
+    '''When there are multiple owners, then the newest member has the right to remove the creator as a member'''
 
     invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
     invite(url, data['p2']['token'], data['private_id'], data['p1']['u_id'])
     add_owner(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
     add_owner(url, data['p2']['token'], data['private_id'], data['p1']['u_id'])
 
-    # assert ch.channel_removeowner(data['p2_token'], data['public_id'], data['p1_id'])
     assert rem_owner(url, data['p2']['token'], data['public_id'], data['p1']['u_id']) == 200
-    
-    # assert ch.channel_removeowner(data['p1_token'], data['private_id'], data['p2_id'])
     assert rem_owner(url, data['p1']['token'], data['private_id'], data['p2']['u_id']) == 200
 
 def test_removeowner_but_not_owner(url, data):
-    # ch.channel_join(data['p3_token'], data['public_id'])
-    # ch.channel_join(data['p4_token'], data['public_id'])
-    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id'])
+    '''You must be an owner to reomve someone as an owner'''
 
     join(url, data['p3']['token'], data['public_id'])
     join(url, data['p4']['token'], data['public_id'])
     add_owner(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
 
-    # AccessError: ch.channel_removeowner(data['p4_token'], data['public_id'], data['p3_id'])
+    # AccessError:
     assert rem_owner(url, data['p4']['token'], data['public_id'], data['p3']['u_id']) != 200
 
 def test_removeowner_for_ordinary_member(url, data):
-    # ch.channel_join(data['p3_token'], data['public_id'])
-    # ch.channel_join(data['p4_token'], data['public_id'])
-    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id'])
+    '''You must remove an owner and not an ordinary member'''
 
     join(url, data['p3']['token'], data['public_id'])
     join(url, data['p4']['token'], data['public_id'])        
     add_owner(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
 
-    # AccessError: ch.channel_removeowner(data['p1_token'], data['public_id'], data['p4_id'])
+    # AccessError:
     assert rem_owner(url, data['p1']['token'], data['public_id'], data['p4']['u_id']) != 200
 
 def test_removeowner_but_not_in_channel(url, data):
-    # ch.channel_join(data['p3_token'], data['public_id'])
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
-    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id'])
-    # ch.channel_addowner(data['p2_token'], data['private_id'], data['p4_id'])
+    '''Both users must be in the same channel'''
 
     join(url, data['p3']['token'], data['public_id'])
     invite(url, data['p2']['token'], data['private_id'], data['p4']['u_id'])
     add_owner(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
     add_owner(url, data['p2']['token'], data['public_id'], data['p4']['u_id'])
 
-    # InputError: ch.channel_removeowner(data['p1_token'], data['public_id'], data['p4_id'])
+    # InputError:
     assert rem_owner(url, data['p1']['token'], data['public_id'], data['p4']['u_id']) != 200
 
 def test_self_removeowner(url, data):
-    # ch.channel_join(data['p3_token'], data['public_id'])
-    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id'])
+    '''Can't remove yourself'''
 
     join(url, data['p3']['token'], data['public_id'])
     add_owner(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
 
-    # InputError: ch.channel_removeowner(data['p1_token'], data['public_id'], data['p1_id'])
+    # InputErrors:
     assert rem_owner(url, data['p1']['token'], data['public_id'], data['p1']['u_id']) != 200
-    
-    # InputError: ch.channel_removeowner(data['p3_token'], data['public_id'], data['p3_id'])
     assert rem_owner(url, data['p3']['token'], data['public_id'], data['p3']['u_id']) != 200
 
 
@@ -528,75 +451,57 @@ def test_self_removeowner(url, data):
 ## Invalid Cases ##
 
 def test_invalid_channels(url, data):
-    # InputError ch.channel_invite(data['p1_token'], 4645, data['p3_id'])
+    '''invalid channels raise InputErrors'''
+
+    # InputErrors:
     assert invite(url, data['p1']['token'], 4645, data['p3']['u_id']) != 200
-
-    # InputError ch.channel_join(data['p3_token'], 24324)
     assert join(url, data['p3']['token'], 24342) != 200
-    
-    # InputError: ch.channel_details(data['p1_token'], 3235325)
     assert details(url, data['p1']['token'], 326532) != 200
-
-    # InputError ch.channel_messages(data['p1_token'], 3235325, 0)
     assert messages(url, data['p1']['token'], 23762323, 0) != 200
 
-    # ch.channel_join(data['p3_token'], data['public_id'])
     join(url, data['p3']['token'], data['public_id'])
 
-    # InputError ch.channel_leave(data['p3_token'], 523545)
+    # InputErrors:
     assert leave(url, data['p3']['token'], 523545) != 200
-
-    # InputError ch.channel_addowner(data['p1_token'], 3453453, data['p3_id'])
     assert add_owner(url, data['p1']['token'], 3453452, data['p3']['u_id']) != 200
     
-    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id'])
     add_owner(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
     
-    # InputError ch.channel_removeowner(data['p1_token'], 436356, data['p3_id'])
+    # InputError:
     assert rem_owner(url, data['p1']['token'], 4362674, data['p3']['u_id']) != 200
 
 def test_invalid_u_id(url, data):
-    # InputError ch.channel_invite(data['p1_token'], data['public_id'], 3454356)
+    '''Invalid U_ID raises InputErrors'''
+
+    # InputError:
     assert invite(url, data['p1']['token'], data['public_id'], 324215423) != 200
     
-    # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
     invite(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
     
-    # InputError ch.channel_addowner(data['p1_token'], data['public_id'], 4365346)
+    # InputError:
     assert add_owner(url, data['p1']['token'], data['public_id'], 325252535) != 200
     
-    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p3_id'])
     add_owner(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
     
-    # InputError ch.channel_removeowner(data['p1_token'], data['public_id'], 2354542)
+    # InputError:
     assert rem_owner(url, data['p1']['token'], data['public_id'], 2345662352345) != 200
 
 def test_invalid_tokens(url, data):
-    # ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
+    '''Invalid tokens raise AccessErrors'''
+
     invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
     
-    # AccessError ch.channel_invite(2736273, data['public_id'], data['p3_id'])
+    # AccessErrors:
     assert invite(url, 435614532, data['public_id'], data['p3']['u_id']) != 200
-    
-    # AccessError ch.channel_join(56453, data['public_id'])
     assert join(url, 4353245, data['public_id']) != 200
-    
-    # AccessError ch.channel_details(23532, data['public_id'])
     assert details(url, 2745624, data['public_id']) != 200
-    
-    # AccessError ch.channel_leave(563464, data['public_id'])
     assert leave(url, 3462623, data['public_id']) != 200
-    
-    # AccessError ch.channel_addowner(23141, data['public_id'], data['p2_id'])
     assert add_owner(url, 53245523253, data['public_id'], data['p2']['u_id']) != 200
     
-    # ch.channel_addowner(data['p1_token'], data['public_id'], data['p2_id'])
     add_owner(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
     
-    # AccessError ch.channel_removeowner(23141, data['public_id'], data['p2_id'])
+    # AccessErrors:
     assert rem_owner(url, 534252, data['public_id'], data['p2']['u_id']) != 200
-    
-    # AccessError ch.channel_messages(232414, data['public_id'], 0)
     assert messages(url, 264323, data['public_id'], 0)
 
 
@@ -604,100 +509,97 @@ def test_invalid_tokens(url, data):
 ## Flockr owner tests ##
 
 def test_flockr_addowner_success(url, data):
-    # ch.channel_join(data['flockr_owner_token'], data['public_id'])
-    # ch.channel_join(data['p3_token'], data['public_id'])
+    '''
+    The FlockR owner is allowed to add standard users as owners 
+    even if they are not an owner of the channel.
+    '''
 
     join(url, data['flockr_owner']['token'], data['public_id'])
     join(url, data['p3']['token'], data['public_id'])
-    
-    # assert ch.channel_addowner(data['flockr_owner_token'], data['public_id'], data['p3_id'])
     assert add_owner(url, data['flockr_owner']['token'], data['public_id'], data['p3']['u_id']) == 200
 
 def test_flockr_removeowner_success(url, data):
-    # ch.channel_join(data['flockr_owner_token'], data['public_id'])
+    '''
+    FlockR owner must to be a member of the channel to remove an owner.
+    They don't necessarily have to be a channel owner.
+    '''
+
     join(url, data['flockr_owner']['token'], data['public_id'])
-    
-    # assert ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
     assert rem_owner(url, data['flockr_owner']['token'], data['public_id'], data['p1']['u_id']) == 200
-    
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['flockr_owner_id'])
     invite(url, data['p2']['token'], data['private_id'], data['flockr_owner']['u_id'])
-    
-    # assert ch.channel_removeowner(data['flockr_owner_token'], data['private_id'], data['p2_id'])
     assert rem_owner(url, data['flockr_owner']['token'], data['private_id'], data['p2']['u_id']) == 200
 
 def test_flockr_addowner_but_not_member(url, data):
-    # ch.channel_join(data['p3_token'], data['public_id'])
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
+    '''
+    If the flockR owner is not part of the channel, they don't get any piviledges.
+    '''
 
     join(url, data['p3']['token'], data['public_id'])
     invite(url, data['p2']['token'], data['private_id'], data['p4']['u_id'])
 
-    # AccessError ch.channel_addowner(data['flockr_owner_token'], data['public_id'], data['p3_id'])
+    # AccessError:
     assert add_owner(url, data['flockr_owner']['token'], data['public_id'], data['p3']['u_id']) != 200
-
-    # AccessError ch.channel_addowner(data['flockr_owner_token'], data['private_id'], data['p4_id'])
     assert add_owner(url, data['flockr_owner']['token'], data['private_id'], data['p4']['u_id']) != 200
 
 
 def test_flockr_removeowner_but_not_member(url, data):
-    # AccessError ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
+    '''
+    If the flockR owner is not part of the channel, they don't get any piviledges.
+    '''
+
+    # AccessErrors:
     assert rem_owner(url, data['flockr_owner']['token'], data['public_id'], data['p1']['u_id']) != 200
-    
-    # AccessError ch.channel_removeowner(data['flockr_owner_token'], data['private_id'], data['p2_id'])
     assert rem_owner(url, data['flockr_owner']['token'], data['private_id'], data['p2']['u_id']) != 200
 
 
 def test_flockr_join_private(url, data):
-    # assert ch.channel_join(data['flockr_owner_token'], data['private_id'])
+    '''
+    FlockR members are allowed to join private channels
+    '''
+
     assert join(url, data['flockr_owner']['token'], data['private_id']) == 200
-    
-    # assert ch.channel_leave(data['flockr_owner_token'], data['private_id'])
     assert leave(url, data['flockr_owner']['token'], data['private_id']) == 200
-    
-    # assert ch.channel_join(data['flockr_owner_token'], data['private_id'])
     assert join(url, data['flockr_owner']['token'], data['private_id']) == 200
 
 
 def test_flockr_invite_private(url, data):
-    # ch.channel_invite(data['p2_token'], data['private_id'], data['flockr_owner_id'])
+    '''
+    FlockR owners are allowed to invite anyone who is not currently in the
+    private channel even when they are not an owner of the channel.
+    '''
+
     invite(url, data['p2']['token'], data['private_id'], data['flockr_owner']['u_id'])
-    
-    # assert ch.channel_invite(data['flockr_owner_token'], data['private_id'], data['p3_id'])
     assert invite(url, data['flockr_owner']['token'], data['private_id'], data['p3']['u_id']) == 200
 
 
 def test_add_flockr_as_owner(url, data):
-    # ch.channel_join(data['flockr_owner_token'], data['public_id'])
-    join(url, data['flockr_owner']['token'], data['public_id'])
+    '''
+    Adding the FlockR owner as a channel owner doesn't change much.
+    '''
 
-    # assert ch.channel_addowner(data['p1_token'], data['public_id'], data['flockr_owner_id'])
+    join(url, data['flockr_owner']['token'], data['public_id'])
     assert add_owner(url, data['p1']['token'], data['public_id'], data['flockr_owner']['u_id']) == 200
 
-    # InputError ch.channel_addowner(data['p1_token'], data['public_id'], data['flockr_owner_id'])
+    # InputError:
     assert add_owner(url, data['p1']['token'], data['public_id'], data['flockr_owner']['u_id']) != 200
 
-    # assert ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
     assert rem_owner(url, data['flockr_owner']['token'], data['public_id'], data['p1']['u_id']) == 200
 
-    # InputError ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
+    # InputError:
     assert rem_owner(url, data['flockr_owner']['token'], data['public_id'], data['p1']['u_id']) != 200
 
 
 def test_flockr_leaving_channel(url, data):
-    # ch.channel_join(data['flockr_owner_token'], data['public_id'])
+    '''
+    Flockr members can leave channels but the channels must have an owner.
+    '''
+
     join(url, data['flockr_owner']['token'], data['public_id'])
-
-    # assert ch.channel_leave(data['flockr_owner_token'], data['public_id'])
     assert leave(url, data['flockr_owner']['token'], data['public_id'])
-
-    # ch.channel_invite(data['p1_token'], data['public_id'], data['p3_id'])
-    # ch.channel_join(data['flockr_owner_token'], data['public_id'])
-    # ch.channel_removeowner(data['flockr_owner_token'], data['public_id'], data['p1_id'])
 
     invite(url, data['p1']['token'], data['public_id'], data['p3']['u_id'])
     join(url, data['flockr_owner']['token'], data['public_id'])
     rem_owner(url, data['flockr_owner']['token'], data['public_id'], data['p1']['u_id'])
 
-    # AccessError ch.channel_leave(data['flockr_owner_token'], data['public_id'])
+    # AccessError:
     assert leave(url, data['flockr_owner']['token'], data['public_id']) != 200
