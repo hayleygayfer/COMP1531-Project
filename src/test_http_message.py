@@ -49,7 +49,7 @@ def create_channel(url_create, token, name, is_pub):
     response = requests.post(url_create + "channels/create", json=payload)
     return response.json()
 
-def send(url_send, token, channel_id, msg):
+def message_send(url_send, token, channel_id, msg):
     payload = {"token": token, "channel_id": channel_id, "message": msg,}
     response = requests.post(url_send + "message/send", json=payload)
     return {
@@ -57,7 +57,7 @@ def send(url_send, token, channel_id, msg):
         'id': response.json()
     }
 
-def ch_messages(url_msg, token, channel_id, start):
+def channel_messages(url_msg, token, channel_id, start):
     payload = {'token': token, 'channel_id': channel_id, 'start': start}
     response = requests.get(url_msg + "channel/messages", params=payload)
     return {
@@ -73,76 +73,72 @@ def ch_messages(url_msg, token, channel_id, start):
 
 def test_message_user_owner_http(url, user_list, channel_list):
     # Send message
-    response = send(url, user_list['token1'], channel_list['c1_id'], "This is the first message in the channel")
+    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This is the first message in the channel")
     message_ID = response['id']
     assert response['status'] == 200
 
     # Get message from channel messages
-    messages = ch_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']
+    messages = channel_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']
     message_id_at_index_zero = messages[0]['message_id']
     assert message_ID == message_id_at_index_zero
 
 def test_message_user_member(url, user_list, channel_list):
     # Send message
-    response = send(url, user_list['token2'], channel_list['c2_id'], "This is the first message in the channel")
+    response = message_send(url, user_list['token2'], channel_list['c2_id'], "This is the first message in the channel")
     message_ID = response['id']
     assert response['status'] == 200
 
     # Get message from channel messages
-    messages = ch_messages(url, user_list['token2'], channel_list['c2_id'], 0)['messages']
+    messages = channel_messages(url, user_list['token2'], channel_list['c2_id'], 0)['messages']
     message_id_at_index_zero = messages[0]['message_id']
     assert message_ID == message_id_at_index_zero
 
 def test_message_non_alpha_characters(url, user_list, channel_list):
     # Send message
-    response = send(url, user_list['token1'], channel_list['c1_id'], "This message has many non alpha character: !@#$%^&*()")
+    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message has many non alpha character: !@#$%^&*()")
     message_ID = response['id']
     assert response['status'] == 200
 
     # Get message from channel messages
-    messages = ch_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']
+    messages = channel_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']
     message_id_at_index_zero = messages[0]['message_id']
     assert message_ID == message_id_at_index_zero
 
 # INVALID CASES #
 def test_message_greater_than_1000(url, user_list, channel_list):
     # Send message
-    response = send(url, user_list['token1'], channel_list['c1_id'], "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N")
+    response = message_send(url, user_list['token1'], channel_list['c1_id'], "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N")
     message_ID = response['id']
     assert response['status'] == 200
 
     # Get message from channel messages
-    messages = ch_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']
+    messages = channel_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']
     message_id_at_index_zero = messages[0]['message_id']
     assert message_ID == message_id_at_index_zero
 
-
     # Send message with invalid amount
-    response = send(url, user_list['token1'], channel_list['c1_id'], "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Na")
+    response = message_send(url, user_list['token1'], channel_list['c1_id'], "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Na")
     assert response['status'] == 400 #TODO 404
 
 def test_user_not_in_channel(url, user_list, channel_list):
     # Send message
-    payload = {'token3': user_list['token3'], 'c2_id': channel_list['c2_id'], 'message': "This user is not in the channel"}
-    response = requests.post(url + "message/send", json=payload)
-    assert response.status_code == 400
+    response = message_send(url, user_list['token3'], channel_list['c2_id'], "This user is not in the channel")
+    assert response['status'] == 400
 
 def test_user_logged_out(url, user_list, channel_list):
     # Auth logout 
-    payload = {'token2': user_list['token2']}
+    payload = {'token': user_list['token2']}
     response = requests.post(url + "auth/logout", json=payload)
     assert response.json() == {'is_success': True}
 
-     # Send message
-    payload = {'token2': user_list['token2'], 'c2_id': channel_list['c2_id'], 'message': "This user is logged out"}
-    response = requests.post(url + "message/send", json=payload)
-    assert response.status_code == 400
+    # Send message
+    response = message_send(url, user_list['token2'], channel_list['c2_id'], "This user is logged out")
+    assert response['status'] == 400
 
 def test_empty_message(url, user_list, channel_list):
     # Send message
-    payload = {'token2': user_list['token2'], 'c2_id': channel_list['c2_id'], 'message': ""}
-    response = requests.post(url + "message/send", json=payload)
-    assert response.status_code == 404
+    response = message_send(url, user_list['token2'], channel_list['c2_id'], "")
+    assert response['status'] == 400 #TODO 404
 
 # test message_remove #
 """
