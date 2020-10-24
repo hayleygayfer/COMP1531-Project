@@ -214,6 +214,7 @@ def http_search():
     token = request.get_json()["token"]
     query_str = request.get_json()["query_str"]
     response = search(token, query_str)
+    return dumps(response)
 
 ### MESSAGES ###
 
