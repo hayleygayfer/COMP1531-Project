@@ -9,6 +9,8 @@ from auth import auth_register, auth_login, auth_logout
 import channel as ch
 from channels import channels_list, channels_listall, channels_create
 from message import message_send, message_remove, message_edit
+from user import user_profile, user_profile_setname, user_profile_setemail, user_profile_sethandle
+
 
 def defaultHandler(err):
     response = err.get_response()
@@ -48,7 +50,7 @@ def http_clear():
     return {}
 
 
-# Auth Register
+# Auth/Register
 @APP.route("/auth/register", methods=['POST'])
 def http_auth_register():
     email = request.get_json()["email"]
@@ -58,6 +60,7 @@ def http_auth_register():
     response = auth_register(email, password, name_first, name_last)
     return dumps(response)
 
+# Auth/Login
 @APP.route("/auth/login", methods=['POST'])
 def http_auth_login():
     email = request.get_json()["email"]
@@ -65,6 +68,7 @@ def http_auth_login():
     response = auth_login(email, password)
     return dumps(response)
 
+# Auth/Logout
 @APP.route("/auth/logout", methods=['POST'])
 def http_auth_logout():
     token = request.get_json()["token"]
@@ -124,6 +128,41 @@ def http_channel_rem():
     channel_id = request.get_json()["channel_id"]
     u_id = request.get_json()["u_id"]
     response = ch.channel_removeowner(token, channel_id, u_id)
+
+
+###### USER ######
+
+# User/Profile
+@APP.route("/user/profile", methods=['GET'])
+def http_user_profile():
+    token = request.args.get('token')
+    u_id = request.args.get('u_id')
+    response = user_profile(token, int(u_id))
+    return dumps(response)
+
+# User/Profile/Setname
+@APP.route("/user/profile/setname", methods=['PUT'])
+def http_user_profile_setname():
+    token = request.get_json()['token']
+    name_first = request.get_json()['name_first']
+    name_last = request.get_json()['name_last']
+    response = user_profile_setname(token, name_first, name_last)
+    return dumps(response)
+
+# User/Profile/Setemail
+@APP.route("/user/profile/setemail", methods=['PUT'])
+def http_user_profile_setemail():
+    token = request.get_json()['token']
+    email = request.get_json()['email']
+    response = user_profile_setemail(token, email)
+    return dumps(response)
+
+# User/Profile/Sethandle
+@APP.route("/user/profile/sethandle", methods=['PUT'])
+def http_user_profile_sethandle():
+    token = request.get_json()['token']
+    handle = request.get_json()['handle_str']
+    response = user_profile_sethandle(token, handle)
     return dumps(response)
 
 ###### CHANNELS ######
