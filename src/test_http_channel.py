@@ -43,18 +43,7 @@ Private Channel: Person2 (O)
 ## HELPER FUNCTIONS
 ######################################################################
 
-def auth(url_str, email, password, n1, n2):
-    payload = {"email": email, "password": password, "name_first": n1, "name_last": n2}
-    requests.post(url_str + "auth/register", json=payload)
-    payload = {"email": email, "password": password}
-    response = requests.post(url_str + "auth/login", json=payload)
-    return response.json()
-
-def create(url_create, token, name, is_pub):
-    payload = {"token": token, "name": name, "is_public": is_pub}
-    response = requests.post(url_create + "channels/create", json=payload)
-    return response.json()
-
+## CHANNEL ##
 def invite(url_invite, token, channel_id, u_id):
     payload = {"token": token, "channel_id": channel_id, "u_id": u_id}
     response = requests.post(url_invite + "channel/invite", json=payload)
@@ -79,6 +68,42 @@ def rem_owner(url_rem, token, channel_id, u_id):
     payload = {"token": token, "channel_id": channel_id, "u_id": u_id}
     response = requests.post(url_rem + "channel/removeowner", json=payload)
     return response.status_code
+
+def details(url_detail, token, channel_id):
+    payload = {'token': token, 'channel_id': channel_id}
+    response = requests.get(url_detail + "channel/details", params=payload)
+    return {
+        'status': response.status_code,
+        'name': response.json().get('name'),
+        'owners': response.json().get('owner_members'),
+        'all': response.json().get('all_members')
+    }
+
+def messages(url_msg, token, channel_id, start):
+    payload = {'token': token, 'channel_id': channel_id, 'start': start}
+    response = requests.get(url_msg + "channel/messages", params=payload)
+    return {
+        'status': response.status_code,
+        'msg': response.json()
+    }
+
+## OTHER ##
+def auth(url_str, email, password, n1, n2):
+    payload = {"email": email, "password": password, "name_first": n1, "name_last": n2}
+    requests.post(url_str + "auth/register", json=payload)
+    payload = {"email": email, "password": password}
+    response = requests.post(url_str + "auth/login", json=payload)
+    return response.json()
+
+def create(url_create, token, name, is_pub):
+    payload = {"token": token, "name": name, "is_public": is_pub}
+    response = requests.post(url_create + "channels/create", json=payload)
+    return response.json()
+
+def send(url_send, token, channel_id, msg):
+    payload = {"token": token, "channel_id": channel_id, "message": msg,}
+    requests.post(url_send + "message/send", json=payload)
+
 
 ######################################################################
 ## /channel/invite ##
@@ -118,20 +143,62 @@ def test_not_in_channel_invite(url, data):
 ## /channel/details ##
 
 def test_details_authorisation(url, data):
-    # TODO
-    pass
+    # assert ch.channel_details(data['p1_token'], data['public_id'])
+    assert details(url, data['p1']['token'], data['public_id'])['status'] == 200
+    
+    # assert ch.channel_details(data['p2_token'], data['private_id'])
+    assert details(url, data['p2']['token'], data['private_id'])['status'] == 200
+
+    # AccessError: ch.channel_details(data['p2_token'], data['public_id'])
+    assert details(url, data['p2']['token'], data['public_id'])['status'] != 200
+
+    # AccessError: ch.channel_details(data['p1_token'], data['private_id'])
+    assert details(url, data['p1']['token'], data['private_id'])['status'] != 200
 
 def test_view_details(url, data):
-    # TODO
-    pass
+    # ch.channel_invite(data['p2_token'], data['private_id'], data['p3_id'])
+    # ch.channel_addowner(data['p2_token'], data['private_id'], data['p3_id'])
+    # ch.channel_invite(data['p2_token'], data['private_id'], data['p4_id'])
+    # ch.channel_invite(data['p1_token'], data['public_id'], data['p2_id'])
+    # ch.channel_join(data['p5_token'], data['public_id'])
+    # ch.channel_removeowner(data['p3_token'], data['private_id'], data['p2_id'])
+    # ch.channel_leave(data['p2_token'], data['public_id'])
 
+    invite(url, data['p2']['token'], data['private_id'], data['p3']['u_id'])
+    add_owner(url, data['p2']['token'], data['private_id'], data['p3']['u_id'])
+    invite(url, data['p2']['token'], data['private_id'], data['p4']['u_id'])
+    invite(url, data['p1']['token'], data['public_id'], data['p2']['u_id'])
+    join(url, data['p5']['token'], data['public_id'])
+    rem_owner(url, data['p3']['token'], data['private_id'], data['p2']['u_id'])
+    leave(url, data['p2']['token'], data['public_id'])
+
+    assert details(url, data['p1']['token'], data['public_id'])['name'] == 'PublicChannel'
+    assert details(url, data['p1']['token'], data['public_id'])['owners'][0]['u_id'] == data['p1']['u_id']
+    assert details(url, data['p1']['token'], data['public_id'])['owners'][0]['name_first'] == 'Personone'
+    assert details(url, data['p1']['token'], data['public_id'])['owners'][0]['name_last'] == 'One'
+    assert details(url, data['p1']['token'], data['public_id'])['all'][0]['u_id'] == data['p1']['u_id']
+    assert details(url, data['p1']['token'], data['public_id'])['all'][0]['name_first'] == 'Personone'
+    assert details(url, data['p1']['token'], data['public_id'])['all'][0]['name_last'] == 'One'
+    assert details(url, data['p1']['token'], data['public_id'])['all'][1]['u_id'] == data['p5']['u_id']
+
+    assert details(url, data['p2']['token'], data['private_id'])['name'] == 'PrivateChannel'
+    assert details(url, data['p2']['token'], data['private_id'])['owners'][0]['u_id'] == data['p3']['u_id']
+    assert details(url, data['p2']['token'], data['private_id'])['owners'][0]['name_first'] == 'Personthree'
+    assert details(url, data['p2']['token'], data['private_id'])['owners'][0]['name_last'] == 'Three'
+    assert details(url, data['p2']['token'], data['private_id'])['all'][0]['u_id'] == data['p2']['u_id']
+    assert details(url, data['p2']['token'], data['private_id'])['all'][0]['name_first'] == 'Persontwo'
+    assert details(url, data['p2']['token'], data['private_id'])['all'][0]['name_last'] == 'Two'
+    assert details(url, data['p2']['token'], data['private_id'])['all'][1]['u_id'] == data['p3']['u_id']
+    assert details(url, data['p2']['token'], data['private_id'])['all'][2]['u_id'] == data['p4']['u_id']
+    
 
 ####################################################################
 ## /channel/messages ##
 
 def test_view_messages_authorisation(url, data):
-    # TODO
-    pass
+    # msg.message_send(data['p1_token'], data['public_id'], "public msg")
+    # msg.message_send(data['p2_token'], data['private_id'], "private msg")
+    send(url, data['p1']['token'], data['public_id'], "public message")
 
 def test_invalid_messages_start(url, data):
     # TODO
