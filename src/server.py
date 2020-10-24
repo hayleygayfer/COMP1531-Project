@@ -7,6 +7,8 @@ from data import data
 
 from auth import auth_register, auth_login, auth_logout
 from other import search, users_all, admin_userpermission_change
+from user import user_profile, user_profile_setname, user_profile_setemail, user_profile_sethandle
+from channels import channels_list, channels_listall, channels_create
 
 def defaultHandler(err):
     response = err.get_response()
@@ -45,8 +47,7 @@ def http_clear():
     data['channels'].clear()
     return {}
 
-
-# Auth Register
+# Auth/Register
 @APP.route("/auth/register", methods=['POST'])
 def http_auth_register():
     email = request.get_json()["email"]
@@ -56,6 +57,7 @@ def http_auth_register():
     response = auth_register(email, password, name_first, name_last)
     return dumps(response)
 
+# Auth/Login
 @APP.route("/auth/login", methods=['POST'])
 def http_auth_login():
     email = request.get_json()["email"]
@@ -63,12 +65,73 @@ def http_auth_login():
     response = auth_login(email, password)
     return dumps(response)
 
+# Auth/Logout
 @APP.route("/auth/logout", methods=['POST'])
 def http_auth_logout():
     token = request.get_json()["token"]
     response = auth_logout(token)
     return dumps(response)
+    
+###### USER ######
 
+# User/Profile
+@APP.route("/user/profile", methods=['GET'])
+def http_user_profile():
+    token = request.args.get('token')
+    u_id = request.args.get('u_id')
+    response = user_profile(token, int(u_id))
+    return dumps(response)
+
+# User/Profile/Setname
+@APP.route("/user/profile/setname", methods=['PUT'])
+def http_user_profile_setname():
+    token = request.get_json()['token']
+    name_first = request.get_json()['name_first']
+    name_last = request.get_json()['name_last']
+    response = user_profile_setname(token, name_first, name_last)
+    return dumps(response)
+
+# User/Profile/Setemail
+@APP.route("/user/profile/setemail", methods=['PUT'])
+def http_user_profile_setemail():
+    token = request.get_json()['token']
+    email = request.get_json()['email']
+    response = user_profile_setemail(token, email)
+    return dumps(response)
+
+# User/Profile/Sethandle
+@APP.route("/user/profile/sethandle", methods=['PUT'])
+def http_user_profile_sethandle():
+    token = request.get_json()['token']
+    handle = request.get_json()['handle_str']
+    response = user_profile_sethandle(token, handle)
+    return dumps(response)
+
+###### CHANNELS ######
+
+# Channels_list
+@APP.route("/channels/list", methods=['GET'])
+def http_channels_list():
+    token = request.get_json()["token"]
+    response = channels_list(token)
+    return dumps(response)
+
+# Channels_listall
+@APP.route("/channels/listall", methods=['GET'])
+def http_channels_listall():
+    token = request.get_json()["token"]
+    response = channels_listall(token)
+    return dumps(response)
+
+# Channels_create
+@APP.route("/channels/create", methods=['POST'])
+def http_channels_create():
+    token = request.get_json()["token"]
+    name = request.get_json()["name"]
+    is_public = request.get_json()["is_public"]
+    response = channels_create(token, name, is_public)
+    return dumps(response)
+    
 ###### OTHER ######
 
 # users_all
@@ -93,7 +156,6 @@ def http_search():
     token = request.get_json()["token"]
     query_str = request.get_json()["query_str"]
     response = search(token, query_str)
-    return dumps(response)
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
