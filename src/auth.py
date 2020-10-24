@@ -2,6 +2,10 @@ from data import data
 from error import InputError, AccessError
 from re import search # regex for email validation
 from random import random
+import hashlib
+import jwt
+
+SECRET = 'adaskljnkjladsncjakldnckjscankj'
 
 def auth_login(email, password):
     if validate_email(email) == False:
@@ -9,8 +13,8 @@ def auth_login(email, password):
 
     for user in data['users']:
         if user['email'] == email:
-            if user['password'] == password:
-                user['token'] = email
+            if user['password'] == hashlib.sha256(password.encode()).hexdigest():
+                user['token'] = jwt.encode({'email': user['email']}, SECRET, algorithm='HS256').decode('utf-8')
                 return {
                     'u_id': user['u_id'],
                     'token': user['token'],
@@ -32,6 +36,9 @@ def auth_logout(token):
     }
 
 def auth_register(email, password, name_first, name_last):
+
+    SECRET = 'adaskljnkjladsncjakldnckjscankj'
+
     if validate_email(email) == False:
         raise InputError(f"Email entered is not a valid email ")
 
@@ -53,12 +60,18 @@ def auth_register(email, password, name_first, name_last):
     if data['users'] == []:
         permissions = 'OWNER'
 
+    # Hashed password
+    hash_password = hashlib.sha256(password.encode()).hexdigest()
+
+    # Token
+    encoded_token = jwt.encode({'email': email}, SECRET, algorithm='HS256').decode('utf-8')
+
     data['users'].append(
         {
             'u_id': len(data['users']) + 1,
-            'token': email,
+            'token': (encoded_token),
             'email': email,
-            'password': password,
+            'password': hash_password,
             'name_first': name_first,
             'name_last': name_last,
             'handle_str': handle,
@@ -66,10 +79,12 @@ def auth_register(email, password, name_first, name_last):
         }
     )
 
+
     return {
         'u_id': len(data['users']),
-        'token': email,
+        'token': str(encoded_token),
     }
+
 
 def validate_email(email):
     regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
@@ -118,3 +133,14 @@ def generate_valid_handle(name_first, name_last):
         handle = handle[:15]
         handle = handle + str(int(random()*100000))
     return handle
+
+###### VALIDATE TOKEN ######
+
+def validate_token(token):
+    SECRET = 'adaskljnkjladsncjakldnckjscankj'
+    email = jwt.decode(token, SECRET, algorithms=['HS256'])
+    for user in data['users']:
+        if user.get('email') == email['email']:
+            return user
+    return None
+

@@ -6,16 +6,16 @@ def channels_list(token):
     
     channels = []
     u_id = 0
-    validated = False
 
     # Check for authentication
-    for user in data['users']:
-        if user['token'] == token:
-            u_id = user['u_id']
-            validated = True
-    
-    if not validated:
+    user = auth.validate_token(token)
+    if user == None:
         raise AccessError('Invalid Token')
+    else:
+        u_id = user['u_id']
+
+    
+    
     
     # Loop through channels, and associated users to find matches -> inefficient?
     for channel in data['channels']:
@@ -28,11 +28,8 @@ def channels_list(token):
 def channels_listall(token):
 
     # Check for authentication
-    for user in data['users']:
-        if user['token'] == token:
-            validated = True
-    
-    if not validated:
+    user = auth.validate_token(token)
+    if user == None:
         raise AccessError('Invalid Token')
 
     # List all channels (regardless of authentication)
