@@ -275,61 +275,50 @@ def test_edit_user_member(url, user_list, channel_list):
 # INVALID CASES #
 def test_not_valid_user(url, user_list, channel_list):
     # Join channel
-    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
-    response = requests.post(url + "channel/join", json=payload)
-    assert response.status_code == 200
+    assert channel_join(url, user_list['token2'], channel_list['c1_id']) == 200
+
     # Send message
-    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id'], 'message': "This message was sent by not an owner"}
-    response = requests.post(url + "message/send", json=payload)
-    message_ID = response.json()
-    assert response.status_code == 200
+    response = message_send(url, user_list['token2'], channel_list['c1_id'], "This message was sent by not an owner")
+    message_ID = response['id']
+    assert response['status'] == 200
+
     # Edit message
-    payload = {'token2': user_list['token2'], 'message_id': message_ID, 'message': "This message should not be able to be edited"}
-    response = requests.post(url + "message/edit", json=payload)
-    assert response.status_code == 400
+    assert message_edit(url, user_list['token2'], message_ID, "This message should not be able to be edited") == 400
+
 
 def test_edit_not_by_person_who_sent(url, user_list, channel_list):
     # Join channel
-    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id']}
-    response = requests.post(url + "channel/join", json=payload)
-    assert response.status_code == 200
+    assert channel_join(url, user_list['token2'], channel_list['c1_id']) == 200
+
     # Add owner
-    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'u2_id': user_list['u2_id']}
-    response = requests.post(url + "channel/addowner", json=payload)
-    assert response.status_code == 200
+    assert add_owner(url, user_list['token1'], channel_list['c1_id'], user_list['u2_id']) == 200
+
+    # Send message
+    response = message_send(url, user_list['token2'], channel_list['c1_id'], "This message was sent by an owner of this channel")
+    message_ID = response['id']
+    assert response['status'] == 200
+
     # Edit message
-    payload = {'token2': user_list['token2'], 'c1_id': channel_list['c1_id'], 'message': "This message was sent by an owner of this channel"}
-    response = requests.post(url + "message/send", json=payload)
-    message_ID = response.json()
-    assert response.status_code == 200
-    # Edit message again
-    payload = {'token1': user_list['token1'], 'message_id': message_ID, 'message': "This message should not be able to be edited"}
-    response = requests.post(url + "message/edit", json=payload)
-    assert response.status_code == 400
+    assert message_edit(url, user_list['token1'], message_ID, "This message should not be able to be edited") == 400
+
 
 def test_empty_string (url, user_list, channel_list):
     # Send message
-    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This is the first message sent"}
-    response = requests.post(url + "message/send", json=payload)
-    message_ID1 = response.json()
-    assert response.status_code == 200
+    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This is the first message sent")
+    message_ID1 = response['id']
+    assert response['status'] == 200
+
     # Send message
-    payload = {'token1': user_list['token1'], 'c1_id': channel_list['c1_id'], 'message': "This is the second message sent"}
-    response = requests.post(url + "message/send", json=payload)
-    message_ID2 = response.json()
-    assert response.status_code == 200
+    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This is the second message sent")
+    message_ID2 = response['id']
+    assert response['status'] == 200
+
     # Edit message
-    payload = {'token1': user_list['token1'], 'message_id': message_ID2, 'message': ""}
-    response = requests.post(url + "message/edit", json=payload)
-    assert response.status_code == 200
+    assert message_edit(url, user_list['token1'], message_ID2, "") == 200
+
     # Get message from channel messages
-    payload = {'token1': user_list['token1'], 'message_id': message_ID2, 'start': 0}
-    response = requests.post(url + "channel/messages", json=payload)
-    messages = response.json()['message']
+    messages = channel_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']
     message_id_at_index_zero = messages[0]['message_id']
     assert message_ID1 == message_id_at_index_zero
-
-
-
 
 
