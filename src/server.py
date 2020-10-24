@@ -215,6 +215,7 @@ def http_search():
     query_str = request.get_json()["query_str"]
     response = search(token, query_str)
 
+### MESSAGES ###
 
 # Message send
 @APP.route("/message/send", methods=['POST'])
@@ -225,6 +226,22 @@ def http_message_send():
     response = message_send(token, channel_id, message)
     return dumps(response)
 
+# Message remove
+@APP.route("/message/remove", methods=['DELETE'])
+def http_message_remove():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["message_id"]
+    response = message_remove(token, channel_id)
+    return dumps(response)
+
+# Message edit
+@APP.route("/message/edit", methods=['PUT'])
+def http_message_edit():
+    token = request.get_json()["token"]
+    channel_id = request.get_json()["message_id"]
+    message = request.get_json()["message"]
+    response = message_edit(token, channel_id, message)
+    return dumps(response)
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
