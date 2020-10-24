@@ -128,6 +128,7 @@ def http_channel_rem():
     channel_id = request.get_json()["channel_id"]
     u_id = request.get_json()["u_id"]
     response = ch.channel_removeowner(token, channel_id, u_id)
+    return dumps(response)
 
 
 ###### USER ######
