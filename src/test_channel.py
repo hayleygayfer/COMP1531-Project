@@ -103,18 +103,26 @@ def test_view_details(data):
 
     # View details of public channel
     assert ch.channel_details(data['p1_token'], data['public_id'])['name'] == 'PublicChannel'
-    assert ch.channel_details(data['p1_token'], data['public_id'])['owner_members'][0] == data['p1_id']
+    assert ch.channel_details(data['p1_token'], data['public_id'])['owner_members'][0]['u_id'] == data['p1_id']
+    assert ch.channel_details(data['p1_token'], data['public_id'])['owner_members'][0]['name_first'] == 'Personone'
+    assert ch.channel_details(data['p1_token'], data['public_id'])['owner_members'][0]['name_last'] == 'One'
 
-    assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][0] == data['p1_id']
-    assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][1] == data['p5_id'] # Person2 left
+    assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][0]['u_id'] == data['p1_id']
+    assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][0]['name_first'] == 'Personone'
+    assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][0]['name_last'] == 'One'
+    assert ch.channel_details(data['p1_token'], data['public_id'])['all_members'][1]['u_id'] == data['p5_id'] # Person2 left
 
     # View details of private channel
     assert ch.channel_details(data['p2_token'], data['private_id'])['name'] == 'PrivateChannel'
-    assert ch.channel_details(data['p2_token'], data['private_id'])['owner_members'][0] == data['p3_id'] # Since Person2 got removed
+    assert ch.channel_details(data['p2_token'], data['private_id'])['owner_members'][0]['u_id'] == data['p3_id'] # Since Person2 got removed
+    assert ch.channel_details(data['p2_token'], data['private_id'])['owner_members'][0]['name_first'] == 'Personthree'
+    assert ch.channel_details(data['p2_token'], data['private_id'])['owner_members'][0]['name_last'] == 'Three'
 
-    assert ch.channel_details(data['p2_token'], data['private_id'])['all_members'][0] == data['p2_id']
-    assert ch.channel_details(data['p2_token'], data['private_id'])['all_members'][1] == data['p3_id']
-    assert ch.channel_details(data['p2_token'], data['private_id'])['all_members'][2] == data['p4_id']
+    assert ch.channel_details(data['p2_token'], data['private_id'])['all_members'][0]['u_id'] == data['p2_id']
+    assert ch.channel_details(data['p2_token'], data['private_id'])['all_members'][0]['name_first'] == 'Persontwo'
+    assert ch.channel_details(data['p2_token'], data['private_id'])['all_members'][0]['name_last'] == 'Two'
+    assert ch.channel_details(data['p2_token'], data['private_id'])['all_members'][1]['u_id'] == data['p3_id']
+    assert ch.channel_details(data['p2_token'], data['private_id'])['all_members'][2]['u_id'] == data['p4_id']
 
 
 # must be a member of the channel to view messages

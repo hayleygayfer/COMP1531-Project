@@ -166,15 +166,23 @@ def test_view_details(url, data):
     '''
 
     assert details(url, data['p1']['token'], data['public_id'])['name'] == 'PublicChannel'
-    assert details(url, data['p1']['token'], data['public_id'])['owners'][0] == data['p1']['u_id']
-    assert details(url, data['p1']['token'], data['public_id'])['all'][0] == data['p1']['u_id']
-    assert details(url, data['p1']['token'], data['public_id'])['all'][1] == data['p5']['u_id']
+    assert details(url, data['p1']['token'], data['public_id'])['owners'][0]['u_id'] == data['p1']['u_id']
+    assert details(url, data['p1']['token'], data['public_id'])['owners'][0]['name_first'] == 'Personone'
+    assert details(url, data['p1']['token'], data['public_id'])['owners'][0]['name_last'] == 'One'
+    assert details(url, data['p1']['token'], data['public_id'])['all'][0]['u_id'] == data['p1']['u_id']
+    assert details(url, data['p1']['token'], data['public_id'])['all'][0]['name_first'] == 'Personone'
+    assert details(url, data['p1']['token'], data['public_id'])['all'][0]['name_last'] == 'One'
+    assert details(url, data['p1']['token'], data['public_id'])['all'][1]['u_id'] == data['p5']['u_id']
 
     assert details(url, data['p2']['token'], data['private_id'])['name'] == 'PrivateChannel'
-    assert details(url, data['p2']['token'], data['private_id'])['owners'][0] == data['p3']['u_id']
-    assert details(url, data['p2']['token'], data['private_id'])['all'][0] == data['p2']['u_id']
-    assert details(url, data['p2']['token'], data['private_id'])['all'][1] == data['p3']['u_id']
-    assert details(url, data['p2']['token'], data['private_id'])['all'][2] == data['p4']['u_id']
+    assert details(url, data['p2']['token'], data['private_id'])['owners'][0]['u_id'] == data['p3']['u_id']
+    assert details(url, data['p2']['token'], data['private_id'])['owners'][0]['name_first'] == 'Personthree'
+    assert details(url, data['p2']['token'], data['private_id'])['owners'][0]['name_last'] == 'Three'
+    assert details(url, data['p2']['token'], data['private_id'])['all'][0]['u_id'] == data['p2']['u_id']
+    assert details(url, data['p2']['token'], data['private_id'])['all'][0]['name_first'] == 'Persontwo'
+    assert details(url, data['p2']['token'], data['private_id'])['all'][0]['name_last'] == 'Two'
+    assert details(url, data['p2']['token'], data['private_id'])['all'][1]['u_id'] == data['p3']['u_id']
+    assert details(url, data['p2']['token'], data['private_id'])['all'][2]['u_id'] == data['p4']['u_id']
     
 
 ####################################################################

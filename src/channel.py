@@ -50,8 +50,8 @@ def channel_details(token, channel_id):
         if channel['channel_id'] == channel_id:
             return {
                 'name': channel['name'],
-                'all_members': channel['all_members'],
-                'owner_members': channel['owner_members']
+                'all_members': get_user_details(channel['all_members']),
+                'owner_members': get_user_details(channel['owner_members'])
             }
             
 
@@ -347,6 +347,24 @@ def is_token_flockr_owner(token):
     if token == data['users'][0].get('token'):
         return True
     return False
+
+# Gets user object from u_id
+def get_user_names(u_id):
+    for user in data['users']:
+        if user['u_id'] == u_id:
+            return {
+                'u_id': u_id,
+                'name_first': user['name_first'],
+                'name_last': user['name_last']
+            }
+
+# Returns a list of user objects
+def get_user_details(u_ids):
+    users = []
+    for u_id in u_ids:
+        users.append(get_user_names(u_id))
+    return users
+        
 
 #### TODO: Message functions currently working on
 
