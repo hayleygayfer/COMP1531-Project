@@ -5,22 +5,14 @@ import auth
 def channels_list(token):
     
     channels = []
-    u_id = 0
-    validated = False
 
     # Check for authentication
-    for user in data['users']:
-        if user['token'] == token:
-            u_id = user['u_id']
-            validated = True
-    
-    if not validated:
-        raise AccessError('Invalid Token')
+    user = auth.validate_token(token)
     
     # Loop through channels, and associated users to find matches -> inefficient?
     for channel in data['channels']:
         for member in channel['all_members']:
-            if member['u_id'] == u_id:
+            if member == user['u_id']:
                 channels.append(channel)
     
     return channels
@@ -28,12 +20,7 @@ def channels_list(token):
 def channels_listall(token):
 
     # Check for authentication
-    for user in data['users']:
-        if user['token'] == token:
-            validated = True
-    
-    if not validated:
-        raise AccessError('Invalid Token')
+    user = auth.validate_token(token)
 
     # List all channels (regardless of authentication)
     return data['channels']
@@ -44,26 +31,14 @@ def channels_create(token, name, is_public):
     if len(name) > 20:
         raise InputError('Invalid channel name: Must be less than 20 characters')
 
-    global data
-    channel_creator = {}
-    validated = False
-
     # Check for authentication & retrieve owner member id
-    for user in data['users']:
-        if user['token'] == token:
-            channel_creator['u_id'] = user['u_id']
-            channel_creator['name_first'] = user['name_first']
-            channel_creator['name_last'] = user['name_last']
-            validated = True
+    channel_creator = auth.validate_token(token)
     
-    if not validated:
-        raise AccessError('Invalid Token')
-
     channel = {
         'channel_id': len(data['channels']),
         'name': name,
-        'all_members': [ channel_creator ],
-        'owner_members': [ channel_creator ],
+        'all_members': [ channel_creator['u_id'] ],
+        'owner_members': [ channel_creator['u_id'] ],
         'is_public': is_public,
         'messages': [],
         'message_count': 0

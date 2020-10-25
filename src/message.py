@@ -1,3 +1,4 @@
+from datetime import datetime
 from data import data
 from error import InputError, AccessError
 
@@ -22,8 +23,8 @@ def message_send(token, channel_id, message):
     elif message == "":
         raise InputError("Message must contain at least 1 character")
     
-    # TODO: Calculate current timestamp
-    timestamp = 1582426789
+    # Calculates current timestamp
+    timestamp = datetime.timestamp(datetime.now())
 
     msg_id = generate_message_id(channel_id)
     append_msg_to_channel(channel_id, message, msg_id, u_id, timestamp)
@@ -125,7 +126,7 @@ def channel_member(u_id, channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for member in channel['all_members']:
-                if member['u_id'] == u_id:
+                if member == u_id:
                     return True
     return False        
 
@@ -185,7 +186,7 @@ def do_remove(channel, msg_id):
 
 def user_is_not_owner(u_id, owners):
     for p in owners:
-        if p.get('u_id') == u_id:
+        if p == u_id:
             return False
     return True
 

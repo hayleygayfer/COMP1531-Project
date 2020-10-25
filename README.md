@@ -4,8 +4,11 @@
 
  * 08/10: Added section 6.8
  * 08/10: Removed any reference to "admin", clarity about implementing entire interface
+
  * 12/10: Clarified that even if you modify the handle it must remain less than 20 characters
 
+ * 12/10: Clarified that even if you modify the handle it must remain less than 20 characters
+ * 20/10: Replaced instances of "Slackr" permissions with "Flockr"
 ## Contents
 
   1. Aims
@@ -71,50 +74,13 @@ Complete. Please see commit history to view old iteration info.
 
 ### 4.1. Task
 
-<<<<<<< HEAD
-**NOTE:** In merging the instructions for this iteration into your repo, you may get a failed pipeline. This is most likely because your code is not pytest compliant. If this is the case, that is the *first* thing you should address for this iteration. It is important you have a *stable* master branch before proceeding to add additional features.
-=======
 **NOTE:** In merging the instructions for this iteration into your repo, you may get a failed pipeline. This is most likely because your code is not pylint compliant. If this is the case, that is the *first* thing you should address for this iteration. It is important you have a *stable* master branch before proceeding to add additional features.
->>>>>>> auth
+
 
 In this iteration, more features were added to the specification, and the focus has been changed to HTTP endpoints. Many of the theory surrounding iteration 2 will be covered in week 4-6 lectures. Note that there will still be 1 or 2 features of the frontend that will not work because the routes will not appear until iteration 3.
 
 In this iteration, you are expected to:
 
-<<<<<<< HEAD
-1. Implement and test the HTTP Flask server according to the interface provided in the specification.
-
-    Part of this section may be automarked.
-
-    Pylint has been added to your continuous integration file, meaning that code that isn't pylint compliant will now fail the pipeline. The provided `.pylintrc` file is *very* lenient, so there is no reason you should have to disable any additional checks.
-
-    Additionally, CI pipelines will measure *branch* coverage for all `.py` files that aren't tests. The coverage percentage for master is visible in a badge at the top of this repo and changes in coverage will appear in Merge Requests. Do note that coverage of `server.py` is not measured, nor will what is executed by your HTTP tests. This is because, when running HTTP tests, the server is run in a separate process.
-
-    Your implementation should build upon your work in iteration 1, and ideally your HTTP layer is just a wrapper for underlying functions you've written that handle the logic. Your implementation will rely on topics taught in week 4 (HTTP servers and testing) as well as week 5 (authentication and authorisation).
-
-    You can structure your tests however you choose, as long as they are appended with `_test.py`. It's important you consider how to separate (or combine) your integration tests from iteration 1 with the extra integration tests (HTTP with requests library) in iteration 2. You will be marked on both tests being present/used in this iteration. **An example of a HTTP test has been provided for you in `src/echo_http_test.py`**.
-
-2. Continue demonstrating effective project management and effective git usage
-
-    Part of this section may be automarked.
-
-    You will be heavily marked for your use of thoughtful project management and use of git effectively. The degree to which your team works effectively will also be assessed.
-
-To run the server you should always use the command
-
-```bash
-python3 src/server.py
-```
-
-This will start the server on the next available port. If you get any errors relating to `flask_cors`, ensure you have installed all the necessary Python libraries for this course (the list of libraries was updated for this iteration). You can do this with:
-
-```bash
-pip3 install $(curl https://www.cse.unsw.edu.au/~cs1531/20T3/requirements.txt)
-```
-
-A frontend has been built by Sally & Bob that you can use in this iteration, and use your backend to power it (note: an incomplete backend will mean the frontend cannot work). **You can, if you wish, make changes to the frontend code, but it is not required for this iteration.** The source code for the frontend is only provided for your own fun or curiosity.
-
-=======
 1. Implement and test the HTTP Flask server according to the entire interface provided in the specification.
 
     Part of this section may be automarked.
@@ -147,7 +113,6 @@ pip3 install $(curl https://www.cse.unsw.edu.au/~cs1531/20T3/requirements.txt)
 
 A frontend has been built by Sally & Bob that you can use in this iteration, and use your backend to power it (note: an incomplete backend will mean the frontend cannot work). **You can, if you wish, make changes to the frontend code, but it is not required for this iteration.** The source code for the frontend is only provided for your own fun or curiosity.
 
->>>>>>> auth
 ### 4.2. Implementing and testing features
 
 You should first approach this project by considering its distinct "features". Each feature should add some meaningful functionality to the project, but still be as small as possible. You should aim to size features as the smallest amount of functionality that adds value without making the project more unstable. For each feature you should:
@@ -175,7 +140,6 @@ Your tests, keep in mind the following:
 * Pushing directly to `master` is not possible for this repo. The only way to get code into master is via a merge request. If you discover you have a bug in `master` that got through testing, create a bugfix branch and merge that in via a merge request.
 
 ### 4.3. Recommended approach
-<<<<<<< HEAD
 
 Our recommendation with this iteration is that you:
 
@@ -190,8 +154,6 @@ You are not required to store data persistently in this iteration. However, basi
 
 ### 4.5. Submission
 
-=======
-
 Our recommendation with this iteration is that you:
 
 1. Start out trying to implement the new functions the same way you did in iteration 1 (a series of implemented functions, categorised in files, with black-box pytests testing them).
@@ -205,7 +167,6 @@ You are not required to store data persistently in this iteration. However, basi
 
 ### 4.5. Submission
 
->>>>>>> auth
 This iteration is due to be submitted at 8pm Monday 26th October (**week 7**). You will then be demonstrating this in your week 7 lab. All team members **must** attend this lab session, or they will not receive a mark.
 
 At the due date provided, we will automatically collect and submit the code that is on the `master` branch of your repository. If the deadline is approaching and you have features that are either untested or failing their tests, **DO NOT MERGE IN THOSE MERGE REQUESTS**. Your tutor will look at unmerged branches and may allocate some reduced marks for incomplete functionality, but `master` should only contain working code.
@@ -264,11 +225,9 @@ These interface specifications come from Sally and Bob, who are building the fro
 |------------|-------------|----------|-----------|----------|----------|
 |auth/login|POST|(email, password)|{ u_id, token }|**InputError** when any of:<ul><li>Email entered is not a valid email using the method provided [here](https://www.geeksforgeeks.org/check-if-email-address-valid-or-not-in-python/) (unless you feel you have a better method)</li><li>Email entered does not belong to a user</li><li>Password is not correct</li></ul> | Given a registered users' email and password and generates a valid token for the user to remain authenticated |
 |auth/logout|POST|(token)|{ is_success }|N/A|Given an active token, invalidates the token to log the user out. If a valid token is given, and the user is successfully logged out, it returns true, otherwise false. |
-<<<<<<< HEAD
-|auth/register|POST|(email, password, name_first, name_last)|{ u_id, token }|**InputError** when any of:<ul><li>Email entered is not a valid email using the method provided [here](https://www.geeksforgeeks.org/check-if-email-address-valid-or-not-in-python/) (unless you feel you have a better method).</li><li>Email address is already being used by another user</li><li>Password entered is less than 6 characters long</li><li>name_first not is between 1 and 50 characters inclusively in length</li><li>name_last is not between 1 and 50 characters inclusively in length</ul>|Given a user's first and last name, email address, and password, create a new account for them and return a new token for authentication in their session. A handle is generated that is the concatentation of a lowercase-only first name and last name. If the concatenation is longer than 20 characters, it is cutoff at 20 characters. If the handle is already taken, you may modify the handle in any way you see fit to make it unique. |
-=======
 |auth/register|POST|(email, password, name_first, name_last)|{ u_id, token }|**InputError** when any of:<ul><li>Email entered is not a valid email using the method provided [here](https://www.geeksforgeeks.org/check-if-email-address-valid-or-not-in-python/) (unless you feel you have a better method).</li><li>Email address is already being used by another user</li><li>Password entered is less than 6 characters long</li><li>name_first not is between 1 and 50 characters inclusively in length</li><li>name_last is not between 1 and 50 characters inclusively in length</ul>|Given a user's first and last name, email address, and password, create a new account for them and return a new token for authentication in their session. A handle is generated that is the concatentation of a lowercase-only first name and last name. If the concatenation is longer than 20 characters, it is cutoff at 20 characters. If the handle is already taken, you may modify the handle in any way you see fit (maintaining the 20 character limit) to make it unique. |
->>>>>>> auth
+
+>>>>>>> master
 |channel/invite|POST|(token, channel_id, u_id)|{}|**InputError** when any of:<ul><li>channel_id does not refer to a valid channel.</li><li>u_id does not refer to a valid user</li></ul>**AccessError** when<ul><li>the authorised user is not already a member of the channel</li>|Invites a user (with user id u_id) to join a channel with ID channel_id. Once invited the user is added to the channel immediately|
 |channel/details|GET|(token, channel_id)|{ name, owner_members, all_members }|**InputError** when any of:<ul><li>Channel ID is not a valid channel</li></ul>**AccessError** when<ul><li>Authorised user is not a member of channel with channel_id</li></ul>|Given a Channel with ID channel_id that the authorised user is part of, provide basic details about the channel|
 |channel/messages|GET|(token, channel_id, start)|{ messages, start, end }|**InputError** when any of:<ul><li>Channel ID is not a valid channel</li><li>start is greater than the total number of messages in the channel</li></ul>**AccessError** when<ul><li>Authorised user is not a member of channel with channel_id</li></ul>|Given a Channel with ID channel_id that the authorised user is part of, return up to 50 messages between index "start" and "start + 50". Message with index 0 is the most recent message in the channel. This function returns a new index "end" which is the value of "start + 50", or, if this function has returned the least recent messages in the channel, returns -1 in "end" to indicate there are no more messages to load after this return.|
@@ -287,11 +246,11 @@ These interface specifications come from Sally and Bob, who are building the fro
 |user/profile/setemail|PUT|(token, email)|{}|**InputError** when any of:<ul><li>Email entered is not a valid email using the method provided [here](https://www.geeksforgeeks.org/check-if-email-address-valid-or-not-in-python/) (unless you feel you have a better method).</li><li>Email address is already being used by another user</li>|Update the authorised user's email address|
 |user/profile/sethandle|PUT|(token, handle_str)|{}|**InputError** when any of:<ul><li>handle_str must be between 3 and 20 characters</li><li>handle is already used by another user</li></ul>|Update the authorised user's handle (i.e. display name)|
 |users/all|GET|(token)|{ users}|N/A|Returns a list of all users and their associated details|
-<<<<<<< HEAD
-|admin/userpermission/change|POST|(token, u_id, permission_id)|{}|**InputError** when any of:<ul><li>u_id does not refer to a valid user<li>permission_id does not refer to a value permission</li></ul>**AccessError** when<ul><li>The authorised user is not an admin or owner</li></ul>|Given a User by their user ID, set their permissions to new permissions described by permission_id|Given a User by their user ID, set their permissions to new permissions described by permission_id|
-=======
+
 |admin/userpermission/change|POST|(token, u_id, permission_id)|{}|**InputError** when any of:<ul><li>u_id does not refer to a valid user<li>permission_id does not refer to a value permission</li></ul>**AccessError** when<ul><li>The authorised user is not an owner</li></ul>|Given a User by their user ID, set their permissions to new permissions described by permission_id|Given a User by their user ID, set their permissions to new permissions described by permission_id|
->>>>>>> auth
+
+|admin/userpermission/change|POST|(token, u_id, permission_id)|{}|**InputError** when any of:<ul><li>u_id does not refer to a valid user<li>permission_id does not refer to a value permission</li></ul>**AccessError** when<ul><li>The authorised user is not an admin or owner</li></ul>|Given a User by their user ID, set their permissions to new permissions described by permission_id|Given a User by their user ID, set their permissions to new permissions described by permission_id|
+
 |search|GET|(token, query_str)|{ messages }|N/A|Given a query string, return a collection of messages in all of the channels that the user has joined that match the query|
 |clear|DELETE|()|{}|N/A|Resets the internal data of the application to it's initial state|
 
@@ -328,12 +287,12 @@ For example, if we imagine a user with token "12345" is trying to read messages 
  * Flockr users have two global permissions
    1) Owners (permission id 1), who can also modify other owners' permissions.
    2) Members (permission id 2), who do not have any special permissions
-* All slackr users are members by default, except for the very first user who signs up, who is an owner
+* All flockr users are members by default, except for the very first user who signs up, who is an owner
 
 A user's primary permissions are their global permissions. Then the channel permissions are layered on top. For example:
-* An owner of slackr has owner permissions in every channel they've joined
-* A member of slackr is a member in channels they are not owners of
-* A member of slackr is an owner in channels they are owners of
+* An owner of flockr has owner permissions in every channel they've joined
+* A member of flockr is a member in channels they are not owners of
+* A member of flockr is an owner in channels they are owners of
 
 ### 6.7. Working with the frontend
 
@@ -360,13 +319,10 @@ The descriptions will not be assessed, they are just there for the frontend to h
 
 The types in error.py have been modified appropriately for you.
 
-<<<<<<< HEAD
-=======
 ### 6.8. Other Points
 
 * Each message should have it's own unique ID. I.E. No messages should share an ID with another message, even if that other message is in a different channel.
 
->>>>>>> auth
 ## 7. Due Dates and Weightings
 
 |Iteration|Code and report due                  |Demonstration to tutor(s)      |Assessment weighting of project (%)|
