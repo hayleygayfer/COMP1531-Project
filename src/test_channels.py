@@ -8,14 +8,26 @@ from other import clear
 
 ### channels_list ###
 
+# EXCEPTIONS #
+def test_invalid_user():
+    clear()
+    # create user1
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login("person1@email.com", "password")['token']
+
+    with pytest.raises(AccessError):
+        channels.channels_list(1111)
+
 # VALID CASES #
 def test_no_channels():
     clear()
     # create user1
     auth.auth_register("person1@email.com", "password", "Person", "One")
     token1 = auth.auth_login("person1@email.com", "password")['token']
+    print(token1)
     # no channels created / joined
     assert channels.channels_list(token1) == []
+
 
 def test_user_in_no_channels():
     clear()
@@ -61,55 +73,20 @@ def test_user_is_in_all_channels():
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-                {
-                    'u_id': u2_id,
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                },
-                {
-                    'u_id': u3_id,
-                    'name_first': 'Person',
-                    'name_last': 'Three'                    
-                }
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
-            'is_public': True
+            'all_members': [u1_id, u2_id, u3_id],
+            'owner_members': [u1_id],
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },
         {
             'channel_id': c2_id, 
             'name': "channel_2", 
-            'all_members': [
-                {
-                    'u_id': u2_id,
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                },
-                {
-                    'u_id': u3_id,
-                    'name_first': 'Person',
-                    'name_last': 'Three'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u2_id,
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                }
-            ],
-            'is_public': True
+            'all_members': [u2_id, u3_id],
+            'owner_members': [u2_id],
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },
     ]
 
@@ -137,31 +114,11 @@ def test_user_is_in_some_channels():
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-                {
-                    'u_id': u2_id,
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                },
-                {
-                    'u_id': u3_id,
-                    'name_first': 'Person',
-                    'name_last': 'Three'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
-            'is_public': True
+            'all_members': [u1_id, u2_id, u3_id],
+            'owner_members': [u1_id],
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },
     ]
     # user2 and user3 will not see the same list
@@ -170,6 +127,16 @@ def test_user_is_in_some_channels():
     assert channels.channels_list(token1) == channels.channels_list(token3)
 
 ### channels_listall ###
+
+# EXCEPTIONS #
+def test_invalid_user_all():
+    clear()
+    # create user1
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login("person1@email.com", "password")['token']
+
+    with pytest.raises(AccessError):
+        channels.channels_listall(1111)
 
 # VALID CASES #
 def test_no_total_channels():
@@ -197,59 +164,29 @@ def test_total_channels():
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
-            'is_public': True
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },  
                 {
             'channel_id': c2_id, 
             'name': "channel_2", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
-            'is_public': True
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },   
                 {
             'channel_id': c3_id, 
             'name': "channel_3", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
-            'is_public': True
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },   
     ]
     # check that user1 is in all channels
@@ -274,59 +211,29 @@ def test_total_channels_not_created_by_user():
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
-            'is_public': True
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },  
                 {
             'channel_id': c2_id, 
             'name': "channel_2", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
-            'is_public': True
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },   
                 {
             'channel_id': c3_id, 
             'name': "channel_3", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
-            'is_public': True
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },   
     ]
     # user1 and user2 see the same list
@@ -343,6 +250,15 @@ def test_name_over_20_characters():
 
     with pytest.raises(InputError):
         channels.channels_create(token1, "channels____________1", True)
+
+def test_invalid_token():
+    clear()
+    # create user1
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login("person1@email.com", "password")['token']
+
+    with pytest.raises(AccessError):
+        channels.channels_create("not_valid", "channel_1", True)
 
 # VALID CASES #
 
@@ -371,39 +287,19 @@ def test_public_private():
         {
             'channel_id': cpublic_id, 
             'name': "channels_public", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
-            'is_public': True
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
+            'is_public': True,
+            'messages': [],
+            'message_count': 0
         },  
         {
             'channel_id': cprivate_id, 
             'name': "channels_private", 
-            'all_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': u1_id,
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
-            'is_public': False
+            'all_members': [u1_id],
+            'owner_members': [u1_id],
+            'is_public': False,
+            'messages': [],
+            'message_count': 0
         },   
     ]

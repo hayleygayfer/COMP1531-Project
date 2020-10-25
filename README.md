@@ -4,8 +4,11 @@
 
  * 08/10: Added section 6.8
  * 08/10: Removed any reference to "admin", clarity about implementing entire interface
+
  * 12/10: Clarified that even if you modify the handle it must remain less than 20 characters
 
+ * 12/10: Clarified that even if you modify the handle it must remain less than 20 characters
+ * 20/10: Replaced instances of "Slackr" permissions with "Flockr"
 ## Contents
 
   1. Aims
@@ -73,6 +76,7 @@ Complete. Please see commit history to view old iteration info.
 
 **NOTE:** In merging the instructions for this iteration into your repo, you may get a failed pipeline. This is most likely because your code is not pylint compliant. If this is the case, that is the *first* thing you should address for this iteration. It is important you have a *stable* master branch before proceeding to add additional features.
 
+
 In this iteration, more features were added to the specification, and the focus has been changed to HTTP endpoints. Many of the theory surrounding iteration 2 will be covered in week 4-6 lectures. Note that there will still be 1 or 2 features of the frontend that will not work because the routes will not appear until iteration 3.
 
 In this iteration, you are expected to:
@@ -136,6 +140,19 @@ Your tests, keep in mind the following:
 * Pushing directly to `master` is not possible for this repo. The only way to get code into master is via a merge request. If you discover you have a bug in `master` that got through testing, create a bugfix branch and merge that in via a merge request.
 
 ### 4.3. Recommended approach
+
+Our recommendation with this iteration is that you:
+
+1. Start out trying to implement the new functions the same way you did in iteration 1 (a series of implemented functions, categorised in files, with black-box pytests testing them).
+2. Write another layer of HTTP tests that test the inputs/outputs on routes according to the specific, and while writing tests for each component/feature, write the Flask route/endpoint for that feature too.
+
+This approach means that you can essentially finish the project/testing logic without worrying about HTTP, and then simply wrap the HTTP/Flask layer on top of it at the end.
+
+### 4.4. Storing data
+
+You are not required to store data persistently in this iteration. However, basic persistence will be covered in lectures and you are welcome to implement this if you find it convenient.
+
+### 4.5. Submission
 
 Our recommendation with this iteration is that you:
 
@@ -228,6 +245,7 @@ These interface specifications come from Sally and Bob, who are building the fro
 |user/profile/sethandle|PUT|(token, handle_str)|{}|**InputError** when any of:<ul><li>handle_str must be between 3 and 20 characters</li><li>handle is already used by another user</li></ul>|Update the authorised user's handle (i.e. display name)|
 |users/all|GET|(token)|{ users}|N/A|Returns a list of all users and their associated details|
 |admin/userpermission/change|POST|(token, u_id, permission_id)|{}|**InputError** when any of:<ul><li>u_id does not refer to a valid user<li>permission_id does not refer to a value permission</li></ul>**AccessError** when<ul><li>The authorised user is not an owner</li></ul>|Given a User by their user ID, set their permissions to new permissions described by permission_id|Given a User by their user ID, set their permissions to new permissions described by permission_id|
+|admin/userpermission/change|POST|(token, u_id, permission_id)|{}|**InputError** when any of:<ul><li>u_id does not refer to a valid user<li>permission_id does not refer to a value permission</li></ul>**AccessError** when<ul><li>The authorised user is not an admin or owner</li></ul>|Given a User by their user ID, set their permissions to new permissions described by permission_id|Given a User by their user ID, set their permissions to new permissions described by permission_id|
 |search|GET|(token, query_str)|{ messages }|N/A|Given a query string, return a collection of messages in all of the channels that the user has joined that match the query|
 |clear|DELETE|()|{}|N/A|Resets the internal data of the application to it's initial state|
 
@@ -264,12 +282,12 @@ For example, if we imagine a user with token "12345" is trying to read messages 
  * Flockr users have two global permissions
    1) Owners (permission id 1), who can also modify other owners' permissions.
    2) Members (permission id 2), who do not have any special permissions
-* All slackr users are members by default, except for the very first user who signs up, who is an owner
+* All flockr users are members by default, except for the very first user who signs up, who is an owner
 
 A user's primary permissions are their global permissions. Then the channel permissions are layered on top. For example:
-* An owner of slackr has owner permissions in every channel they've joined
-* A member of slackr is a member in channels they are not owners of
-* A member of slackr is an owner in channels they are owners of
+* An owner of flockr has owner permissions in every channel they've joined
+* A member of flockr is a member in channels they are not owners of
+* A member of flockr is an owner in channels they are owners of
 
 ### 6.7. Working with the frontend
 
