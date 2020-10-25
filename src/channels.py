@@ -69,7 +69,7 @@ def channels_listall(token):
 '''
     Creates a new channel with that name that is either a public or private channel.
     The name must be more than 20 characters long.
-
+    Member must be authenticated to create channel. 
     
     Args:
         1. Token of user (int)
