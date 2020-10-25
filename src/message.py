@@ -126,7 +126,7 @@ def channel_member(u_id, channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for member in channel['all_members']:
-                if member['u_id'] == u_id:
+                if member == u_id:
                     return True
     return False        
 
@@ -186,7 +186,7 @@ def do_remove(channel, msg_id):
 
 def user_is_not_owner(u_id, owners):
     for p in owners:
-        if p.get('u_id') == u_id:
+        if p == u_id:
             return False
     return True
 
