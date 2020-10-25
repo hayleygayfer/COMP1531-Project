@@ -98,30 +98,8 @@ def test_user_is_in_all_channels_http(url, user_list, channel_list):
         {
             'channel_id': channel_list['c_id_1'], 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-                {
-                    'u_id': user_list['user3']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Three'                    
-                },
-                {
-                    'u_id': user_list['user2']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [user_list['user1']['u_id'], user_list['user3']['u_id'], user_list['user2']['u_id']],
+            'owner_members': [user_list['user1']['u_id']],
             'is_public': True,
             'messages': [],
             'message_count': 0
@@ -129,25 +107,8 @@ def test_user_is_in_all_channels_http(url, user_list, channel_list):
         {
             'channel_id': channel_list['c_id_2'], 
             'name': "channel_2", 
-            'all_members': [
-                {
-                    'u_id': user_list['user2']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                },
-                {
-                    'u_id': user_list['user3']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Three'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': user_list['user2']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                }
-            ],
+            'all_members': [user_list['user2']['u_id'], user_list['user3']['u_id']],
+            'owner_members': [user_list['user2']['u_id']],
             'is_public': True,
             'messages': [],
             'message_count': 0
@@ -173,30 +134,8 @@ def test_user_is_in_some_channels_http(url, user_list, channel_list):
         {
             'channel_id': channel_list['c_id_1'], 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-                {
-                    'u_id': user_list['user2']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                },
-                {
-                    'u_id': user_list['user3']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Three'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [user_list['user1']['u_id'], user_list['user2']['u_id'], user_list['user3']['u_id']],
+            'owner_members': [user_list['user1']['u_id']],
             'is_public': True,
             'messages': [],
             'message_count': 0
@@ -234,20 +173,8 @@ def test_total_channels_http(url, user_list, channel_list):
         {
             'channel_id': channel_list['c_id_1'], 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [user_list['user1']['u_id']],
+            'owner_members': [user_list['user1']['u_id']],
             'is_public': True,
             'messages': [],
             'message_count': 0
@@ -255,20 +182,8 @@ def test_total_channels_http(url, user_list, channel_list):
         {
             'channel_id': channel_list['c_id_2'], 
             'name': "channel_2", 
-            'all_members': [
-                {
-                    'u_id': user_list['user2']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': user_list['user2']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                }
-            ],
+            'all_members': [user_list['user2']['u_id']],
+            'owner_members': [user_list['user2']['u_id']],
             'is_public': True,
             'messages': [],
             'message_count': 0
@@ -285,20 +200,8 @@ def test_total_channels_not_created_by_user_http(url, user_list, channel_list):
         {
             'channel_id': channel_list['c_id_1'], 
             'name': "channel_1", 
-            'all_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [user_list['user1']['u_id']],
+            'owner_members': [user_list['user1']['u_id']],
             'is_public': True,
             'messages': [],
             'message_count': 0
@@ -306,20 +209,8 @@ def test_total_channels_not_created_by_user_http(url, user_list, channel_list):
         {
             'channel_id': channel_list['c_id_2'], 
             'name': "channel_2", 
-            'all_members': [
-                {
-                    'u_id': user_list['user2']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': user_list['user2']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'Two'
-                }
-            ],
+            'all_members': [user_list['user2']['u_id']],
+            'owner_members': [user_list['user2']['u_id']],
             'is_public': True,
             'messages': [],
             'message_count': 0
@@ -371,20 +262,8 @@ def test_public_private_http(url, user_list):
         {
             'channel_id': c_id_private['channel_id'], 
             'name': "channel_private", 
-            'all_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [user_list['user1']['u_id']],
+            'owner_members': [user_list['user1']['u_id']],
             'is_public': False,
             'messages': [],
             'message_count': 0
@@ -392,20 +271,8 @@ def test_public_private_http(url, user_list):
         {
             'channel_id': c_id_public['channel_id'], 
             'name': "channel_public", 
-            'all_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                },
-            ],
-            'owner_members': [
-                {
-                    'u_id': user_list['user1']['u_id'],
-                    'name_first': 'Person',
-                    'name_last': 'One'
-                }
-            ],
+            'all_members': [user_list['user1']['u_id']],
+            'owner_members': [user_list['user1']['u_id']],
             'is_public': True,
             'messages': [],
             'message_count': 0

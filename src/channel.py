@@ -17,9 +17,6 @@ def channel_invite(token_inviter, channel_id, u_id_invitee):
     # Matching the inviter and the token
     u_id_inviter = token_to_u_id(token_inviter)['u_id']
 
-    # Find name and last name of invitee
-    name_first, name_last = u_id_to_name(u_id_invitee)
-
     if exists_in_channel(channel_id, u_id_invitee) == True:
         raise InputError(f"The User already exists in this Channel ")
     
@@ -27,7 +24,7 @@ def channel_invite(token_inviter, channel_id, u_id_invitee):
         raise AccessError("User is not a part of the Channel ")
 
     # Append the user to 'all_members' of the channel after all tests are passed
-    append_data(channel_id, u_id_invitee, name_first, name_last)
+    append_data(channel_id, u_id_invitee)
 
     return {
         'is_success': True
@@ -118,8 +115,6 @@ def channel_leave(token, channel_id):
     # Matching the user and the token
     user_details = token_to_u_id(token)
     u_id = user_details['u_id']
-    name_first = user_details['name_first']
-    name_last = user_details['name_last']
 
     if exists_in_channel(channel_id, u_id) == False:
         raise AccessError(f"You are not a member of the Channel ID: {channel_id} ")
@@ -128,7 +123,7 @@ def channel_leave(token, channel_id):
         raise InputError("You are the only admin left in this channel. You cannot leave if you are the only admin")
 
     # Member leaves the channel and is cleared from all_members
-    rem_user_member(channel_id, u_id, name_first, name_last)
+    rem_user_member(channel_id, u_id)
 
     return {
         'is_success': True
@@ -146,8 +141,6 @@ def channel_join(token, channel_id):
     # Matching the user and the token
     user_details = token_to_u_id(token)
     u_id = user_details['u_id']
-    name_first = user_details['name_first']
-    name_last = user_details['name_last']
     
     # Only Flockr owners can join private channels
     if private_channel(channel_id) == True:
@@ -158,7 +151,7 @@ def channel_join(token, channel_id):
         raise InputError(f"You are already a member of the Channel ID: {channel_id} ")
     
     # After all tests are passed, append the data for all channel members
-    append_data(channel_id, u_id, name_first, name_last)
+    append_data(channel_id, u_id)
 
     return {
         'is_success': True
@@ -191,8 +184,7 @@ def channel_addowner(token, channel_id, u_id):
         raise InputError(f"User {u_id} is already an owner of the channel ")
 
     # Matching the u_id to their name
-    name_first, name_last = u_id_to_name(u_id)
-    append_user_owner(channel_id, u_id, name_first, name_last)
+    append_user_owner(channel_id, u_id)
 
     return {
         'is_success': True
@@ -228,21 +220,17 @@ def channel_removeowner(token, channel_id, u_id):
     if (is_token_owner(token, channel_id) == False) and (is_token_flockr_owner(token) == False):
         raise AccessError(f"User {u_id} is not an owner of the channel")
 
-    # Match the users u_id to their name
-    name_first, name_last = u_id_to_name(u_id)
-
     # If the flockr owner removes the only owner, he/she becomes the new owner
     flockr_owner_u_id = data['users'][0].get('u_id')
-    flockr_owner_name_first = data['users'][0].get('name_first')
-    flockr_owner_name_last = data['users'][0].get('name_last')
+
     ####
     if is_token_flockr_owner(token) == True and is_token_owner(token, channel_id) == False:
         if user_is_owner(channel_id, u_id) == True:
             if size_owners(channel_id) == 1:
-                append_user_owner(channel_id, flockr_owner_u_id, flockr_owner_name_first, flockr_owner_name_last)
+                append_user_owner(channel_id, flockr_owner_u_id)
     ####
 
-    rem_user_owner(channel_id, u_id, name_first, name_last)
+    rem_user_owner(channel_id, u_id)
 
     return {
         'is_success': True
@@ -279,12 +267,6 @@ def token_to_u_id(token):
                 'name_last': user['name_last']
             }
 
-# Obtains the users name from their id
-def u_id_to_name(u_id):
-    for user in data['users']:
-        if user['u_id'] == u_id:
-            return user['name_first'], user['name_last']
-
 # Check if channel is private
 def private_channel(channel_id):
     for channel in data['channels']:
@@ -298,61 +280,49 @@ def exists_in_channel(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for user in channel['all_members']:
-                if user.get('u_id') == u_id:
+                if user == u_id:
                     return True
     return False
 
 # Append data of user to channel where all members can see
-def append_data(channel_id, u_id, name_first, name_last):
+def append_data(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            channel['all_members'].append(
-                {
-                    'u_id': u_id,
-                    'name_first': name_first,
-                    'name_last': name_last,
-                }
-            )
+            channel['all_members'].append(u_id)
 
 # Is the current u_id stored in the owners section of the channel
 def user_is_owner(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owners.get('u_id') == u_id:
+                if owners == u_id:
                     return True
     return False
 
 # Append user data to the owner members section of the channel
-def append_user_owner(channel_id, u_id, name_first, name_last):
+def append_user_owner(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            channel['owner_members'].append(
-                {
-                    'u_id': u_id,
-                    'name_first': name_first,
-                    'name_last': name_last,
-                }
-            )
+            channel['owner_members'].append(u_id)
 
 # Remove the user data from owner members
-def rem_user_owner(channel_id, u_id, name_first, name_last):
+def rem_user_owner(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owners.get('u_id') == u_id:
+                if owners == u_id:
                     channel['owner_members'].remove(owners)
 
 # Remove user data from channel
-def rem_user_member(channel_id, u_id, name_first, name_last):
+def rem_user_member(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for members in channel['all_members']:
-                if members.get('u_id') == u_id:
+                if members == u_id:
                     channel['all_members'].remove(members)
 
     # IF they are an owner they need to be cleared from owner_members
-    rem_user_owner(channel_id, u_id, name_first, name_last)
+    rem_user_owner(channel_id, u_id)
 
 # Is the authenticated user an owner of the channel
 def is_token_owner(token, channel_id):      
@@ -360,7 +330,7 @@ def is_token_owner(token, channel_id):
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
                 # match the u_id of the authenticated user to the ids of all owners
-                if token_to_u_id(token)['u_id'] == owners.get('u_id'):
+                if token_to_u_id(token)['u_id'] == owners:
                     return True
     return False
 
