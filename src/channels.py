@@ -66,6 +66,23 @@ def channels_listall(token):
     # List all channels (regardless of authentication)
     return data['channels']
 
+'''
+    Creates a new channel with that name that is either a public or private channel.
+    The name must be more than 20 characters long.
+
+    
+    Args:
+        1. Token of user (int)
+        2. Name of channel (string): Must be more than 20 characters long
+        3. If the channel is public or private (True/False) 
+    Return:
+        A dictionary of all channel IDs.
+        - All keys are channel IDs
+        - The data is taken from channel
+
+    An AccessError or InputError is raised when there are errors in the function call.
+'''
+
 def channels_create(token, name, is_public):
 
     # Test whether channel name is more than 20 characters.
