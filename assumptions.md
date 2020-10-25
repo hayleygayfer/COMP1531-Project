@@ -62,11 +62,13 @@
 
 ## USER.PY
 
-> TODO
+* Users must be logged in with a valid token to change their first or last name
+* Handles are unique, a user cannot set their handle to one already in use
 
 ## OTHER.PY
 
-> TODO
+* Search based on query_str returns all messages that contain that string
+* Owner permissions are stored seperately in user dictionaries
 
 ## OTHER ASSUMPTIONS
 
