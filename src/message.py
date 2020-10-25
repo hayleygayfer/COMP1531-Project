@@ -5,7 +5,23 @@ from error import InputError, AccessError
 MAX_MSG_IN_CH = 10000
 
 def message_send(token, channel_id, message):
-    '''Send a message from an authorised user to the channel specified by channel_id'''
+    '''
+    Sends a message from an authenticated user, to the channel.
+    A mesage_id is generated which depends on the channel_id and the number of current messages in the channel.
+    To be accessed from a member of the channel with id channel_id.
+
+    Args:
+        1. token (int): the token of the authenticated user who is sending the message
+        2. channel_id (int): used to identify the channel
+        3. message (string): the message being sent (cannot be of NoneType)
+
+    Return:
+        The generated message_id (int)
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+
     # check for valid token/channel
     u_id = get_uid_from_token(token)
     if u_id == None:
@@ -32,7 +48,22 @@ def message_send(token, channel_id, message):
     return msg_id
 
 def message_remove(token, message_id):
-    '''Given a message_id for a message, this message is removed from the channel'''
+    '''
+    An authenticated user of a channel, removes a message.
+    All details corresponding to the message message_id are erased from the channel for everyone.
+    To be accessed from a member of the channel corresponding to the message.
+
+    Args:
+        1. token (int): the token of the authenticated user who is deleting the message
+        3. message_id (int): the message getting removed
+
+    Return:
+        A dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+
     # check for valid token
     u_id = get_uid_from_token(token)
     if u_id == None:
@@ -66,10 +97,24 @@ def message_remove(token, message_id):
     }
 
 def message_edit(token, message_id, message):
-    '''Given a message_id for a message, update the existing message with the new message.
-    
-    The message is deleted if the message is an empty string
     '''
+    An authenticated user from a channel, edits a message in a channel by modifying the message.
+    The edited message corresponds to the message with id message_id, and is replaced.
+    To be accessed from a member of the channel with id channel_id.
+
+    Args:
+        1. token (int): the token of the authenticated user who is editting the message
+        2. message_id (int): used to identify the message to be edited
+        3. message (string): the message is replaced with this string
+            * an empty string will delete the message (see message_remove)
+
+    Return:
+        A dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+
     # check for valid token
     u_id = get_uid_from_token(token)
     if u_id == None:
@@ -110,18 +155,21 @@ def message_edit(token, message_id, message):
 ## HELPER FUNCTIONS ##
 #################################################################################
 
+# Returns the user_id corresponding to the active token
 def get_uid_from_token(token):
     for user in data['users']:
         if user.get('token') == token:
             return user['u_id']
     return None
 
+# Determines if the channel is valid or not
 def valid_channel(channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             return True
     return False
 
+# Determines if a user is a member of a channel
 def channel_member(u_id, channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -130,7 +178,7 @@ def channel_member(u_id, channel_id):
                     return True
     return False        
 
-# generate a message id based on the channel and the messages inside that channel
+# Generate a message_id based on the channel and the messages inside that channel
 def generate_message_id(channel_id):
     i = channel_id*MAX_MSG_IN_CH + 1
     for channel in data['channels']:
@@ -141,9 +189,11 @@ def generate_message_id(channel_id):
                 i += 1
     return i
 
+# Returns the channel_id corresponding to the message_id
 def get_channel_id(message_id):
     return int(message_id/MAX_MSG_IN_CH)
 
+# Determines if a message exists within the channel
 def message_not_found(channel_id, msg_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -152,6 +202,7 @@ def message_not_found(channel_id, msg_id):
                     return False
     return True
 
+# Adds a message to a channel along with other relevant details
 def append_msg_to_channel(channel_id, msg_string, msg_id, u_id, time):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -165,6 +216,7 @@ def append_msg_to_channel(channel_id, msg_string, msg_id, u_id, time):
             )
             channel['message_count'] += 1
 
+# Returns the channel array corresponding to the message_id and channel_id
 def find_channel(msg_id, channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -172,24 +224,27 @@ def find_channel(msg_id, channel_id):
                 if msg.get('message_id') == msg_id:
                     return channel
 
+# Modify a message string with a new message
 def do_edit(channel, msg_id, new_msg):
     for msg in channel['messages']:
         if msg.get('message_id') == msg_id:
             msg['message'] = new_msg
 
+# Delete a message
 def do_remove(channel, msg_id):
     for msg in channel['messages']:
         if msg.get('message_id') == msg_id:
             channel['messages'].remove(msg)
             channel['message_count'] -= 1
 
-
+# Identifies if a user is an owner of a channel
 def user_is_not_owner(u_id, owners):
     for p in owners:
         if p == u_id:
             return False
     return True
 
+# Returns the user_id corresponding to the owner of FlockR
 def get_flockr_owner_id(u_id):
     if u_id == data['users'][0].get('u_id'):
         return True
