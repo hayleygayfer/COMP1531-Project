@@ -20,7 +20,7 @@ def channels_list(token):
 def channels_listall(token):
 
     # Check for authentication
-    user = auth.validate_token(token)
+    auth.validate_token(token)
 
     # List all channels (regardless of authentication)
     return data['channels']

@@ -13,7 +13,7 @@ def test_invalid_user():
     clear()
     # create user1
     auth.auth_register("person1@email.com", "password", "Person", "One")
-    token1 = auth.auth_login("person1@email.com", "password")['token']
+    auth.auth_login("person1@email.com", "password")['token']
 
     with pytest.raises(AccessError):
         channels.channels_list(1111)
@@ -133,7 +133,7 @@ def test_invalid_user_all():
     clear()
     # create user1
     auth.auth_register("person1@email.com", "password", "Person", "One")
-    token1 = auth.auth_login("person1@email.com", "password")['token']
+    auth.auth_login("person1@email.com", "password")['token']
 
     with pytest.raises(AccessError):
         channels.channels_listall(1111)
