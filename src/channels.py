@@ -8,8 +8,6 @@ def channels_list(token):
 
     # Check for authentication
     user = auth.validate_token(token)
-    if user == None:
-        raise AccessError('Invalid Token')
     
     # Loop through channels, and associated users to find matches -> inefficient?
     for channel in data['channels']:
@@ -23,8 +21,6 @@ def channels_listall(token):
 
     # Check for authentication
     user = auth.validate_token(token)
-    if user == None:
-        raise AccessError('Invalid Token')
 
     # List all channels (regardless of authentication)
     return data['channels']
@@ -38,9 +34,6 @@ def channels_create(token, name, is_public):
     # Check for authentication & retrieve owner member id
     channel_creator = auth.validate_token(token)
     
-    if channel_creator == None:
-        raise AccessError('Invalid Token')
-
     channel = {
         'channel_id': len(data['channels']),
         'name': name,

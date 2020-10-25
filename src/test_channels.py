@@ -8,6 +8,16 @@ from other import clear
 
 ### channels_list ###
 
+# EXCEPTIONS #
+def test_invalid_user():
+    clear()
+    # create user1
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    token1 = auth.auth_login("person1@email.com", "password")['token']
+
+    with pytest.raises(AccessError):
+        channels.channels_list(1111)
+
 # VALID CASES #
 def test_no_channels():
     clear()
@@ -117,6 +127,16 @@ def test_user_is_in_some_channels():
     assert channels.channels_list(token1) == channels.channels_list(token3)
 
 ### channels_listall ###
+
+# EXCEPTIONS #
+def test_invalid_user_all():
+    clear()
+    # create user1
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    token1 = auth.auth_login("person1@email.com", "password")['token']
+
+    with pytest.raises(AccessError):
+        channels.channels_listall(1111)
 
 # VALID CASES #
 def test_no_total_channels():
@@ -230,6 +250,15 @@ def test_name_over_20_characters():
 
     with pytest.raises(InputError):
         channels.channels_create(token1, "channels____________1", True)
+
+def test_invalid_token():
+    clear()
+    # create user1
+    auth.auth_register("person1@email.com", "password", "Person", "One")
+    auth.auth_login("person1@email.com", "password")['token']
+
+    with pytest.raises(AccessError):
+        channels.channels_create("not_valid", "channel_1", True)
 
 # VALID CASES #
 
