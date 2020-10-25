@@ -1,18 +1,6 @@
 from data import data
 from error import InputError, AccessError
 import auth
-'''
-    Provide a list of all the channels and all their details.
-    An authorised user must be appart of the channel. 
-    
-    Args:
-        1. Token of authorised user (int)
-    Return:
-        A dictionary of all the channels and their associated details 
-        - Each key is a channel 
-
-    An AccessError or InputError is raised when there are errors in the function call.
-'''
 def channels_list(token):
     
     channels = []
