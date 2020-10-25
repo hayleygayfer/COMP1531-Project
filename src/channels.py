@@ -40,7 +40,7 @@ def channels_create(token, name, is_public):
     
     if channel_creator == None:
         raise AccessError('Invalid Token')
-
+    
     channel = {
         'channel_id': len(data['channels']),
         'name': name,

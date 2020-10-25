@@ -138,7 +138,10 @@ def generate_valid_handle(name_first, name_last):
 
 def validate_token(token):
     SECRET = 'adaskljnkjladsncjakldnckjscankj'
-    email = jwt.decode(token, SECRET, algorithms=['HS256'])
+    try:
+        email = jwt.decode(token, SECRET, algorithms=['HS256'])
+    except:
+        raise AccessError("Invalid token")
     for user in data['users']:
         if user.get('email') == email['email']:
             return user
