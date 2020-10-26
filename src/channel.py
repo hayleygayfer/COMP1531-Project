@@ -3,7 +3,22 @@ from data import data
 from error import InputError, AccessError
 
 def channel_invite(token_inviter, channel_id, u_id_invitee):
-    '''A token belonging to a user in a channel is used to invite another user who is not part of that channel.'''
+    '''
+    Invite a user who is not currently in the channel, to the channel.
+    The invited user is added to the channel immediately.
+    To be accessed from a member of the channel with id channel_id.
+
+    Args:
+        1. token_inviter (int): the token of the authenticated user who is doing the inviting
+        2. channel_id (int): used to identify the channel
+        3. u_id_invitee (int): the user_id of the non-channel member who is getting the invitation
+
+    Return:
+        A dictionary to signify the fact that there were no errors in the function call
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
 
     if validate_token(token_inviter) == False:
         raise AccessError(f"Not a valid token ")
@@ -31,7 +46,23 @@ def channel_invite(token_inviter, channel_id, u_id_invitee):
     }
 
 def channel_details(token, channel_id):
-    '''A token is used to view the details of a channel the corresponding user in.'''
+    '''
+    Provide some details about a particular channel that the authenticated user is a part of.
+    To be accessed from a member of the channel with id channel_id.
+
+    Args:
+        1. token (int): the token of the authenticated user who is viewing the details
+        2. channel_id (int): used to identify the channel
+
+    Return:
+        A dictionary containing details about the channel corresponding to the channel_id with keys:
+        - 'name' (string): - channel name
+        - 'owner_members' (array): - displays the owners in the channel including their user_id's, first name and surname
+        - 'all_members' (array): - displays the regular members including their user_id's, first name and surname
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -56,9 +87,28 @@ def channel_details(token, channel_id):
             
 
 def channel_messages(token, channel_id, start):
-    '''A token is used to access messages in a channel that the corresponding user is in.
-    
-    The system will return back up to 50 messages after the start value in a similar way that many websites use pagination to display small chunks of data at a time.'''
+    '''
+    Output a list of messages from a particular channel that the authenticated user is a part of.
+    Uses pagination to display a maximum of 50 messages from the start value.
+    The displayed messages start with the message with the start value index and prints previous messages.
+    To be accessed from a member of the channel with id channel_id.
+
+    Args:
+        1. token (int): the token of the authenticated user who is viewing the messages
+        2. channel_id (int): used to identify the channel
+        3. start (int): identifies the message to begin displaying other messages from
+
+    Return:
+        A dictionary containing details about the channel corresponding to the channel_id with keys:
+        - 'messages' (array): an array containing details about some messages incluing the actual message string
+        - 'start' (int): the starting index of the returned messages
+        - 'end' (int): the ending index of the messages containing one of:
+            * (start value + 50) to show that 50 messages have been returned
+            * (-1) to show that all the older messages have been returned (less than 50 remaining messages)
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -104,7 +154,21 @@ def channel_messages(token, channel_id, start):
     }
 
 def channel_leave(token, channel_id):
-    '''A token is used to leave a channel that the corresponding user are in.'''
+    '''
+    The authenticated user who is a part of a channel, leaves that channel.
+    All channel details of that user (including owner status) gets removed.
+    To be accessed from a member of the channel with id channel_id.
+
+    Args:
+        1. token (int): the token of the authenticated user who is leaving
+        2. channel_id (int): used to identify the channel
+
+    Return:
+        A dictionary to signify the fact that there were no errors in the function call
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -130,7 +194,21 @@ def channel_leave(token, channel_id):
     }
 
 def channel_join(token, channel_id):
-    '''A token from a user is used to join a channel they are not currently in.'''
+    '''
+    The authenticated user who is not a part of a channel, joins that channel.
+    Their details get added to that channel under 'all_members'.
+    To be accessed from a user who is not a member of the channel with id channel_id.
+
+    Args:
+        1. token (int): the token of the authenticated user who is joining
+        2. channel_id (int): used to identify the channel
+
+    Return:
+        A dictionary to signify the fact that there were no errors in the function call
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -158,7 +236,23 @@ def channel_join(token, channel_id):
     }
 
 def channel_addowner(token, channel_id, u_id):
-    '''A token from a channel owner is used to add another member as an owner of that channel.'''
+    '''
+    The authenticated user who is a part of a channel, adds another user as an owner of the channel.
+    The user to-be-added immediately becomes an owner with their details getting added to 'owner_members'.
+    The user to-be-added cannot be an onwer of the channel with id channel_id.
+    To be accessed from an owner of the channel with id channel_id.
+
+    Args:
+        1. token (int): the token of the authenticated user who is adding another owner
+        2. channel_id (int): used to identify the channel
+        3. u_id (int): the user_id of the user who is getting promoted to an owner
+
+    Return:
+        A dictionary to signify the fact that there were no errors in the function call
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -191,7 +285,23 @@ def channel_addowner(token, channel_id, u_id):
     }
 
 def channel_removeowner(token, channel_id, u_id):
-    '''A token from a channel owner is used to remove owner status from another member in that channel.'''
+    '''
+    The authenticated user who is a part of a channel, removes another user as an owner of the channel.
+    The user to-be-removed immediately gets their owner status revoked and their details gets deleted from 'owner_members'.
+    The user to-be-removed must be an onwer of the channel with id channel_id.
+    To be accessed from an owner of the channel with id channel_id.
+
+    Args:
+        1. token (int): the token of the authenticated user who is adding another owner
+        2. channel_id (int): used to identify the channel
+        3. u_id (int): the user_id of the user who is getting promoted to an owner
+
+    Return:
+        A dictionary to signify the fact that there were no errors in the function call
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
 
     if validate_token(token) == False:
         raise AccessError(f"Not a valid token ")
@@ -236,28 +346,32 @@ def channel_removeowner(token, channel_id, u_id):
         'is_success': True
     }
 
+
 #################################################################################
 # Validation functions
 
+# Validates the active token
 def validate_token(token):
     for users in data['users']:
         if token == users.get('token'):
             return True
     return False
 
+# Validates the channel
 def validate_channel(channel_id):
     for channel in data['channels']:
         if channel.get('channel_id') == channel_id:
             return True
     return False
 
+# Validates the user
 def validate_user(u_id):
     for users in data['users']:
         if users.get('u_id') == u_id:
             return True
     return False
 
-# Converts a token to the users id
+# Returns the corresponding u_id from the active token
 def token_to_u_id(token):
     for user in data['users']:
         if user['token'] == token:
@@ -267,7 +381,7 @@ def token_to_u_id(token):
                 'name_last': user['name_last']
             }
 
-# Check if channel is private
+# Check if channel with is private
 def private_channel(channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -284,13 +398,13 @@ def exists_in_channel(channel_id, u_id):
                     return True
     return False
 
-# Append data of user to channel where all members can see
+# Add data of user to channel for new users to a channel
 def append_data(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             channel['all_members'].append(u_id)
 
-# Is the current u_id stored in the owners section of the channel
+# Identifies if the user is an owner of a channel
 def user_is_owner(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -299,7 +413,7 @@ def user_is_owner(channel_id, u_id):
                     return True
     return False
 
-# Append user data to the owner members section of the channel
+# Add user data for new owner members of a channel
 def append_user_owner(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -324,7 +438,7 @@ def rem_user_member(channel_id, u_id):
     # IF they are an owner they need to be cleared from owner_members
     rem_user_owner(channel_id, u_id)
 
-# Is the authenticated user an owner of the channel
+# Identifies if the user corresponding to the active token is an owner of the channel
 def is_token_owner(token, channel_id):      
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -365,9 +479,7 @@ def get_user_details(u_ids):
         users.append(get_user_names(u_id))
     return users
         
-
-#### TODO: Message functions currently working on
-
+# Identifies if the start value is greater than the number of messages in a channel
 def invalid_messages_start(channel_id, start):
     for channel in data['channels']:
         if channel_id == channel['channel_id']:

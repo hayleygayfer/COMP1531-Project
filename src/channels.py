@@ -2,7 +2,8 @@ from data import data
 from error import InputError, AccessError
 import auth
 
-'''
+def channels_list(token):
+    '''
     Provide a list of all the channels and all their details.
     An authorised user must be appart of the channel. 
     
@@ -13,9 +14,7 @@ import auth
         - Each key is a channel 
 
     An AccessError or InputError is raised when there are errors in the function call.
-'''
-
-def channels_list(token):
+    '''
     
     channels = []
 
@@ -30,7 +29,9 @@ def channels_list(token):
     
     return channels
 
-'''
+
+def channels_listall(token):
+    '''
     Provide a list of all the channels and all their details.
     The authentication does not impact the list.
     
@@ -42,9 +43,7 @@ def channels_list(token):
         - Each key is a channel 
 
     An AccessError or InputError is raised when there are errors in the function call.
-'''
-
-def channels_listall(token):
+    '''
 
     # Check for authentication
     auth.validate_token(token)
@@ -52,7 +51,9 @@ def channels_listall(token):
     # List all channels (regardless of authentication)
     return data['channels']
 
-'''
+
+def channels_create(token, name, is_public):
+    '''
     Creates a new channel with that name that is either a public or private channel.
     The name must be more than 20 characters long.
     Member must be authenticated to create channel. 
@@ -67,9 +68,7 @@ def channels_listall(token):
         - The data is taken from channel
 
     An AccessError or InputError is raised when there are errors in the function call.
-'''
-
-def channels_create(token, name, is_public):
+    '''
 
     # Test whether channel name is more than 20 characters.
     if len(name) > 20:
