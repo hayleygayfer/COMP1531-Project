@@ -8,6 +8,25 @@ import jwt
 SECRET = 'adaskljnkjladsncjakldnckjscankj'
 
 def auth_login(email, password):
+    '''
+    Matches an email and password to a user to log them in.
+    After the user logs in, they become authenticated and an active token is generated and added to their user data
+        * A new token is generated every time the user is logged in
+    The password is immediately hashed so it is not stored in the database
+        * The hashed password is compared with the hashed password for the input email
+    Can be accessed by anyone but will only be successful if the user has already registered.
+
+    Args:
+        1. email (str): the user email used to idenitfy a user
+        2. password (str): a password used to verify their identity
+
+    Return:
+        A dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+
     if validate_email(email) == False:
         raise InputError("Email entered is not a valid email")
 
@@ -23,7 +42,23 @@ def auth_login(email, password):
                 raise InputError("Password is not correct")
     raise InputError("Email entered does not belong to a user")
 
+
 def auth_logout(token):
+    '''
+    Takes the active token and logs the user out
+    After the user logs out, their token becomes inactive and will never be valid again
+    Can be accessed by anyone who is currently logged in
+
+    Args:
+        1. token (int): the token of the authenticated user who is attempting to log out
+
+    Return:
+        A dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+
     for user in data['users']:
         if user['token'] == token:
             user['token'] = ''
@@ -35,7 +70,29 @@ def auth_logout(token):
         'is_success': False,
     }
 
+
 def auth_register(email, password, name_first, name_last):
+    '''
+    Takes some information about a new user to create an account for them
+    If a new user manages to register successfully, they automatically become logged in and an active token is generated (see auth_login)
+
+    Args:
+        1. email (str): the email of the new user
+        2. password (int): used to identify the channel
+        3. name_first (string): the first name of the user (cannot contain multiple names)
+        4. name_last (string): the surname of the user (can contain multiple names)
+
+    Return:
+        A dictionary containing the following keys:
+        'u_id' (int): The user_id is a fixed integer used for identification
+        'token' (int): A ticket which allows the user to explore the Flockr in their current session
+
+    The password is hashed before it is stored so the original string is not visible on the server
+    A handle is generated using the names of the user and is added to their user data
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
 
     SECRET = 'adaskljnkjladsncjakldnckjscankj'
 
@@ -85,6 +142,7 @@ def auth_register(email, password, name_first, name_last):
         'token': str(encoded_token),
     }
 
+#########################################################################
 
 def validate_email(email):
     regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
