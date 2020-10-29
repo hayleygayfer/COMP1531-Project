@@ -170,14 +170,14 @@ def http_user_profile_sethandle():
 # Channels_list
 @APP.route("/channels/list", methods=['GET'])
 def http_channels_list():
-    token = request.get_json()["token"]
+    token = request.args.get("token")
     response = channels_list(token)
     return dumps(response)
 
 # Channels_listall
 @APP.route("/channels/listall", methods=['GET'])
 def http_channels_listall():
-    token = request.get_json()["token"]
+    token = request.args.get("token")
     response = channels_listall(token)
     return dumps(response)
 
@@ -195,7 +195,7 @@ def http_channels_create():
 # users_all
 @APP.route("/users/all", methods=['GET'])
 def http_users_all():
-    token = request.get_json()["token"]
+    token = request.args.get("token")
     response = users_all(token)
     return dumps(response)
 
@@ -211,7 +211,7 @@ def http_admin_userpermission_change():
 # search
 @APP.route("/search", methods=['GET'])
 def http_search():
-    token = request.get_json()["token"]
+    token = request.args.get("token")
     query_str = request.get_json()["query_str"]
     response = search(token, query_str)
     return dumps(response)
