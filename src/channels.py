@@ -15,7 +15,9 @@ def channels_list(token):
             if member == user['u_id']:
                 channels.append(channel)
     
-    return channels
+    return {
+        'channels': channels
+    }
 
 def channels_listall(token):
 
@@ -23,7 +25,9 @@ def channels_listall(token):
     user = auth.validate_token(token)
 
     # List all channels (regardless of authentication)
-    return data['channels']
+    return {
+        'channels': data['channels']
+    }
 
 def channels_create(token, name, is_public):
 
