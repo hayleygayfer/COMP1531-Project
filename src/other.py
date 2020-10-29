@@ -12,7 +12,9 @@ def clear():
 def users_all(token):
     if valid_token(token) is False:
         raise AccessError
-    return data['users']
+    return {
+        'users': data['users']
+    }
 
 def admin_userpermission_change(token, u_id, permission_id):
     if valid_token(token) is False:
