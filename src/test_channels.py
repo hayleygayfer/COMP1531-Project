@@ -26,7 +26,7 @@ def test_no_channels():
     token1 = auth.auth_login("person1@email.com", "password")['token']
     print(token1)
     # no channels created / joined
-    assert channels.channels_list(token1) == []
+    assert channels.channels_list(token1)['channels'] == []
 
 
 def test_user_in_no_channels():
@@ -46,7 +46,7 @@ def test_user_in_no_channels():
     # invites user2
     channel.channel_invite(token1, ch_id, u2_id)
     # user3 is not in any channels
-    assert channels.channels_list(token3) == []
+    assert channels.channels_list(token3)['channels'] == []
 
 def test_user_is_in_all_channels():
     clear()
@@ -69,7 +69,7 @@ def test_user_is_in_all_channels():
     # user1 and user2 invite user3 to both channels
     channel.channel_invite(token1, c1_id, u3_id)
     channel.channel_invite(token2, c2_id, u3_id)
-    assert channels.channels_list(token3) == [
+    assert channels.channels_list(token3)['channels'] == [
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
@@ -110,7 +110,7 @@ def test_user_is_in_some_channels():
     channel.channel_invite(token1, c1_id, u2_id)
     # user1 invites user3 to channel_1 channels
     channel.channel_invite(token1, c1_id, u3_id)
-    assert channels.channels_list(token3) == [
+    assert channels.channels_list(token3)['channels'] == [
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
@@ -146,7 +146,7 @@ def test_no_total_channels():
     token1 = auth.auth_login("person1@email.com", "password")['token']
 
     # no channels exist
-    assert channels.channels_listall(token1) == []
+    assert channels.channels_listall(token1)['channels'] == []
 
 def test_total_channels():
     clear()
@@ -160,7 +160,7 @@ def test_total_channels():
     c3_id = channels.channels_create(token1, "channel_3", True)['channel_id']
 
     # 3 channels exist
-    assert channels.channels_listall(token1) == [
+    assert channels.channels_listall(token1)['channels'] == [
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
@@ -207,7 +207,7 @@ def test_total_channels_not_created_by_user():
     c3_id = channels.channels_create(token1, "channel_3", True)['channel_id']
 
     # user2 checks all channels
-    assert channels.channels_listall(token2) == [
+    assert channels.channels_listall(token2)['channels'] == [
         {
             'channel_id': c1_id, 
             'name': "channel_1", 
@@ -283,7 +283,7 @@ def test_public_private():
     cprivate_id = channels.channels_create(token1, "channels_private", False)['channel_id']
     print(cprivate_id)
 
-    assert channels.channels_listall(token1) == [
+    assert channels.channels_listall(token1)['channels'] == [
         {
             'channel_id': cpublic_id, 
             'name': "channels_public", 
