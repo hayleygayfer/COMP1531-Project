@@ -46,9 +46,7 @@ def search(token, query_str):
     for channel in channels:
         messages.append(list(filter(lambda message: query_str in message['message'], channel['messages'])))
 
-    return {
-        messages
-    }
+    return messages
 
 # validate token
 def valid_token(token):
