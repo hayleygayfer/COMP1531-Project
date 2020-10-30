@@ -142,6 +142,17 @@ def auth_register(email, password, name_first, name_last):
         'token': str(encoded_token),
     }
 
+## ITERATION 3
+
+def auth_passwordreset_request(email):
+
+    return {}
+
+def auth_passwordreset_reset(reset_code, new_password):
+
+    return {}
+
+
 #########################################################################
 
 def validate_email(email):

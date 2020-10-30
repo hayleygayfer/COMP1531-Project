@@ -153,6 +153,31 @@ def message_edit(token, message_id, message):
         'is_success': True
     }
 
+
+## ITERATION 3
+def message_sendlater(token, channel_id, message, time_sent):
+    
+    return {
+        'message_id': 0
+    }
+
+def message_react():
+    
+    return {}
+
+def message_unreact():
+    
+    return {}
+
+def message_pin():
+    
+    return {}
+
+def message_unpin():
+    
+    return {}
+
+
 #################################################################################
 ## HELPER FUNCTIONS ##
 #################################################################################

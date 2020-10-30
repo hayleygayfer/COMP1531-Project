@@ -68,6 +68,14 @@ def user_profile_sethandle(token, handle_str):
     return {
     }
 
+## ITERATION 3
+
+def user_profile_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
+
+    return {}
+
+
+
 def validate_handle_str(handle_str):
     return 3 < len(handle_str) < 20
         
