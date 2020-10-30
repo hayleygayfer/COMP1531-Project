@@ -12,7 +12,9 @@ def user_profile(token, u_id):
     if user_id[0]['token'] != token:
         raise AccessError("Not a valid token")
 
-    return user_id[0]
+    return {
+        'user': user_id[0]
+    }
 
 def user_profile_setname(token, name_first, name_last):
 

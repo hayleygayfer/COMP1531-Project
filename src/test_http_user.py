@@ -18,7 +18,7 @@ def test_valid_user_profile_http(userObject, url):
     params = {'token': userObject['token'], 'u_id': userObject['u_id']}
     response = requests.get(url + 'user/profile', params=params)
     assert response.status_code == 200
-    user = response.json()
+    user = response.json().get('user')
     assert user['handle_str'] == 'tonystark'
     assert user['u_id'] == 1
     assert user['email'] == 'tonystark@avengers.com'
@@ -227,4 +227,4 @@ def test_invalid_token_set_handle(userObject, url):
 def retrieveUser(token, u_id, url):
     params = {'token': token, 'u_id': int(u_id)}
     response = requests.get(url + 'user/profile', params=params)
-    return response.json()
+    return response.json().get('user')

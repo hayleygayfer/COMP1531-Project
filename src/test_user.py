@@ -18,7 +18,7 @@ def userObject():
 ###### User Profile ######
 
 def test_valid_user_profile(userObject):
-    response = user.user_profile(userObject['token'], userObject['u_id'])
+    response = user.user_profile(userObject['token'], userObject['u_id'])['user']
     assert response['handle_str'] == 'tonystark'
     assert response['u_id'] == 1
     assert response['email'] == 'tonystark@avengers.com'

@@ -80,8 +80,8 @@ def http_auth_logout():
 @APP.route("/channel/invite", methods=['POST'])
 def http_channel_invite():
     token = request.get_json()["token"]
-    channel_id = request.get_json()["channel_id"]
-    u_id = request.get_json()["u_id"]
+    channel_id = int(request.get_json()["channel_id"])
+    u_id = int(request.get_json()["u_id"])
     response = ch.channel_invite(token, channel_id, u_id)
     return dumps(response)
 
@@ -103,30 +103,30 @@ def http_channel_msgs():
 @APP.route("/channel/leave", methods=['POST'])
 def http_channel_leave():
     token = request.get_json()["token"]
-    channel_id = request.get_json()["channel_id"]
+    channel_id = int(request.get_json()["channel_id"])
     response = ch.channel_leave(token, channel_id)
     return dumps(response)
 
 @APP.route("/channel/join", methods=['POST'])
 def http_channel_join():
     token = request.get_json()["token"]
-    channel_id = request.get_json()["channel_id"]
+    channel_id = int(request.get_json()["channel_id"])
     response = ch.channel_join(token, channel_id)
     return dumps(response)
 
 @APP.route("/channel/addowner", methods=['POST'])
 def http_channel_add():
     token = request.get_json()["token"]
-    channel_id = request.get_json()["channel_id"]
-    u_id = request.get_json()["u_id"]
+    channel_id = int(request.get_json()["channel_id"])
+    u_id = int(request.get_json()["u_id"])
     response = ch.channel_addowner(token, channel_id, u_id)
     return dumps(response)
 
 @APP.route("/channel/removeowner", methods=['POST'])
 def http_channel_rem():
     token = request.get_json()["token"]
-    channel_id = request.get_json()["channel_id"]
-    u_id = request.get_json()["u_id"]
+    channel_id = int(request.get_json()["channel_id"])
+    u_id = int(request.get_json()["u_id"])
     response = ch.channel_removeowner(token, channel_id, u_id)
     return dumps(response)
 
@@ -136,8 +136,8 @@ def http_channel_rem():
 @APP.route("/user/profile", methods=['GET'])
 def http_user_profile():
     token = request.args.get('token')
-    u_id = request.args.get('u_id')
-    response = user_profile(token, int(u_id))
+    u_id = int(request.args.get('u_id'))
+    response = user_profile(token, u_id)
     return dumps(response)
 
 # User/Profile/Setname
@@ -203,8 +203,8 @@ def http_users_all():
 @APP.route("/admin/userpermission/change", methods=['POST'])
 def http_admin_userpermission_change():
     token = request.get_json()["token"]
-    u_id = request.get_json()["u_id"]
-    permission_id = request.get_json()["permission_id"]
+    u_id = int(request.get_json()["u_id"])
+    permission_id = int(request.get_json()["permission_id"])
     response = admin_userpermission_change(token, u_id, permission_id)
     return dumps(response)
 
@@ -222,7 +222,7 @@ def http_search():
 @APP.route("/message/send", methods=['POST'])
 def http_message_send():
     token = request.get_json()["token"]
-    channel_id = request.get_json()["channel_id"]
+    channel_id = int(request.get_json()["channel_id"])
     message = request.get_json()["message"]
     response = message_send(token, channel_id, message)
     return dumps(response)
@@ -231,7 +231,7 @@ def http_message_send():
 @APP.route("/message/remove", methods=['DELETE'])
 def http_message_remove():
     token = request.get_json()["token"]
-    channel_id = request.get_json()["message_id"]
+    channel_id = int(request.get_json()["message_id"])
     response = message_remove(token, channel_id)
     return dumps(response)
 
@@ -239,7 +239,7 @@ def http_message_remove():
 @APP.route("/message/edit", methods=['PUT'])
 def http_message_edit():
     token = request.get_json()["token"]
-    channel_id = request.get_json()["message_id"]
+    channel_id = int(request.get_json()["message_id"])
     message = request.get_json()["message"]
     response = message_edit(token, channel_id, message)
     return dumps(response)
