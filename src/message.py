@@ -45,7 +45,9 @@ def message_send(token, channel_id, message):
     msg_id = generate_message_id(channel_id)
     append_msg_to_channel(channel_id, message, msg_id, u_id, timestamp)
 
-    return msg_id
+    return {
+        'message_id': msg_id
+    }
 
 def message_remove(token, message_id):
     '''
