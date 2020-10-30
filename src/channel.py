@@ -483,6 +483,8 @@ def get_user_details(u_ids):
 def invalid_messages_start(channel_id, start):
     for channel in data['channels']:
         if channel_id == channel['channel_id']:
+            if channel['message_count'] == start and start == 0:
+                return False
             if channel['message_count'] <= start:
                 return True
     return False
