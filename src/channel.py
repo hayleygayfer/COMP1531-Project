@@ -1,4 +1,3 @@
-# Comments in this file are assumptions
 from data import data
 from error import InputError, AccessError
 
