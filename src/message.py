@@ -161,19 +161,19 @@ def message_sendlater(token, channel_id, message, time_sent):
         'message_id': 0
     }
 
-def message_react():
+def message_react(token, message_id, react_id):
     
     return {}
 
-def message_unreact():
+def message_unreact(token, message_id, react_id):
     
     return {}
 
-def message_pin():
+def message_pin(token, message_id):
     
     return {}
 
-def message_unpin():
+def message_unpin(token, message_id):
     
     return {}
 
