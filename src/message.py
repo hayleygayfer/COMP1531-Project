@@ -238,7 +238,9 @@ def append_msg_to_channel(channel_id, msg_string, msg_id, u_id, time):
                     'message': msg_string,
                     'message_id': msg_id,
                     'u_id': u_id,
-                    'time_created': time
+                    'time_created': time,
+                    'reacts': [],
+                    'is_pinned': False
                 }
             )
             channel['message_count'] += 1
