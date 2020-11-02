@@ -11,7 +11,7 @@ def message_send(token, channel_id, message):
     To be accessed from a member of the channel with id channel_id.
 
     Args:
-        1. token (int): the token of the authenticated user who is sending the message
+        1. token (str): the token of the authenticated user who is sending the message
         2. channel_id (int): used to identify the channel
         3. message (string): the message being sent (cannot be of NoneType)
 
@@ -56,7 +56,7 @@ def message_remove(token, message_id):
     To be accessed from a member of the channel corresponding to the message.
 
     Args:
-        1. token (int): the token of the authenticated user who is deleting the message
+        1. token (str): the token of the authenticated user who is deleting the message
         3. message_id (int): the message getting removed
 
     Return:
@@ -105,7 +105,7 @@ def message_edit(token, message_id, message):
     To be accessed from a member of the channel with id channel_id.
 
     Args:
-        1. token (int): the token of the authenticated user who is editting the message
+        1. token (str): the token of the authenticated user who is editting the message
         2. message_id (int): used to identify the message to be edited
         3. message (string): the message is replaced with this string
             * an empty string will delete the message (see message_remove)
@@ -170,7 +170,44 @@ def message_unreact(token, message_id, react_id):
     return {}
 
 def message_pin(token, message_id):
+    '''
+    A channel owner (or Flockr owner), pins a particular message in the channel.
+    Marking a message as pinned gives the message display priority on the frontend.
+
+    Args:
+        1. token (str): the token of the authenticated user who is pinning the message
+        2. message_id (int): used to identify the message to be edited
+
+    Return:
+        An empty dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+
+    # check for valid token
+    u_id = get_uid_from_token(token)
+    if u_id == None:
+        raise AccessError("Invalid token")
+
+    # Find message
+    channel_id = get_channel_id(message_id)
+    if not valid_channel(channel_id):
+        raise InputError("Message not found")
+
+    if not channel_member(u_id, channel_id):
+        raise AccessError("You are not a member of this channel")
+
+    # User must be a channel/flockr owner
+    channel = find_channel(message_id, channel_id)
+    owners = channel['owner_members']
+    flockr_owner_id = get_flockr_owner_id(u_id)
+    if user_is_not_owner(u_id, owners) and u_id != flockr_owner_id:
+        raise AccessError("You are not authorised to edit this message")
     
+
+    # Pin the message
+    doPin(channel, message_id)
     return {}
 
 def message_unpin(token, message_id):
@@ -278,3 +315,13 @@ def get_flockr_owner_id(u_id):
     if u_id == data['users'][0].get('u_id'):
         return True
     return False
+
+# Pin the message to channel 
+def doPin(channel, msg_id):
+    for msg in channel['messages']:
+        if msg.get('message_id') == msg_id:
+            if msg['is_pinned']:
+                raise InputError(f'Message with ID {msg_id} is already pinned')
+
+            msg['is_pinned'] = True
+    
