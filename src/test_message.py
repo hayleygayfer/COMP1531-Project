@@ -10,6 +10,8 @@ import pytest
 from error import InputError, AccessError
 from other import clear
 
+SUCCESS = {}
+
 ### message ###
 
 # fixtures #
@@ -256,22 +258,27 @@ message_pin(token, message_id) = {}
 def test_single_msg_pin(data):
     msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be pinned")['message_id']
     msg.message_send(data['token1'], data['c1_id'], "This message will not be pinned") 
-    assert msg.message_pin(data['token1'], msg1_id)
+    assert msg.message_pin(data['token1'], msg1_id) == SUCCESS
 
 # Pin two messages
 def test_double_msg_pin(data):
     msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be pinned")['message_id']
     msg2_id = msg.message_send(data['token1'], data['c1_id'], "This message will also be pinned")['message_id']
-    assert msg.message_pin(data['token1'], msg1_id)
-    assert msg.message_pin(data['token1'], msg2_id)
+    assert msg.message_pin(data['token1'], msg1_id) == SUCCESS
+    assert msg.message_pin(data['token1'], msg2_id) == SUCCESS
 
 # A channel owner can pin a message sent by a regular member
 def test_pin_by_owner(data):
-    pass
+    channel.channel_join(data['token3'], data['c2_id'])
+    msg1_id = msg.message_send(data['token3'], data['c2_id'], "This message was sent by a regular member and it will be pinned")['message_id']
+    assert msg.message_pin(data['token2'], msg1_id) == SUCCESS
 
 # The Flockr owner does not have to be a channel owner to pin a message
 def test_pin_flockr_owner(data):
-    pass
+    channel.channel_join(data['token1'], data['c2_id'])
+    msg1_id = msg.message_send(data['token2'], data['c2_id'], "This message was sent by an owner and it will be pinned")['message_id']
+    # FO can pin another owner's message but they must be in the channel
+    assert msg.message_pin(data['token1'], msg1_id) == SUCCESS
 
 
 ## INVALID CASES ##
@@ -279,7 +286,7 @@ def test_pin_flockr_owner(data):
 # Pinning a message which is already pinned
 def test_pin_existing(data):
     msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be pinned")['message_id']
-    assert msg.message_pin(data['token1'], msg1_id)
+    assert msg.message_pin(data['token1'], msg1_id) == SUCCESS
     with pytest.raises(InputError):
         msg.message_pin(data['token1'], msg1_id) # Already pinned
 
@@ -287,12 +294,21 @@ def test_pin_existing(data):
 def test_pin_in_another_channel(data):
     msg1_id = msg.message_send(data['token2'], data['c2_id'], "This message will be pinned by a channel owner")['message_id']
     msg2_id = msg.message_send(data['token2'], data['c2_id'], "This message cannot be pinned")['message_id']
-    assert msg.message_pin(data['token2'], msg1_id) # P2 is permitted to pin
+    assert msg.message_pin(data['token2'], msg1_id) == SUCCESS # P2 is permitted to pin
+
+    channel.channel_join(data['token3'], data['c1_id'])
+    channel.channel_addowner(data['token1'], data['c1_id'], data['u3_id'])
+    with pytest.raises(AccessError):
+        msg.message_pin(data['token3'], msg2_id) # P3 (An owner of C1 is not in C2)
 
     with pytest.raises(AccessError):
-        msg.message_pin(data['token1'], msg2_id) # P1 (Flockr Owner) is not in the channel with this message
-
+        msg.message_pin(data['token1'], msg2_id) # P1 (Flockr Owner) is not in C2 either
 
 # A normal member cannot pin a message even if it is their own
 def test_pin_but_not_owner(data):
-    pass
+    channel.channel_join(data['token2'], data['c1_id'])
+    msg1_id = msg.message_send(data['token2'], data['c1_id'], "I am a normal owner. I cannot pin this :(")['message_id']
+    # P2 is a regular member in C1 who has just sent a message
+    with pytest.raises(AccessError):
+        # Since they are not an owner, they cannot pin this message
+        msg.message_pin(data['token2'], msg1_id)
