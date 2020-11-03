@@ -23,8 +23,8 @@ def user_list(url):
 @pytest.fixture
 def channel_list(url, user_list):
     # person one and person two create channels
-    c1 = create_channel(url, user_list['token1'], "channel_1", True)
-    c2 = create_channel(url, user_list['token2'], "channel_2", True)
+    c1 = channels_create(url, user_list['token1'], "channel_1", True)
+    c2 = channels_create(url, user_list['token2'], "channel_2", True)
 
     return {
         'c1_id': c1['channel_id'],
@@ -47,7 +47,7 @@ def auth(url_auth, email, password, n1, n2):
     response = requests.post(url_auth + "auth/login", json=payload)
     return response.json()
 
-def create_channel(url_create, token, name, is_pub):
+def channels_create(url_create, token, name, is_pub):
     payload = {"token": token, "name": name, "is_public": is_pub}
     response = requests.post(url_create + "channels/create", json=payload)
     return response.json()
@@ -57,10 +57,10 @@ def message_send(url_send, token, channel_id, msg):
     response = requests.post(url_send + "message/send", json=payload)
     return {
         'status': response.status_code,
-        'id': response.json().get('message_id')
+        'message_id': response.json().get('message_id')
     }
 
-def message_rem(url_rem, token, message_id):
+def message_remove(url_rem, token, message_id):
     payload = {"token": token, "message_id": message_id}
     response = requests.delete(url_rem + "message/remove", json=payload)
     return response.status_code
@@ -85,17 +85,17 @@ def channel_join(url_join, token, channel_id):
     response = requests.post(url_join + "channel/join", json=payload)
     return response.status_code
 
-def add_owner(url_add, token, channel_id, u_id):
+def channel_addowner(url_add, token, channel_id, u_id):
     payload = {"token": token, "channel_id": channel_id, "u_id": u_id}
     response = requests.post(url_add + "channel/addowner", json=payload)
     return response.status_code
 
-def pin(url_pin, token, message_id):
+def message_pin(url_pin, token, message_id):
     payload = {'token': token, 'message_id': message_id}
     response = requests.post(url_pin + "message/pin", json=payload)
     return response.status_code
 
-def unpin(url_unpin, token, message_id):
+def message_unpin(url_unpin, token, message_id):
     payload = {'token': token, 'message_id': message_id}
     response = requests.post(url_unpin + "message/unpin", json=payload)
     return response.status_code
@@ -107,7 +107,7 @@ def unpin(url_unpin, token, message_id):
 def test_message_user_owner_http(url, user_list, channel_list):
     # Send message
     response = message_send(url, user_list['token1'], channel_list['c1_id'], "This is the first message in the channel")
-    message_ID = response['id']
+    message_ID = response['message_id']
     assert response['status'] == 200
 
     # Get message from channel messages
@@ -118,7 +118,7 @@ def test_message_user_owner_http(url, user_list, channel_list):
 def test_message_user_member(url, user_list, channel_list):
     # Send message
     response = message_send(url, user_list['token2'], channel_list['c2_id'], "This is the first message in the channel")
-    message_ID = response['id']
+    message_ID = response['message_id']
     assert response['status'] == 200
 
     # Get message from channel messages
@@ -129,7 +129,7 @@ def test_message_user_member(url, user_list, channel_list):
 def test_message_non_alpha_characters(url, user_list, channel_list):
     # Send message
     response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message has many non alpha character: !@#$%^&*()")
-    message_ID = response['id']
+    message_ID = response['message_id']
     assert response['status'] == 200
 
     # Get message from channel messages
@@ -141,7 +141,7 @@ def test_message_non_alpha_characters(url, user_list, channel_list):
 def test_message_greater_than_1000(url, user_list, channel_list):
     # Send message
     response = message_send(url, user_list['token1'], channel_list['c1_id'], "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. N")
-    message_ID = response['id']
+    message_ID = response['message_id']
     assert response['status'] == 200
 
     # Get message from channel messages
@@ -182,74 +182,62 @@ OUTPUT: {}
 # VALID CASES #
 def test_remove_user_owner(url, user_list, channel_list):
     # Send message
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be removed")
-    message_ID = response['id']
-    assert response['status'] == 200
+    message_ID = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be removed")['message_id']
 
     # Remove message
-    assert message_rem(url, user_list['token1'], message_ID) == 200
+    assert message_remove(url, user_list['token1'], message_ID) == 200
 
 def test_remove_flocker_owner_but_not_owner(url, user_list, channel_list):
     # Join channel  
     assert channel_join(url, user_list['token1'], channel_list['c2_id']) == 200
 
     # Send message
-    response = message_send(url, user_list['token1'], channel_list['c2_id'], "This message will be removed")
-    message_ID = response['id']
-    assert response['status'] == 200
+    message_ID = message_send(url, user_list['token1'], channel_list['c2_id'], "This message will be removed")['message_id']
 
     # Remove message
-    assert message_rem(url, user_list['token1'], message_ID) == 200
+    assert message_remove(url, user_list['token1'], message_ID) == 200
 
 
 def test_remove_request_user_member(url, user_list, channel_list):
     # Send message
-    response = message_send(url, user_list['token2'], channel_list['c2_id'], "This message will be removed")
-    message_ID = response['id']
-    assert response['status'] == 200
+    message_ID = message_send(url, user_list['token2'], channel_list['c2_id'], "This message will be removed")['message_id']
 
     # Remove message
-    assert message_rem(url, user_list['token2'], message_ID) == 200
+    assert message_remove(url, user_list['token2'], message_ID) == 200
 
 # INVALID CASES #
 def test_message_no_longer_exists(url, user_list, channel_list):
     # Send message
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This is a valid message")
-    message_ID = response['id']
-    assert response['status'] == 200
+    message_ID = message_send(url, user_list['token1'], channel_list['c1_id'], "This is a valid message")['message_id']
 
     # Remove message
-    assert message_rem(url, user_list['token1'], message_ID) == 200
+    assert message_remove(url, user_list['token1'], message_ID) == 200
 
     # Remove message again
-    assert message_rem(url, user_list['token2'], message_ID) == 400
+    assert message_remove(url, user_list['token2'], message_ID) == 400
 
 def test_not_users_message(url, user_list, channel_list):
     # Join channel
     assert channel_join(url, user_list['token2'], channel_list['c1_id']) == 200
 
     # Add owner
-    assert add_owner(url, user_list['token1'], channel_list['c1_id'], user_list['u2_id']) == 200
+    assert channel_addowner(url, user_list['token1'], channel_list['c1_id'], user_list['u2_id']) == 200
 
     # Send message
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message was sent by one of the owners of the channel")
-    message_ID = response['id']
-    assert response['status'] == 200
+    message_ID = message_send(url, user_list['token1'], channel_list['c1_id'], "This message was sent by one of the owners of the channel")['message_id']
 
     # Remove message 
-    assert message_rem(url, user_list['token2'], message_ID) == 400
+    assert message_remove(url, user_list['token2'], message_ID) == 400
 
 def test_user_not_owner(url, user_list, channel_list):
     # Join channel
     assert channel_join(url, user_list['token2'], channel_list['c1_id']) == 200
 
     # Send message
-    response = message_send(url, user_list['token2'], channel_list['c1_id'], "This message was sent by one of the members of the channel")
-    message_ID = response['id']
-    assert response['status'] == 200
+    message_ID = message_send(url, user_list['token2'], channel_list['c1_id'], "This message was sent by one of the members of the channel")['message_id']
 
     # Remove message 
-    assert message_rem(url, user_list['token2'], message_ID) == 400
+    assert message_remove(url, user_list['token2'], message_ID) == 400
 
 # test message_edit #
 """
@@ -260,9 +248,7 @@ OUTPUT: {}
 # VALID CASES #
 def test_edit_user_owner(url, user_list, channel_list):
     # Send message
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message was sent by the owner of flocker")
-    message_ID = response['id']
-    assert response['status'] == 200
+    message_ID = message_send(url, user_list['token1'], channel_list['c1_id'], "This message was sent by the owner of flocker")['message_id']
 
     # Edit message 
     assert message_edit(url, user_list['token1'], message_ID, "This is the new message we just changed it completely but same same hey") == 200
@@ -273,12 +259,10 @@ def test_edit_user_member(url, user_list, channel_list):
     assert channel_join(url, user_list['token2'], channel_list['c1_id']) == 200
 
     # Add owner
-    assert add_owner(url, user_list['token1'], channel_list['c1_id'], user_list['u2_id']) == 200
+    assert channel_addowner(url, user_list['token1'], channel_list['c1_id'], user_list['u2_id']) == 200
     
     # Send message
-    response = message_send(url, user_list['token2'], channel_list['c1_id'], "This message was sent by an owner of this channel")
-    message_ID = response['id']
-    assert response['status'] == 200
+    message_ID = message_send(url, user_list['token2'], channel_list['c1_id'], "This message was sent by an owner of this channel")['message_id']
 
     # Edit message
     assert message_edit(url, user_list['token2'], message_ID, "This message should be able to be edited") == 200
@@ -290,9 +274,7 @@ def test_not_valid_user(url, user_list, channel_list):
     assert channel_join(url, user_list['token2'], channel_list['c1_id']) == 200
 
     # Send message
-    response = message_send(url, user_list['token2'], channel_list['c1_id'], "This message was sent by not an owner")
-    message_ID = response['id']
-    assert response['status'] == 200
+    message_ID = message_send(url, user_list['token2'], channel_list['c1_id'], "This message was sent by not an owner")['message_id']
 
     # Edit message
     assert message_edit(url, user_list['token2'], message_ID, "This message should not be able to be edited") == 400
@@ -303,12 +285,10 @@ def test_edit_not_by_person_who_sent(url, user_list, channel_list):
     assert channel_join(url, user_list['token2'], channel_list['c1_id']) == 200
 
     # Add owner
-    assert add_owner(url, user_list['token1'], channel_list['c1_id'], user_list['u2_id']) == 200
+    assert channel_addowner(url, user_list['token1'], channel_list['c1_id'], user_list['u2_id']) == 200
 
     # Send message
-    response = message_send(url, user_list['token2'], channel_list['c1_id'], "This message was sent by an owner of this channel")
-    message_ID = response['id']
-    assert response['status'] == 200
+    message_ID = message_send(url, user_list['token2'], channel_list['c1_id'], "This message was sent by an owner of this channel")['message_id']
 
     # Edit message
     assert message_edit(url, user_list['token1'], message_ID, "This message should not be able to be edited") == 400
@@ -316,14 +296,8 @@ def test_edit_not_by_person_who_sent(url, user_list, channel_list):
 
 def test_empty_string (url, user_list, channel_list):
     # Send message
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This is the first message sent")
-    message_ID1 = response['id']
-    assert response['status'] == 200
-
-    # Send message
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This is the second message sent")
-    message_ID2 = response['id']
-    assert response['status'] == 200
+    message_ID1 = message_send(url, user_list['token1'], channel_list['c1_id'], "This is the first message sent")['message_id']
+    message_ID2 = message_send(url, user_list['token1'], channel_list['c1_id'], "This is the second message sent")['message_id']
 
     # Edit message
     assert message_edit(url, user_list['token1'], message_ID2, "") == 200
@@ -347,68 +321,83 @@ pin(token, message_id) = {}
 
 # Pin one message
 def test_single_msg_pin(url, user_list, channel_list):
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned")
-    msg1_id = response['id']
-    message_send(url, user_list['token1'], channel_list['c1_id'], "This message will not be pinned") 
-    assert pin(url, user_list['token1'], msg1_id) == 200
+    # Send messages
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned")['message_id']
+    message_send(url, user_list['token1'], channel_list['c1_id'], "This message will not be pinned")
+
+    # Pin message
+    assert message_pin(url, user_list['token1'], msg1_id) == 200
 
 # Pin two messages
 def test_double_msg_pin(url, user_list, channel_list):
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned")
-    msg1_id = response['id']
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will also be pinned")
-    msg2_id = response['id']
+    # Send messages
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned")['message_id']
+    msg2_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will also be pinned")['message_id']
 
-    assert pin(url, user_list['token1'], msg1_id) == 200
-    assert pin(url, user_list['token1'], msg2_id) == 200
+    # Pin messages
+    assert message_pin(url, user_list['token1'], msg1_id) == 200
+    assert message_pin(url, user_list['token1'], msg2_id) == 200
 
 # A channel owner can pin a message sent by a regular member
 def test_pin_by_owner(url, user_list, channel_list):
+    # Join channel and send message
     channel_join(url, user_list['token3'], channel_list['c2_id'])
+    msg1_id = message_send(url, user_list['token3'], channel_list['c2_id'], "This message was sent by a regular member and it will be pinned")['message_id']
 
-    response = message_send(url, user_list['token3'], channel_list['c2_id'], "This message was sent by a regular member and it will be pinned")
-    msg1_id = response['id']
-    assert pin(url, user_list['token2'], msg1_id) == 200
+    # Owner pins
+    assert message_pin(url, user_list['token2'], msg1_id) == 200
 
 # The Flockr owner does not have to be a channel owner to pin a message
 def test_pin_flockr_owner(url, user_list, channel_list):
+    # FO joins channel
     channel_join(url, user_list['token1'], channel_list['c2_id'])
 
-    response = message_send(url, user_list['token2'], channel_list['c2_id'], "This message was sent by an owner and it will be pinned")
-    msg1_id = response['id']
+    # Onwer sends message
+    msg1_id = message_send(url, user_list['token2'], channel_list['c2_id'], "This message was sent by an owner and it will be pinned")['message_id']
 
-    assert pin(url, user_list['token1'], msg1_id) == 200
+    # FO pins message
+    assert message_pin(url, user_list['token1'], msg1_id) == 200
+
+## INVALID CASES ##
 
 # Pinning a message which is already pinned
 def test_pin_existing(url, user_list, channel_list):
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned")
-    msg1_id = response['id']
-    assert pin(url, user_list['token1'], msg1_id) == 200
+    # Send message
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned")['message_id']
     
-    pin(url, user_list['token1'], msg1_id) == 400
+    # Pin message
+    assert message_pin(url, user_list['token1'], msg1_id) == 200
+    
+    # Pin the same message
+    assert message_pin(url, user_list['token1'], msg1_id) == 400
 
 # Pinning a message in a channel which you are not in
 def test_pin_in_another_channel(url, user_list, channel_list):
-    response = message_send(url, user_list['token2'], channel_list['c2_id'], "This message will be pinned by a channel owner")
-    msg1_id = response['id']
-    response = message_send(url, user_list['token2'], channel_list['c2_id'], "This message cannot be pinned")
-    msg2_id = response['id']
+    # Send message
+    msg1_id = message_send(url, user_list['token2'], channel_list['c2_id'], "This message will be pinned by a channel owner")['message_id']
+    msg2_id = message_send(url, user_list['token2'], channel_list['c2_id'], "This message cannot be pinned")['message_id']
 
-    assert pin(url, user_list['token2'], msg1_id) == 200
+    # Pin one
+    assert message_pin(url, user_list['token2'], msg1_id) == 200
 
+    # P3 becomes an owner of the other channel
     channel_join(url, user_list['token3'], channel_list['c1_id'])
-    add_owner(url, user_list['token1'], channel_list['c1_id'], user_list['u3_id'])
+    channel_addowner(url, user_list['token1'], channel_list['c1_id'], user_list['u3_id'])
     
-    pin(url, user_list['token3'], msg2_id) == 400
-    pin(url, user_list['token1'], msg2_id) == 400
+    # Neither P3 or P1 can pin the other message in C2
+    assert message_pin(url, user_list['token3'], msg2_id) == 400
+    assert message_pin(url, user_list['token1'], msg2_id) == 400
 
 # A normal member cannot pin a message even if it is their own
 def test_pin_but_not_owner(url, user_list, channel_list):
+    # Join channel
     channel_join(url, user_list['token2'], channel_list['c1_id'])
-    response = message_send(url, user_list['token2'], channel_list['c1_id'], "I am a normal owner. I cannot pin this :(")
-    msg1_id = response['id']
+
+    # Send message
+    msg1_id = message_send(url, user_list['token2'], channel_list['c1_id'], "I am a normal owner. I cannot pin this :(")['message_id']
     
-    pin(url, user_list['token2'], msg1_id) == 400
+    # Cannot pin this message
+    assert message_pin(url, user_list['token2'], msg1_id) == 400
 
 
 # message_unpin
@@ -419,77 +408,96 @@ message_unpin(token, message_id) = {}
 
 # Unpin a pinned message
 def test_single_msg_unpin(url, user_list, channel_list):
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned")
-    msg1_id = response['id']
-    message_send(url, user_list['token1'], channel_list['c1_id'], "This message will not be pinned") 
-    pin(url, user_list['token1'], msg1_id)
-    assert unpin(url, user_list['token1'], msg1_id) == 200
+    # Send message
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned")['message_id']
+
+    # Pin message
+    message_pin(url, user_list['token1'], msg1_id)
+
+    # Unpin the same message
+    assert message_unpin(url, user_list['token1'], msg1_id) == 200
 
 # Unpin multiple pinned messages
 def test_double_msg_unpin(url, user_list, channel_list):
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned")
-    msg1_id = response['id']
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will also be pinned")
-    msg2_id = response['id']
-    pin(url, user_list['token1'], msg1_id)
-    pin(url, user_list['token1'], msg2_id)
-    assert unpin(url, user_list['token1'], msg1_id) == 200
-    assert unpin(url, user_list['token1'], msg2_id) == 200
+    # Send messages
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned")['message_id']
+    msg2_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will also be pinned")['message_id']
+    
+    # Pin both messages
+    message_pin(url, user_list['token1'], msg1_id)
+    message_pin(url, user_list['token1'], msg2_id)
+
+    # Unpin both messages
+    assert message_unpin(url, user_list['token1'], msg1_id) == 200
+    assert message_unpin(url, user_list['token1'], msg2_id) == 200
 
 # A channel owner can unpin a message send by someone else
 def test_unpin_by_another_owner(url, user_list, channel_list):
+    # Join channel and send a message
     channel_join(url, user_list['token3'], channel_list['c2_id'])
-    response = message_send(url, user_list['token3'], channel_list['c2_id'], "This message was sent by a regular member and it will be pinned")
-    msg1_id = response['id']
-    pin(url, user_list['token2'], msg1_id)
+    msg1_id = message_send(url, user_list['token3'], channel_list['c2_id'], "This message was sent by a regular member and it will be pinned")['message_id']
+
+    # Owner pins
+    message_pin(url, user_list['token2'], msg1_id)
 
     # Add P3 as an owner and get them to unpin
-    add_owner(url, user_list['token2'], channel_list['c2_id'], user_list['u3_id'])
-    assert unpin(url, user_list['token3'], msg1_id) == 200
+    channel_addowner(url, user_list['token2'], channel_list['c2_id'], user_list['u3_id'])
+    assert message_unpin(url, user_list['token3'], msg1_id) == 200
 
 # The Flockr owner does not have to be a channel owner to pin a message
 def test_unpin_flockr_owner(url, user_list, channel_list):
+    # Send and pin a message
+    msg1_id = message_send(url, user_list['token2'], channel_list['c2_id'], "This message was sent by an owner and it will be pinned")['message_id']
+    message_pin(url, user_list['token2'], msg1_id)
+
+    # Join and attempt to unpin
     channel_join(url, user_list['token1'], channel_list['c2_id'])
-    response = message_send(url, user_list['token2'], channel_list['c2_id'], "This message was sent by an owner and it will be pinned")
-    msg1_id = response['id']
-    
-    # P2 is channel owner and P1 is not (but they are the flockr owner so they are still permitted to unpin)
-    pin(url, user_list['token2'], msg1_id)
-    assert unpin(url, user_list['token1'], msg1_id) == 200
+    assert message_unpin(url, user_list['token1'], msg1_id) == 200
 
 # You can repin a message when it has been unpinned
 def test_pin_unpin(url, user_list, channel_list):
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned over and over")
-    msg1_id = response['id']
-    assert pin(url, user_list['token1'], msg1_id) == 200
-    assert unpin(url, user_list['token1'], msg1_id) == 200
-    assert pin(url, user_list['token1'], msg1_id) == 200
-    assert unpin(url, user_list['token1'], msg1_id) == 200
+    # Send a message
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be pinned over and over")['message_id']
+
+    # Start annoying everyone
+    assert message_pin(url, user_list['token1'], msg1_id) == 200
+    assert message_unpin(url, user_list['token1'], msg1_id) == 200
+    assert message_pin(url, user_list['token1'], msg1_id) == 200
+    assert message_unpin(url, user_list['token1'], msg1_id) == 200
+
+## INVALID CASES ##
 
 # Unpinning a message which is not pinned
 def test_unpin_normal_msg(url, user_list, channel_list):
-    response = message_send(url, user_list['token1'], channel_list['c1_id'], "This message cannot be unpinned")
-    msg1_id = response['id']
+    # Send a message
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message cannot be unpinned")['message_id']
     
-    assert unpin(url, user_list['token1'], msg1_id) == 400
+    # Attempt to unpin
+    assert message_unpin(url, user_list['token1'], msg1_id) == 400
 
 # Unpinning a message in a channel which you are not in
 def test_unpin_in_another_channel(url, user_list, channel_list):
-    response = message_send(url, user_list['token2'], channel_list['c2_id'], "This message can only be unpinned by a channel owner")
-    msg1_id = response['id']
-    assert pin(url, user_list['token2'], msg1_id) == 200
+    # Send and pin a message
+    msg1_id = message_send(url, user_list['token2'], channel_list['c2_id'], "This message can only be unpinned by a channel owner")['message_id']
+    assert message_pin(url, user_list['token2'], msg1_id) == 200
 
+    # Another user joins another channel and becomes owner
     channel_join(url, user_list['token3'], channel_list['c1_id'])
-    add_owner(url, user_list['token1'], channel_list['c1_id'], user_list['u3_id'])
+    channel_addowner(url, user_list['token1'], channel_list['c1_id'], user_list['u3_id'])
 
-    assert unpin(url, user_list['token3'], msg1_id) == 400
-    assert unpin(url, user_list['token1'], msg1_id) == 400
+    # Attempt to unpin from another channel
+    assert message_unpin(url, user_list['token3'], msg1_id) == 400
+    assert message_unpin(url, user_list['token1'], msg1_id) == 400
 
 # A normal member cannot unpin a message even if it is their own
 def test_unpin_but_not_owner(url, user_list, channel_list):
+    # Join channel
     channel_join(url, user_list['token2'], channel_list['c1_id'])
-    response = message_send(url, user_list['token2'], channel_list['c1_id'], "I am a normal owner. I cannot unpin this :(")
-    msg1_id = response['id']
-    assert pin(url, user_list['token1'], msg1_id) == 200
+    
+    # Send message and get owner to pin it
+    msg1_id = message_send(url, user_list['token2'], channel_list['c1_id'], "I am a normal owner. I cannot unpin this :(")['message_id']
+    assert message_pin(url, user_list['token1'], msg1_id) == 200
 
-    assert unpin(url, user_list['token2'], msg1_id) == 400
+    # Message sender is not owner and cannot unpin
+    assert message_unpin(url, user_list['token2'], msg1_id) == 400
+    
