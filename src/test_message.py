@@ -341,8 +341,8 @@ def test_double_msg_unpin(data):
     msg2_id = msg.message_send(data['token1'], data['c1_id'], "This message will also be pinned")['message_id']
     msg.message_pin(data['token1'], msg1_id)
     msg.message_pin(data['token1'], msg2_id)
-    assert msg.message_unpin(data['token1'], msg1_id)
-    assert msg.message_unpin(data['token1'], msg2_id)
+    assert msg.message_unpin(data['token1'], msg1_id) == SUCCESS
+    assert msg.message_unpin(data['token1'], msg2_id) == SUCCESS
 
 # A channel owner can unpin a message send by someone else
 def test_unpin_by_another_owner(data):
