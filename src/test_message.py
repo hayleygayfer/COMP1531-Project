@@ -246,6 +246,12 @@ def test_empty_string (data):
 
 ## ITERATION 3 TESTS ##
 
+# TODO: message_sendlater
+
+# TODO: message_react
+
+# TODO: message_unreact
+
 
 # message_pin
 '''
@@ -312,3 +318,90 @@ def test_pin_but_not_owner(data):
     with pytest.raises(AccessError):
         # Since they are not an owner, they cannot pin this message
         msg.message_pin(data['token2'], msg1_id)
+
+
+
+# message_unpin
+'''
+message_unpin(token, message_id) = {}
+'''
+
+## VALID CASES ##
+
+# Unpin a pinned message
+def test_single_msg_unpin(data):
+    msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be pinned")['message_id']
+    msg.message_send(data['token1'], data['c1_id'], "This message will not be pinned") 
+    msg.message_pin(data['token1'], msg1_id)
+    assert msg.message_unpin(data['token1'], msg1_id) == SUCCESS
+
+# Unpin multiple pinned messages
+def test_double_msg_unpin(data):
+    msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be pinned")['message_id']
+    msg2_id = msg.message_send(data['token1'], data['c1_id'], "This message will also be pinned")['message_id']
+    msg.message_pin(data['token1'], msg1_id)
+    msg.message_pin(data['token1'], msg2_id)
+    assert msg.message_unpin(data['token1'], msg1_id)
+    assert msg.message_unpin(data['token1'], msg2_id)
+
+# A channel owner can unpin a message send by someone else
+def test_unpin_by_another_owner(data):
+    channel.channel_join(data['token3'], data['c2_id'])
+    msg1_id = msg.message_send(data['token3'], data['c2_id'], "This message was sent by a regular member and it will be pinned")['message_id']
+    msg.message_pin(data['token2'], msg1_id)
+
+    # Add P3 as an owner and get them to unpin
+    channel.channel_addowner(data['token2'], data['c2_id'], data['u3_id'])
+    assert msg.message_unpin(data['token3'], msg1_id) == SUCCESS
+
+# The Flockr owner does not have to be a channel owner to pin a message
+def test_unpin_flockr_owner(data):
+    channel.channel_join(data['token1'], data['c2_id'])
+    msg1_id = msg.message_send(data['token2'], data['c2_id'], "This message was sent by an owner and it will be pinned")['message_id']
+    
+    # P2 is channel owner and P1 is not (but they are the flockr owner so they are still permitted to unpin)
+    msg.message_pin(data['token2'], msg1_id)
+    assert msg.message_unpin(data['token1'], msg1_id) == SUCCESS
+
+# You can repin a message when it has been unpinned
+def test_pin_unpin(data):
+    msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be pinned over and over")['message_id']
+    assert msg.message_pin(data['token1'], msg1_id) == SUCCESS
+    assert msg.message_unpin(data['token1'], msg1_id) == SUCCESS
+    assert msg.message_pin(data['token1'], msg1_id) == SUCCESS
+    assert msg.message_unpin(data['token1'], msg1_id) == SUCCESS
+
+
+## INVALID CASES ##
+
+# Unpinning a message which is not pinned
+def test_unpin_normal_msg(data):
+    msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message cannot be unpinned")['message_id']
+    with pytest.raises(InputError):
+        msg.message_unpin(data['token1'], msg1_id) # Is not already pinned
+
+# Unpinning a message in a channel which you are not in
+def test_unpin_in_another_channel(data):
+    msg1_id = msg.message_send(data['token2'], data['c2_id'], "This message can only be unpinned by a channel owner")['message_id']
+    assert msg.message_pin(data['token2'], msg1_id) == SUCCESS # P2 is permitted to pin
+
+    channel.channel_join(data['token3'], data['c1_id'])
+    channel.channel_addowner(data['token1'], data['c1_id'], data['u3_id'])
+
+    # P1 and P3 and in one channel and P2 is in the other
+    with pytest.raises(AccessError):
+        msg.message_unpin(data['token3'], msg1_id) # P3 (An owner of C1 is not in C2)
+    with pytest.raises(AccessError):
+        msg.message_unpin(data['token1'], msg1_id) # P1 (Flockr Owner) is not in C2 either
+
+# A normal member cannot unpin a message even if it is their own
+def test_unpin_but_not_owner(data):
+    channel.channel_join(data['token2'], data['c1_id'])
+    msg1_id = msg.message_send(data['token2'], data['c1_id'], "I am a normal owner. I cannot unpin this :(")['message_id']
+    assert msg.message_pin(data['token1'], msg1_id) == SUCCESS
+
+    # P2 is a regular member in C1 who has just sent a message which has been pinned by an owner
+    with pytest.raises(AccessError):
+        # Since they are not an owner, they cannot unpin this message
+        msg.message_unpin(data['token2'], msg1_id)
+
