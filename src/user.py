@@ -9,7 +9,9 @@ def user_profile(token, u_id):
     if user_id == []:
         raise InputError("Not a valid user")
 
-    if user_id[0]['token'] != token:
+    try:
+        find_user(token)
+    except StopIteration:
         raise AccessError("Not a valid token")
 
     return {
