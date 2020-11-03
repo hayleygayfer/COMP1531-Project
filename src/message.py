@@ -176,7 +176,7 @@ def message_pin(token, message_id):
 
     Args:
         1. token (str): the token of the authenticated user who is pinning the message
-        2. message_id (int): used to identify the message to be edited
+        2. message_id (int): used to identify the message to be pinned
 
     Return:
         An empty dictionary to indicate that the function call was successful
@@ -203,15 +203,53 @@ def message_pin(token, message_id):
     owners = channel['owner_members']
     flockr_owner_id = get_flockr_owner_id(u_id)
     if user_is_not_owner(u_id, owners) and u_id != flockr_owner_id:
-        raise AccessError("You are not authorised to edit this message")
+        raise AccessError("You must be an owner to pin this message")
     
 
     # Pin the message
     doPin(channel, message_id)
     return {}
 
+
 def message_unpin(token, message_id):
+    '''
+    A channel owner (or Flockr owner), unpins a particular message in the channel.
+    Unpinning a pinned message removes the pinned status of the message on the frontend.
+
+    Args:
+        1. token (str): the token of the authenticated user who is unpinning the message
+        2. message_id (int): used to identify the message to be unpinned
+
+    Return:
+        An empty dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+
+    # check for valid token
+    u_id = get_uid_from_token(token)
+    if u_id == None:
+        raise AccessError("Invalid token")
+
+    # Find message
+    channel_id = get_channel_id(message_id)
+    if not valid_channel(channel_id):
+        raise InputError("Message not found")
+
+    if not channel_member(u_id, channel_id):
+        raise AccessError("You are not a member of this channel")
+
+    # User must be a channel/flockr owner
+    channel = find_channel(message_id, channel_id)
+    owners = channel['owner_members']
+    flockr_owner_id = get_flockr_owner_id(u_id)
+    if user_is_not_owner(u_id, owners) and u_id != flockr_owner_id:
+        raise AccessError("You must be an owner to pin this message")
     
+
+    # Unpin the message
+    doUnpin(channel, message_id)
     return {}
 
 
@@ -321,7 +359,15 @@ def doPin(channel, msg_id):
     for msg in channel['messages']:
         if msg.get('message_id') == msg_id:
             if msg['is_pinned']:
-                raise InputError(f'Message with ID {msg_id} is already pinned')
+                raise InputError(f'This message is already pinned')
 
             msg['is_pinned'] = True
-    
+
+# Unpin the message to the channel
+def doUnpin(channel, msg_id):
+    for msg in channel['messages']:
+        if msg.get('message_id') == msg_id:
+            if not msg['is_pinned']:
+                raise InputError(f'This message is not pinned')
+
+            msg['is_pinned'] = False
