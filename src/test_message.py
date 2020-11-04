@@ -10,7 +10,7 @@ import pytest
 from error import InputError, AccessError
 from other import clear
 
-import datetime
+from datetime import datetime, timedelta
 
 SUCCESS = {}
 
@@ -35,6 +35,8 @@ def data():
     # user2 creates a channel
     c2_id = channels.channels_create(token2, "channel_2", True)['channel_id']
 
+    time_current = datetime.now()
+
     return {
         'u1_id': u1_id,
         'u2_id': u2_id,
@@ -43,7 +45,8 @@ def data():
         'token2': token2,
         'token3': token3,
         'c1_id': c1_id,
-        'c2_id': c2_id
+        'c2_id': c2_id,
+        'time_current': time_current,
     }
 
     
@@ -256,29 +259,71 @@ OUTPUT : {message_id}
 '''
 ## VALID CASES ##
 # Sendlater at a valid time in the future (to a channel token is a part of)
-def test_sendlater_valid_time(data):
-    pass
+def test_sendlater_success(data):
+    # Sendlater message 4 days later, token1 is a part of channel_id1
+    time_delta = timedelta(days = 4)
+    future_time = data['time_current'] + time_delta
 
-# Sendlater valid message length (to a channel token is a part of)
-def test_sendlater_valid_length(data):
-    pass
+    assert msg.message_sendlater(data['token1'], data['c1_id'], "This message is a sendlater message", future_time)
+
+    # Sendlater message 4 minutes later, token1 is a part of channel_id1
+    time_delta = timedelta(minutes = 4)
+    future_time = data['time_current'] + time_delta
+
+    assert msg.message_sendlater(data['token1'], data['c1_id'], "This message is a sendlater message", future_time)
+
 
 ## INVALID CASES ##
 # Sendlater to invalid channel (InputError)
 def test_sendlater_invalid_channel(data):
-    pass
+    # Valid time delta
+    time_delta = timedelta(minutes = 4)
+    future_time = data['time_current'] + time_delta
+
+    # Channel_id invalid
+    with pytest.raises(InputError):
+        msg.message_sendlater(data['token1'], 4645, "Sent to invalid channel_id", future_time)
 
 # Sendlater message more than 1000 chars (InputError)
 def test_sendlater_invalid_message_len(data):
-    pass
+    # Valid time delta
+    time_delta = timedelta(minutes = 4)
+    future_time = data['time_current'] + time_delta
+
+    # A string of 1001 chars 
+    long_string = "x" * 1001
+
+    # Message is more than 1000 characters
+    with pytest.raises(InputError):
+        msg.message_sendlater(data['token1'], data['c1_id'], long_string, future_time)
+   
 
 # Sendlater invalid time_sent - in the past (InputError)
 def test_sendlater_invalid_time(data):
-    pass
+    # Valid time delta
+    time_delta = timedelta(minutes = 4)
+    # Time in the past
+    future_time = data['time_current'] - time_delta
+
+    # Channel_id invalid
+    with pytest.raises(InputError):
+        msg.message_sendlater(data['token1'], 4645, "Sendlater time in pass is not possible", future_time)
 
 # Sendlater to a channel which you are not in (AccessError)
 def test_sendlater_in_another_channel(data):
-    pass
+    # Valid time delta
+    time_delta = timedelta(minutes = 4)
+    future_time = data['time_current'] + time_delta
+
+    # Token1 is not a part of c2_id
+    with pytest.raises(AccessError):
+        msg.message_sendlater(data['token1'], data['c2_id'], "Sent to invalid channel_id", future_time)
+
+    # Token2 invites token1 to c2_id
+    channel.channel_invite(data['token2'], data['c2_id'], data['u1_id'])
+
+    assert msg.message_sendlater(data['token1'], data['c2_id'], "Now part of channel", future_time)
+    
 
 # TODO: message_react
 
