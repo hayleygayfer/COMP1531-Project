@@ -58,6 +58,7 @@
 * Users cannot edit/delete their own messages unless they are an owner (or FlockR owner)
 * You must be a channel owner (or FlockR owner) to edit/delete messages
     * However, they are not permitted to edit/delete other owner's messages
+* Any user in the channel can react to their own message
 
 
 ## USER.PY
