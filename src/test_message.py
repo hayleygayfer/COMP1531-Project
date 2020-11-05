@@ -342,18 +342,45 @@ message_react(token, message_id,react_id) = {}
 
 # React by flockr owner in the channel - not their message
 def test_owner_not_own_success (data):
+    # add person 2 two channel 1
+    channel.channel_join(data['token2'], data['c1_id'])
+    msg1_id = msg.message_send(data['token2'], data['c1_id'], "This message will be reacted by person 1")['message_id']
+    # Flockr owner reacts to person 2 message 
+    assert msg.message_react(data['token1'], msg1_id, 1)
+
 
 # React by member in the channel - not their message
 def test_member_not_own_success (data):
+    # add person 2 two channel 1
+    channel.channel_join(data['token2'], data['c1_id'])
+    msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be reacted by person 2")['message_id']
+    # member reacts to person 1 message 
+    assert msg.message_react(data['token2'], msg1_id, 1)
 
 # React by flockr owner in the channel - their message
 def test_owner_own_success (data):
+    msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be reacted by person 1 who sent it")['message_id']
+    # Flockr owner reacts to own message 
+    assert msg.message_react(data['token1'], msg1_id, 1)
 
 # React by member in the channel - their message
 def test_member_own_success (data):
+    # add person 2 two channel 1
+    channel.channel_join(data['token2'], data['c1_id'])
+    msg1_id = msg.message_send(data['token2'], data['c1_id'], "This message will be reacted by person 2 for their own message")['message_id']
+    # member reacts to person 1 message 
+    assert msg.message_react(data['token2'], msg1_id, 1)
 
 # React by a user and then reacted by another user
 def test_react_by_two_users (data):
+    # add person 2 two channel 1
+    channel.channel_join(data['token2'], data['c1_id'])
+    # add person 3 to channel 1
+    channel.channel_join(data['token3'], data['c1_id'])
+    msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message was sent by person 1 but will be reacted by two people")['message_id']
+    # member reacts to person 1 message 
+    assert msg.message_react(data['token2'], msg1_id, 1)
+    assert msg.message_react(data['token3'], msg1_id, 1)
 
 
 ## INVALID CASES ##
