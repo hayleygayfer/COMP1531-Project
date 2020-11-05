@@ -339,12 +339,19 @@ message_react(token, message_id,react_id) = {}
 '''
 
 # React by flockr owner in the channel - not their message
+def test_owner_not_own_success (data):
 
 # React by member in the channel - not their message
+def test_member_not_own_success (data):
 
 # React by flockr owner in the channel - their message
+def test_owner_own_success (data):
 
 # React by member in the channel - their message
+def test_member_own_success (data):
+
+# React by a user and then reacted by another user
+def test_react_by_two_users (data):
 
 
 ## INVALID CASES ##
@@ -355,7 +362,18 @@ message_react(token, message_id,react_id) = {}
     - invalid react ID
     - message alrea
 '''
-# 
+# Message ID does not exist
+def test_message_id_not_exist (data):
+
+# Message ID is not a user in the channel
+def test_message_id_not_in_channel (data):
+
+# Invalid react ID
+def test_invalid_react (data):
+
+# Message is already reacted by a user 
+def test_already_reacted_by_user (data):
+
 
 # message_unreact
 '''
