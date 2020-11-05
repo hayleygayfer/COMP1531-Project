@@ -14,8 +14,8 @@ def test_duplicate_name_handle():
     user1 = auth.auth_register("clint@braton.com", "password", "Clint", "Barton")
     user2 = auth.auth_register("clint@notbarton.com", "password", "Clint", "Barton")
 
-    user_1 = user_profile(user1['token'], user1['u_id'])
-    user_2 = user_profile(user2['token'], user2['u_id'])
+    user_1 = user_profile(user1['token'], user1['u_id'])['user']
+    user_2 = user_profile(user2['token'], user2['u_id'])['user']
 
     assert user_1['handle_str'] != user_2['handle_str']
  

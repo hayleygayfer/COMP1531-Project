@@ -13,7 +13,7 @@ def users_all(token):
     if valid_token(token) is False:
         raise AccessError
     return {
-        data['users']
+        'users': data['users']
     }
 
 def admin_userpermission_change(token, u_id, permission_id):
@@ -49,7 +49,7 @@ def search(token, query_str):
         messages.append(list(filter(lambda message: query_str in message['message'], channel['messages'])))
 
     return {
-        messages
+        'messages': messages
     }
 
 # validate token

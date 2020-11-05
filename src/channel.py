@@ -1,4 +1,3 @@
-# Comments in this file are assumptions
 from data import data
 from error import InputError, AccessError
 
@@ -9,7 +8,7 @@ def channel_invite(token_inviter, channel_id, u_id_invitee):
     To be accessed from a member of the channel with id channel_id.
 
     Args:
-        1. token_inviter (int): the token of the authenticated user who is doing the inviting
+        1. token_inviter (str): the token of the authenticated user who is doing the inviting
         2. channel_id (int): used to identify the channel
         3. u_id_invitee (int): the user_id of the non-channel member who is getting the invitation
 
@@ -51,7 +50,7 @@ def channel_details(token, channel_id):
     To be accessed from a member of the channel with id channel_id.
 
     Args:
-        1. token (int): the token of the authenticated user who is viewing the details
+        1. token (str): the token of the authenticated user who is viewing the details
         2. channel_id (int): used to identify the channel
 
     Return:
@@ -94,7 +93,7 @@ def channel_messages(token, channel_id, start):
     To be accessed from a member of the channel with id channel_id.
 
     Args:
-        1. token (int): the token of the authenticated user who is viewing the messages
+        1. token (str): the token of the authenticated user who is viewing the messages
         2. channel_id (int): used to identify the channel
         3. start (int): identifies the message to begin displaying other messages from
 
@@ -160,7 +159,7 @@ def channel_leave(token, channel_id):
     To be accessed from a member of the channel with id channel_id.
 
     Args:
-        1. token (int): the token of the authenticated user who is leaving
+        1. token (str): the token of the authenticated user who is leaving
         2. channel_id (int): used to identify the channel
 
     Return:
@@ -200,7 +199,7 @@ def channel_join(token, channel_id):
     To be accessed from a user who is not a member of the channel with id channel_id.
 
     Args:
-        1. token (int): the token of the authenticated user who is joining
+        1. token (str): the token of the authenticated user who is joining
         2. channel_id (int): used to identify the channel
 
     Return:
@@ -243,7 +242,7 @@ def channel_addowner(token, channel_id, u_id):
     To be accessed from an owner of the channel with id channel_id.
 
     Args:
-        1. token (int): the token of the authenticated user who is adding another owner
+        1. token (str): the token of the authenticated user who is adding another owner
         2. channel_id (int): used to identify the channel
         3. u_id (int): the user_id of the user who is getting promoted to an owner
 
@@ -292,7 +291,7 @@ def channel_removeowner(token, channel_id, u_id):
     To be accessed from an owner of the channel with id channel_id.
 
     Args:
-        1. token (int): the token of the authenticated user who is adding another owner
+        1. token (str): the token of the authenticated user who is adding another owner
         2. channel_id (int): used to identify the channel
         3. u_id (int): the user_id of the user who is getting promoted to an owner
 
@@ -483,6 +482,8 @@ def get_user_details(u_ids):
 def invalid_messages_start(channel_id, start):
     for channel in data['channels']:
         if channel_id == channel['channel_id']:
+            if channel['message_count'] == start and start == 0:
+                return False
             if channel['message_count'] <= start:
                 return True
     return False

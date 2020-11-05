@@ -55,7 +55,7 @@ def message_send(url_send, token, channel_id, msg):
     response = requests.post(url_send + "message/send", json=payload)
     return {
         'status': response.status_code,
-        'id': response.json()
+        'id': response.json().get('message_id')
     }
 
 def message_rem(url_rem, token, message_id):

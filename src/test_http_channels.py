@@ -52,9 +52,9 @@ def channel_list(url, user_list):
 def test_no_channels_http(url, user_list):
     # get channels list according to person one when none have been created
     payload = {"token": user_list['user1']['token']}
-    response = requests.get(url + "channels/list", json=payload)
+    response = requests.get(url + "channels/list", params=payload)
     assert response.status_code == 200
-    assert response.json() == []
+    assert response.json()['channels'] == []
 
 def test_user_in_no_channels_http(url, user_list):
     # get channels list according to person two when person one has created a channel and has invited person three
@@ -70,9 +70,9 @@ def test_user_in_no_channels_http(url, user_list):
 
     # person two accesses their channels list
     payload = {"token": user_list['user2']['token']}
-    response = requests.get(url + "channels/list", json=payload)
+    response = requests.get(url + "channels/list", params=payload)
     assert response.status_code == 200
-    assert response.json() == []
+    assert response.json()['channels'] == []
 
 def test_user_is_in_all_channels_http(url, user_list, channel_list):
     # person one invites person three to channel one
@@ -92,9 +92,9 @@ def test_user_is_in_all_channels_http(url, user_list, channel_list):
 
     # person three accesses their channels list
     payload = {"token": user_list['user3']['token']}
-    response = requests.get(url + "channels/list", json=payload)
+    response = requests.get(url + "channels/list", params=payload)
     assert response.status_code == 200
-    assert response.json() == [
+    assert response.json()['channels'] == [
         {
             'channel_id': channel_list['c_id_1'], 
             'name': "channel_1", 
@@ -128,9 +128,9 @@ def test_user_is_in_some_channels_http(url, user_list, channel_list):
 
     # person three accesses their channel list
     payload = {"token": user_list['user3']['token']}
-    response = requests.get(url + "channels/list", json=payload)
+    response = requests.get(url + "channels/list", params=payload)
     assert response.status_code == 200
-    assert response.json() == [
+    assert response.json()['channels'] == [
         {
             'channel_id': channel_list['c_id_1'], 
             'name': "channel_1", 
@@ -144,12 +144,12 @@ def test_user_is_in_some_channels_http(url, user_list, channel_list):
 
     # user2 and user3 will not see the same list
     payload = {"token": user_list['user2']['token']}
-    response2 = requests.get(url + "channels/list", json=payload)
+    response2 = requests.get(url + "channels/list", params=payload)
     assert response2.status_code == 200
     assert response.json() != response2.json()
     # user1 and user3 will see the same list
     payload = {"token": user_list['user1']['token']}
-    response2 = requests.get(url + "channels/list", json=payload)
+    response2 = requests.get(url + "channels/list", params=payload)
     assert response2.status_code == 200
     assert response.json() == response2.json()
 
@@ -159,17 +159,17 @@ def test_user_is_in_some_channels_http(url, user_list, channel_list):
 def test_no_total_channels_http(url, user_list):
     # person one accesses all channels list when none have been created
     payload = {"token": user_list['user1']['token']}
-    response = requests.get(url + "channels/listall", json=payload)
+    response = requests.get(url + "channels/listall", params=payload)
     assert response.status_code == 200
-    assert response.json() == []
+    assert response.json()['channels'] == []
 
 
 def test_total_channels_http(url, user_list, channel_list):
     # person one accesses all channels list when two have been created
     payload = {"token": user_list['user1']['token']}
-    response = requests.get(url + "channels/listall", json=payload)
+    response = requests.get(url + "channels/listall", params=payload)
     assert response.status_code == 200
-    assert response.json() == [
+    assert response.json()['channels'] == [
         {
             'channel_id': channel_list['c_id_1'], 
             'name': "channel_1", 
@@ -194,9 +194,9 @@ def test_total_channels_http(url, user_list, channel_list):
 def test_total_channels_not_created_by_user_http(url, user_list, channel_list):
     # person three accessed all channels list when none are created by them
     payload = {"token": user_list['user3']['token']}
-    response = requests.get(url + "channels/listall", json=payload)
+    response = requests.get(url + "channels/listall", params=payload)
     assert response.status_code == 200
-    assert response.json() == [
+    assert response.json()['channels'] == [
         {
             'channel_id': channel_list['c_id_1'], 
             'name': "channel_1", 
@@ -256,9 +256,9 @@ def test_public_private_http(url, user_list):
 
     # person one tries to acccess all channels list
     payload = {"token": user_list['user1']['token']}
-    response = requests.get(url + "channels/listall", json=payload)
+    response = requests.get(url + "channels/listall", params=payload)
     assert response.status_code == 200
-    assert response.json() == [
+    assert response.json()['channels'] == [
         {
             'channel_id': c_id_private['channel_id'], 
             'name': "channel_private", 

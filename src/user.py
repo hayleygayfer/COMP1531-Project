@@ -12,7 +12,9 @@ def user_profile(token, u_id):
     if user_id[0]['token'] != token:
         raise AccessError("Not a valid token")
 
-    return user_id[0]
+    return {
+        'user': user_id[0]
+    }
 
 def user_profile_setname(token, name_first, name_last):
 
@@ -65,6 +67,14 @@ def user_profile_sethandle(token, handle_str):
 
     return {
     }
+
+## ITERATION 3
+
+def user_profile_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
+
+    return {}
+
+
 
 def validate_handle_str(handle_str):
     return 3 < len(handle_str) < 20
