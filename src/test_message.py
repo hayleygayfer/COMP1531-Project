@@ -341,7 +341,7 @@ message_react(token, message_id,react_id) = {}
 '''
 
 # React by flockr owner in the channel - not their message
-def test_owner_not_own_success (data):
+def test_react_owner_not_own_success (data):
     # add person 2 two channel 1
     channel.channel_join(data['token2'], data['c1_id'])
     msg1_id = msg.message_send(data['token2'], data['c1_id'], "This message will be reacted by person 1")['message_id']
@@ -349,7 +349,7 @@ def test_owner_not_own_success (data):
     assert msg.message_react(data['token1'], msg1_id, 1)
 
 # React by member in the channel - not their message
-def test_member_not_own_success (data):
+def test_react_member_not_own_success (data):
     # add person 2 two channel 1
     channel.channel_join(data['token2'], data['c1_id'])
     msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be reacted by person 2")['message_id']
@@ -357,13 +357,13 @@ def test_member_not_own_success (data):
     assert msg.message_react(data['token2'], msg1_id, 1)
 
 # React by flockr owner in the channel - their message
-def test_owner_own_success (data):
+def test_react_owner_own_success (data):
     msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be reacted by person 1 who sent it")['message_id']
     # Flockr owner reacts to own message 
     assert msg.message_react(data['token1'], msg1_id, 1)
 
 # React by member in the channel - their message
-def test_member_own_success (data):
+def test_react_member_own_success (data):
     # add person 2 two channel 1
     channel.channel_join(data['token2'], data['c1_id'])
     msg1_id = msg.message_send(data['token2'], data['c1_id'], "This message will be reacted by person 2 for their own message")['message_id']
@@ -391,25 +391,25 @@ def test_react_by_two_users (data):
     - message alrea
 '''
 # Message ID does not exist
-def test_message_not_exist (data):
+def test_react_message_not_exist (data):
     with pytest.raises(InputError):
         msg.message_react(data['token1'], msg1_id, 1)
 
 # Message ID is not a user in the channel
-def test_message_id_not_in_channel (data):
+def test_react_message_id_not_in_channel (data):
     msg1_id = msg.message_send(data['token2'], data['c2_id'], "This message was sent in channel 2")['message_id']
     # person reacting is not in channel
     with pytest.raises(InputError):
         msg.message_react(data['token1'], msg1_id, 1)
 
 # Invalid react ID
-def test_invalid_react (data):
+def test_react_invalid_react (data):
     msg1_id = msg.message_send(data['token2'], data['c2_id'], "This will be reacted by an invalid message id")['message_id']
     with pytest.raises(InputError):
         msg.message_react(data['token2'], msg1_id, 2)
 
 # Message is already reacted by a user 
-def test_already_reacted_by_user (data):
+def test_react_already_reacted_by_user (data):
     msg1_id = msg.message_send(data['token2'], data['c2_id'], "Will be reacted by the user twice ")['message_id']
     assert msg.message_react(data['token2'], msg1_id, 1)
     with pytest.raises(InputError):
@@ -423,7 +423,7 @@ message_unreact(token, message_id,react_id) = {}
 '''
 ## VALID CASES ##
 # unreact by flockr owner in the channel - not their message
-def test_owner_not_own_success (data):
+def test_unreact_owner_not_own_success (data):
     # add person 2 two channel 1
     channel.channel_join(data['token2'], data['c1_id'])
     msg1_id = msg.message_send(data['token2'], data['c1_id'], "This message will be unreacted by person 1")['message_id']
@@ -432,7 +432,7 @@ def test_owner_not_own_success (data):
     assert msg.message_unreact(data['token1'], msg1_id, 1)
 
 # unreact by member in the channel - not their message
-def test_member_not_own_success (data):
+def test_unreact_member_not_own_success (data):
     # add person 2 two channel 1
     channel.channel_join(data['token2'], data['c1_id'])
     msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be unreacted by person 2")['message_id']
@@ -442,14 +442,14 @@ def test_member_not_own_success (data):
     assert msg.message_unreact(data['token2'], msg1_id, 1)
 
 # unreact by flockr owner in the channel - their message
-def test_owner_own_success (data):
+def test_unreact_owner_own_success (data):
     msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be unreacted by person 1 who sent it")['message_id']
     # Flockr owner reacts to own message 
     msg.message_react(data['token1'], msg1_id, 1)
     assert msg.message_unreact(data['token1'], msg1_id, 1)
 
 # unreact by member in the channel - their message
-def test_member_own_success (data):
+def test_unreact_member_own_success (data):
     # add person 2 two channel 1
     channel.channel_join(data['token2'], data['c1_id'])
     msg1_id = msg.message_send(data['token2'], data['c1_id'], "This message will be unreacted by person 2 for their own message")['message_id']
@@ -458,7 +458,7 @@ def test_member_own_success (data):
     assert msg.message_unreact(data['token2'], msg1_id, 1)
 
 # unreact by a user and then unreacted by another user
-def test_react_by_two_users (data):
+def test_unreact_unreact_by_two_users (data):
     # add person 2 two channel 1
     channel.channel_join(data['token2'], data['c1_id'])
     # add person 3 to channel 1
@@ -472,14 +472,14 @@ def test_react_by_two_users (data):
 
 ## INVALID CASES ##
 # Message does not have a react to remove 
-def test_react_does_not_exist (data):
+def test_unreact_doesnot_have_react (data):
     msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will not be unreacted before it has a react on it")['message_id']
     with pytest.raises(InputError):
         msg.message_unreact(data['token1'], msg1_id, 1)
 
 
 # Message ID is not a user in the channel
-def test_message_id_not_in_channel (data):
+def test__unreact_id_not_in_channel (data):
     msg1_id = msg.message_send(data['token2'], data['c2_id'], "This message was sent in channel 2")['message_id']
     # person is  in channel
     msg.message_react(data['token2'], msg1_id, 1)
@@ -488,7 +488,7 @@ def test_message_id_not_in_channel (data):
         msg.message_unreact(data['token1'], msg1_id, 1)
 
 # Invalid react ID
-def test_invalid_react (data):
+def test__unreact_invalid_react (data):
     msg1_id = msg.message_send(data['token2'], data['c2_id'], "This will be unreacted by an invalid message id")['message_id']
     msg.message_react(data['token2'], msg1_id, 1)
     with pytest.raises(InputError):
