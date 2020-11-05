@@ -325,9 +325,45 @@ def test_sendlater_in_another_channel(data):
     assert msg.message_sendlater(data['token1'], data['c2_id'], "Now part of channel", future_time)
     
 
-# TODO: message_react
+# message_react
+'''
+message_react(token, message_id,react_id) = {}
+'''
 
-# TODO: message_unreact
+## VALID CASES ##
+'''
+    message is valid if:
+    - message in channel by authorised user
+    - react ID is valid
+    - react does not already exist on that message by that user
+'''
+
+# React by flockr owner in the channel - not their message
+
+# React by member in the channel - not their message
+
+# React by flockr owner in the channel - their message
+
+# React by member in the channel - their message
+
+
+## INVALID CASES ##
+
+'''
+    message is invalid if:
+    - message id is not valid in the channel that the user who is reacting is in
+    - invalid react ID
+    - message alrea
+'''
+# 
+
+# message_unreact
+'''
+message_unreact(token, message_id,react_id) = {}
+'''
+## VALID CASES ##
+
+## INVALID CASES ##
 
 
 # message_pin
