@@ -380,6 +380,8 @@ def test_react_by_two_users (url, user_list, channel_list):
     assert message_react(url, user_list['token3'], msg1_id, 1) == SUCCESS
 
 
+## INVALID CASES ##
+
 # TODO REMOVE THE FOLLOWING
 # The idea is that the http tests look almost identical to the normal tests.
 '''
@@ -393,6 +395,28 @@ The equivalent http would be:
 assert message_react(url, user_list['token1'], msg1_id, 1) == ERROR
 '''
 
+def test_react_message_id_not_in_channel (url, user_list, channel_list):
+    # msg1_id = msg.message_send(data['token2'], data['c2_id'], "This message was sent in channel 2")['message_id']
+    msg1_id = message_send(url, user_list['token2'], channel_list['c2_id'], "This message was sent in channel 2")['message_id']
+    # with pytest.raises(InputError):
+    # msg.message_react(data['token1'], msg1_id, 1)
+    assert message_react(url, user_list['token1'], msg1_id, 1) == ERROR
+
+def test_react_invalid_react (url, user_list, channel_list):
+    # msg1_id = msg.message_send(data['token2'], data['c2_id'], "This will be reacted by an invalid message id")['message_id']
+    msg1_id = message_send(url, user_list['token2'], channel_list['c2_id'], "This will be reacted by an invalid message id")['message_id']
+    # with pytest.raises(InputError):
+    # msg.message_react(data['token2'], msg1_id, 2)
+    assert message_react(url, user_list['token2'], msg1_id, 2) == ERROR
+
+def test_react_already_reacted_by_user (url, user_list, channel_list):
+    # msg1_id = msg.message_send(data['token2'], data['c2_id'], "Will be reacted by the user twice ")['message_id']
+    msg1_id = message_send(url, user_list['token2'], channel_list['c2_id'], "Will be reacted by the user twice")['message_id']
+    # assert msg.message_react(data['token2'], msg1_id, 1) == SUCCESS
+    assert message_react(url, user_list['token2'], msg1_id, 1) == SUCCESS
+    # with pytest.raises(InputError):
+    # msg.message_react(data['token2'], msg1_id, 1)
+    assert message_react(url, user_list['token2'], msg1_id, 1) == ERROR
 
 # TODO: message/unreact
 
