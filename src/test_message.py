@@ -266,17 +266,11 @@ def test_sendlater_success(data):
     time_delta = timedelta(days = 4)
     future_time = data['time_current'] + time_delta
 
-    t = threading.Timer(time_delta, msg.message_sendlater)
-    t.start()
-
     assert msg.message_sendlater(data['token1'], data['c1_id'], "This message is a sendlater message", future_time)['message_id']
 
     # Sendlater message 4 minutes later, token1 is a part of channel_id1
     time_delta = timedelta(minutes = 4)
     future_time = data['time_current'] + time_delta
-
-    t = threading.Timer(time_delta, msg.message_sendlater)
-    t.start()
 
     assert msg.message_sendlater(data['token1'], data['c1_id'], "This message is a sendlater message", future_time)['message_id']
 
