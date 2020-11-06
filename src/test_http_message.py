@@ -87,6 +87,16 @@ def channel_addowner(url_add, token, channel_id, u_id):
     response = requests.post(url_add + "channel/addowner", json=payload)
     return response.status_code
 
+def message_react(url_react, token, message_id, react_id):
+    payload = {'token': token, 'message_id': message_id, 'react_id': react_id}
+    response = requests.post(url_react + "message/react", json=payload)
+    return response.status_code
+
+def message_unreact(url_unreact, token, message_id, react_id):
+    payload = {'token': token, 'message_id': message_id, 'react_id': react_id}
+    response = requests.post(url_unreact + "message/unreact", json=payload)
+    return response.status_code
+
 def message_pin(url_pin, token, message_id):
     payload = {'token': token, 'message_id': message_id}
     response = requests.post(url_pin + "message/pin", json=payload)
@@ -313,8 +323,36 @@ def test_empty_string (url, user_list, channel_list):
 
 
 # TODO: message/sendlater
+
 # TODO: message/react
+
+def test_react_owner_not_own_success(url, user_list, channel_list):
+    # channel.channel_join(data['token2'], data['c1_id'])
+    channel_join(url, user_list['token2'], channel_list['c1_id'])
+
+    # msg1_id = msg.message_send(data['token2'], data['c1_id'], "This message will be reacted by person 1")['message_id']
+    msg1_id = message_send(url, user_list['token2'], channel_list['c1_id'], "This message will be reacted by person 1")['message_id']
+    
+    # assert msg.message_react(data['token1'], msg1_id, 1) == SUCCESS
+    assert message_react(url, user_list['token1'], msg1_id, 1) == SUCCESS
+
+# TODO REMOVE THE FOLLOWING
+# The idea is that the http tests look almost identical to the normal tests.
+'''
+For the following:
+
+with pytest.raises(InputError):
+    msg.message_react(data['token1'], msg1_id, 1)
+
+The equivalent http would be:
+
+assert message_react(url, user_list['token1'], msg1_id, 1) == ERROR
+'''
+
+
 # TODO: message/unreact
+
+
 
 # message/pin
 '''
