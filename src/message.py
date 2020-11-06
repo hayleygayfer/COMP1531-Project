@@ -189,7 +189,7 @@ def message_react(token, message_id, react_id):
         raise InputError("Message not found")
 
     if not channel_member(u_id, channel_id):
-        raise AccessError("You are not a member of this channel")
+        raise InputError("You are not a member of this channel")
     
     # Get channel
     channel = find_channel(message_id, channel_id)
@@ -367,8 +367,8 @@ def append_msg_to_channel(channel_id, msg_string, msg_id, u_id, time):
                     'u_id': u_id,
                     'time_created': time,
                     'reacts': [{
-                        'react_id': 0
-                        'u_ids': []
+                        'react_id': 0,
+                        'u_ids': [],
                         'is_this_user_reacted': False
                     }],
                     'is_pinned': False
@@ -432,13 +432,13 @@ def doUnpin(channel, msg_id):
 def doReact (u_id, channel, msg_id, react_id):
     for msg in channel['messages']:
         if msg.get('message_id') == msg_id:
-            msg['reacts']['react_id'] == react_id
-            msg['reacts']['u_ids'].append(u_id)
-            if msg['reacts']['is_this_user_reacted']:
+            msg['reacts'][0]['react_id'] == react_id
+            msg['reacts'][0]['u_ids'].append(u_id)
+            if msg['reacts'][0]['is_this_user_reacted']:
                 raise InputError(f'This message is already reacted by this user')
 
-            msg['reacts']['is_this_user_reacted'] == True
+            msg['reacts'][0]['is_this_user_reacted'] == True
         
-
+ 
 
 
