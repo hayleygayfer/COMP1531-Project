@@ -37,7 +37,7 @@ def data():
     # user2 creates a channel
     c2_id = channels.channels_create(token2, "channel_2", True)['channel_id']
 
-    time_current = datetime.now()
+    time_current = datetime.datetime.now()
 
     return {
         'u1_id': u1_id,
