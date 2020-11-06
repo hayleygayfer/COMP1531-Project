@@ -462,6 +462,32 @@ def test_unreact_unreact_by_two_users (url, user_list, channel_list):
     # assert msg.message_unreact(data['token3'], msg1_id, 1) == SUCCESS
     assert message_unreact(url, user_list['token3'], msg1_id, 1) == SUCCESS
 
+## INVALID CASES ##
+def test_unreact_doesnot_have_react (url, user_list, channel_list):
+    # msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will not be unreacted before it has a react on it")['message_id']
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will not be unreacted before it has a react on it")['message_id']
+    # with pytest.raises(InputError):
+    # msg.message_unreact(data['token1'], msg1_id, 1)
+    assert message_unreact(url, user_list['token1'], msg1_id, 1) == ERROR
+
+def test__unreact_id_not_in_channel (url, user_list, channel_list):
+    #  msg1_id = msg.message_send(data['token2'], data['c2_id'], "This message was sent in channel 2")['message_id']
+    msg1_id = message_send(url, user_list['token2'], channel_list['c2_id'], "This message was sent in channel 2")['message_id']
+    # msg.message_react(data['token2'], msg1_id, 1)
+    message_react(url, user_list['token2'], msg1_id, 1) 
+    # with pytest.raises(InputError):
+    # msg.message_unreact(data['token1'], msg1_id, 1)
+    assert message_unreact(url, user_list['token1'], msg1_id, 1) == ERROR
+
+def test__unreact_invalid_react (url, user_list, channel_list):
+    # msg1_id = msg.message_send(data['token2'], data['c2_id'], "This will be unreacted by an invalid message id")['message_id']
+    msg1_id = message_send(url, user_list['token2'], channel_list['c2_id'], "This will be unreacted by an invalid message id")['message_id']
+    # msg.message_react(data['token2'], msg1_id, 1) == SUCCESS
+    message_react(url, user_list['token2'], msg1_id, 1)
+    # with pytest.raises(InputError):
+    # msg.message_unreact(data['token2'], msg1_id, 2)
+    assert message_unreact(url, user_list['token2'], msg1_id, 2) == ERROR
+
 # message/pin
 '''
 pin(token, message_id) = {}
