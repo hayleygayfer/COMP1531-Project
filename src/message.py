@@ -157,7 +157,36 @@ def message_edit(token, message_id, message):
 
 ## ITERATION 3
 def message_sendlater(token, channel_id, message, time_sent):
+    # Check for valid token
+    u_id = get_uid_from_token(token)
+    if u_id == None:
+        raise AccessError("Invalid token")
+
+    if not valid_channel(channel_id):
+        raise InputError("Channel ID does not exist") 
+
+    if not channel_member(u_id, channel_id):
+        raise AccessError("User not in channel")
     
+    # message length must be at most 1000 and at least 1 characters
+    if len(message) > 1000:
+        raise InputError(f"Message is {len(message) - 1000} characters too long")
+    elif message == "":
+        raise InputError("Message must contain at least 1 character")
+
+    # Calculates current timestamp
+    timestamp = datetime.timestamp(datetime.now())
+
+    # Time_sent must be in the future
+    if timestamp <= current_time:
+        raise InputError(f"Time: {timestamp} is in the past or the current time.")
+
+    msg_id = generate_message_id(channel_id)
+    # TODO: Threading required for appending at future time
+
+    if timestamp == time_sent:
+        append_msg_to_channel(channel_id, message, msg_id, u_id, timestamp)
+
     return {
         'message_id': 0
     }

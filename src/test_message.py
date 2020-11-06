@@ -10,7 +10,7 @@ import pytest
 from error import InputError, AccessError
 from other import clear
 
-import datetime
+from datetime import datetime, timedelta
 import threading
 import time
 
@@ -37,7 +37,7 @@ def data():
     # user2 creates a channel
     c2_id = channels.channels_create(token2, "channel_2", True)['channel_id']
 
-    time_current = datetime.datetime.now()
+    time_current = datetime.now()
 
     return {
         'u1_id': u1_id,
@@ -275,6 +275,9 @@ def test_sendlater_success(data):
     time_delta = timedelta(minutes = 4)
     future_time = data['time_current'] + time_delta
 
+    t = threading.Timer(time_delta, msg.message_sendlater)
+    t.start()
+
     assert msg.message_sendlater(data['token1'], data['c1_id'], "This message is a sendlater message", future_time)['message_id']
 
 
@@ -298,9 +301,15 @@ def test_sendlater_invalid_message_len(data):
     # A string of 1001 chars 
     long_string = "x" * 1001
 
+    # An empty string
+    empty_string = ""
+
     # Message is more than 1000 characters
     with pytest.raises(InputError):
         msg.message_sendlater(data['token1'], data['c1_id'], long_string, future_time)['message_id']
+
+    with pytest.raises(InputError):
+        msg.message_sendlater(data['token1'], data['c1_id'], empty_string, future_time)['message_id']
    
 
 # Sendlater invalid time_sent - in the past (InputError)
