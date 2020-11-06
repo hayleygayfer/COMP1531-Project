@@ -162,10 +162,61 @@ def message_sendlater(token, channel_id, message, time_sent):
     }
 
 def message_react(token, message_id, react_id):
+    '''
+    Any user in the channel can react to a message in the current channel.
+    Reacting to a message displays a certain react.
+
+    Args:
+        1. token (str): the token of the authenticated user who is reacting to the message
+        2. message_id (int): used to identify the message to be reacted
+        3. react_id (int): used to identify the type of react, only valid react is 1 
+
+    Return:
+        An empty dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+    # Check for valid token
+    u_id = get_uid_from_token(token)
+    if u_id == None:
+        raise AccessError("Invalid token")
+
+    # Find message
+    channel_id = get_channel_id(message_id)
+    if not valid_channel(channel_id):
+        raise InputError("Message not found")
+
+    if not channel_member(u_id, channel_id):
+        raise AccessError("You are not a member of this channel")
     
+    # Get channel
+    channel = find_channel(message_id, channel_id)
+
+    # Check that react is valid - this is specific to front end 
+    if react_id != 1:
+        raise InputError("Invalid react")
+
+    doReact(channel, message_id, react_id)
+
     return {}
 
 def message_unreact(token, message_id, react_id):
+    '''
+    A member of a channel can unreacts a particular message in the channel.
+    Unreacting a message removes the react on the message on the frontend.
+
+    Args:
+        1. token (str): the token of the authenticated user who is reacting to the message
+        2. message_id (int): used to identify the message to be reacted
+        3. react_id (int): used to identify the type of react, only valid react is 1 
+
+    Return:
+        An empty dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
     
     return {}
 
@@ -371,3 +422,9 @@ def doUnpin(channel, msg_id):
                 raise InputError(f'This message is not pinned')
 
             msg['is_pinned'] = False
+
+# react to a message in the channel
+def doReact (channel, msg_id, react_id):
+    for msg in channel['messages']:
+        if msg.get('message_id') == msg_id:
+            
