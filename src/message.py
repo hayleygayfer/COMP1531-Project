@@ -198,6 +198,10 @@ def message_react(token, message_id, react_id):
     if react_id != REACT_VALID:
         raise InputError("Invalid react")
 
+    # Check if user has already reacted to message 
+    if alreadyReacted(u_id, channel, message_id, react_id):
+        raise InputError("You have already reacted to this message")
+
     doReact(u_id, channel, message_id, react_id)
 
     return {}
@@ -237,9 +241,9 @@ def message_unreact(token, message_id, react_id):
     # Check that react is valid - this is specific to front end 
     if react_id != REACT_VALID:
         raise InputError("Invalid react")
-    # Check if user has already reacted to message 
-    if alreadyReacted(u_id, channel, message_id, react_id):
-        raise InputError("You have already reacted to this message")
+
+    if noReact(u_id, channel, message_id, react_id):
+        raise InputError("You have not reacted to this message so cannot remove react")
 
     doUnreact(u_id, channel, message_id, react_id)
 
@@ -453,6 +457,15 @@ def doUnpin(channel, msg_id):
 
             msg['is_pinned'] = False
 
+# Checks if the user has already reacted to the message
+def alreadyReacted(u_id, channel, msg_id, react_id):
+    for msg in channel['messages']:
+        if msg.get('message_id') == msg_id:
+            for user in msg['reacts'][0]['u_ids']:
+                if user == u_id:
+                    return True
+    return False
+
 # react to a message in the channel
 def doReact (u_id, channel, msg_id, react_id):
     for msg in channel['messages']:
@@ -464,18 +477,18 @@ def doReact (u_id, channel, msg_id, react_id):
 
             msg['reacts'][0]['is_this_user_reacted'] == True
 
-# Checks if the user has already reacted to the message
-def alreadyReacted(u_id, channel, message_id, react_id):
+def noReact(u_id, channel, msg_id, react_id):
     for msg in channel['messages']:
-        if msg.get('message_id') == message_id:
-            for user in msg['reacts'][0]['u_ids']:
-                if user == u_id:
-                    return True
-    return False 
+        if msg.get('message_id') == msg_id:
+            if msg['reacts'][0]['u_ids'] == []:
+                return True
+    return False
 
-def doUnreact(u_id, channel, message_id, react_id):
+
+# removes react from message in channel
+def doUnreact(u_id, channel, msg_id, react_id):
     for msg in channel['messages']:
-        if msg.get('message_id') == message_id: 
+        if msg.get('message_id') == msg_id: 
             for user in msg['reacts'][0]['u_ids']:
                 if user == u_id:
                     msg['reacts'][0]['u_ids'].remove(u_id)
