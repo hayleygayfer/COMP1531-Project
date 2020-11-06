@@ -197,7 +197,7 @@ def message_react(token, message_id, react_id):
     if react_id != 1:
         raise InputError("Invalid react")
 
-    doReact(channel, message_id, react_id)
+    doReact(u_id, channel, message_id, react_id)
 
     return {}
 
@@ -424,7 +424,16 @@ def doUnpin(channel, msg_id):
             msg['is_pinned'] = False
 
 # react to a message in the channel
-def doReact (channel, msg_id, react_id):
+def doReact (u_id, channel, msg_id, react_id):
     for msg in channel['messages']:
         if msg.get('message_id') == msg_id:
-            
+            msg['reacts']['react_id'] == react_id
+            msg['reacts']['u_ids'].append(u_id)
+            if msg['reacts']['is_this_user_reacted']:
+                raise InputError(f'This message is already reacted by this user')
+
+            msg['reacts']['is_this_user_reacted'] == True
+        
+
+
+
