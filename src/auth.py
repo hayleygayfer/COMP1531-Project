@@ -4,6 +4,8 @@ from re import search # regex for email validation
 from random import random
 import hashlib
 import jwt
+import smtplib, ssl
+from random import random
 
 SECRET = 'adaskljnkjladsncjakldnckjscankj'
 
@@ -145,15 +147,76 @@ def auth_register(email, password, name_first, name_last):
 ## ITERATION 3
 
 def auth_passwordreset_request(email):
+    '''
+    Given an email, sends the email a reset code, to reset the password.
+
+    Args:
+        1. email (str): the email of the user requesting the password be reset
+
+    Return:
+        {}
+
+    The function first checks the email is valid, then sends email with a random code, which is added to memory.
+    '''
+    for user in data['users']:
+        if user['email'] == email:
+            reset_code = {
+                'reset_code': str(generate_reset_code()),
+                'u_id': user['u_id']
+            }
+            data['reset_codes'].append(reset_code)
+            port = 465
+            context = ssl.create_default_context()
+            message = f"""\
+            Flockr Password Reset Request
+
+            Hi {user['name_first']},
+            We've recently recieved a password reset request from you for Flockr. If you did not request this, ignore this email.
+            Your password reset code is: {reset_code['reset_code']}"""
+            with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+                server.login("flockrhelp@gmail.com", "surelypub")
+                server.sendmail("flockrhelp@gmail.com", email, message)
 
     return {}
 
 def auth_passwordreset_reset(reset_code, new_password):
+    '''
+    Given a reset code, sends the email a reset code, to reset the password.
 
-    return {}
+    Args:
+        1. reset code (str): the reset code of the user requesting the password be reset
+        2. new password
+
+    Return:
+        {}
+
+    The function first checks the reset code is valid, then checks the password
+     is valid, then changes the password of the user.
+    '''
+    for combination in data['reset_codes']:
+        if combination['reset_code'] == reset_code:
+            if not validate_password(new_password):
+                raise InputError('Invalid Password')
+            for user in data['users']:
+                if user['u_id'] == combination['u_id']:
+                    user['password'] = hashlib.sha256(new_password.encode()).hexdigest()
+                    data['reset_codes'].remove(combination)
+                    return {}
+    raise InputError('Invalid Reset Code')
 
 
 #########################################################################
+
+def generate_reset_code():
+    reset_code = 0
+    unique_code = False
+    while unique_code == False:
+        unique_code = True
+        reset_code = int(random()*100000)
+        for combination in data['reset_codes']:
+            if combination['reset_code'] == reset_code:
+                unique_code = False
+    return reset_code
 
 def validate_email(email):
     regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
@@ -216,3 +279,9 @@ def validate_token(token):
             return user
     return None
 
+
+if __name__ == '__main__':
+    auth_register("ethoshansen@gmail.com", "password", "Ethan", "Hansen")
+    print(data)
+    auth_passwordreset_request("ethoshansen@gmail.com")
+    print(data)
