@@ -195,7 +195,7 @@ def auth_passwordreset_reset(reset_code, new_password):
     '''
     for combination in data['reset_codes']:
         if combination['reset_code'] == reset_code:
-            if not validate_password(new_password):
+            if validate_password(new_password) == False:
                 raise InputError('Invalid Password')
             for user in data['users']:
                 if user['u_id'] == combination['u_id']:
