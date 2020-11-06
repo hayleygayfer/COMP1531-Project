@@ -185,7 +185,7 @@ def auth_passwordreset_reset(reset_code, new_password):
 
     Args:
         1. reset code (str): the reset code of the user requesting the password be reset
-        2. new password
+        2. new_password (str): the new password for the user requesting a password reset
 
     Return:
         {}
