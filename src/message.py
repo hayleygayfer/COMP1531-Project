@@ -3,6 +3,7 @@ from data import data
 from error import InputError, AccessError
 
 MAX_MSG_IN_CH = 10000
+REACT_VALID = 1
 
 def message_send(token, channel_id, message):
     '''
@@ -194,7 +195,7 @@ def message_react(token, message_id, react_id):
     channel = find_channel(message_id, channel_id)
 
     # Check that react is valid - this is specific to front end 
-    if react_id != 1:
+    if react_id != REACT_VALID:
         raise InputError("Invalid react")
 
     doReact(u_id, channel, message_id, react_id)
@@ -431,7 +432,7 @@ def doReact (u_id, channel, msg_id, react_id):
             if 'u_ids' in msg['reacts']:
                 msg['reacts']['u_ids'].append(u_id)
             else:
-                
+
             if msg['reacts']['is_this_user_reacted']:
                 raise InputError(f'This message is already reacted by this user')
 
