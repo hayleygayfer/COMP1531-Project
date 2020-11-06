@@ -324,7 +324,9 @@ def test_empty_string (url, user_list, channel_list):
 
 # TODO: message/sendlater
 
-# TODO: message/react
+# message/react
+
+## VALID CASES ##
 
 def test_react_owner_not_own_success(url, user_list, channel_list):
     # channel.channel_join(data['token2'], data['c1_id'])
@@ -335,6 +337,48 @@ def test_react_owner_not_own_success(url, user_list, channel_list):
     
     # assert msg.message_react(data['token1'], msg1_id, 1) == SUCCESS
     assert message_react(url, user_list['token1'], msg1_id, 1) == SUCCESS
+
+# React by member in the channel - not their message
+def test_react_member_not_own_success (url, user_list, channel_list):
+    # channel.channel_join(data['token2'], data['c1_id'])
+    channel_join(url, user_list['token2'], channel_list['c1_id'])
+
+    # msg1_id = msg.message_send(data['token2'], data['c1_id'], "This message will be reacted by person 2")['message_id']
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be reacted by person 2")['message_id']
+
+    # assert msg.message_react(data['token2'], msg1_id, 1) == SUCCESS
+    assert message_react(url, user_list['token2'], msg1_id, 1) == SUCCESS
+
+def test_react_owner_own_success (url, user_list, channel_list):
+    # msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be reacted by person 1 who sent it")['message_id']
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be reacted by person 1 who sent it")['message_id']
+
+    # assert msg.message_react(data['token1'], msg1_id, 1) == SUCCESS
+    assert message_react(url, user_list['token1'], msg1_id, 1) == SUCCESS
+
+def test_react_member_own_success (url, user_list, channel_list):
+    # channel.channel_join(data['token2'], data['c1_id'])
+    channel_join(url, user_list['token2'], channel_list['c1_id'])
+
+    #msg1_id = msg.message_send(data['token2'], data['c1_id'], "This message will be reacted by person 2 for their own message")['message_id']
+    msg1_id = message_send(url, user_list['token2'], channel_list['c1_id'], "This message will be reacted by person 2 for their own message")['message_id']
+
+    #assert msg.message_react(data['token2'], msg1_id, 1) == SUCCESS
+    assert message_react(url, user_list['token2'], msg1_id, 1) == SUCCESS
+
+# React by a user and then reacted by another user
+def test_react_by_two_users (url, user_list, channel_list):
+    # channel.channel_join(data['token2'], data['c1_id'])
+    channel_join(url, user_list['token2'], channel_list['c1_id'])
+    # channel.channel_join(data['token3'], data['c1_id'])
+    channel_join(url, user_list['token3'], channel_list['c1_id'])
+    # msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message was sent by person 1 but will be reacted by two people")['message_id']
+    msg1_id = message_send(url, user_list['token2'], channel_list['c1_id'], "This message was sent by person 1 but will be reacted by two people")['message_id']
+    # assert msg.message_react(data['token2'], msg1_id, 1) == SUCCESS
+    assert message_react(url, user_list['token2'], msg1_id, 1) == SUCCESS
+    # assert msg.message_react(data['token3'], msg1_id, 1) == SUCCESS
+    assert message_react(url, user_list['token3'], msg1_id, 1) == SUCCESS
+
 
 # TODO REMOVE THE FOLLOWING
 # The idea is that the http tests look almost identical to the normal tests.
