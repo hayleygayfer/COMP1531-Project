@@ -366,7 +366,11 @@ def append_msg_to_channel(channel_id, msg_string, msg_id, u_id, time):
                     'message_id': msg_id,
                     'u_id': u_id,
                     'time_created': time,
-                    'reacts': [],
+                    'reacts': [ {
+                        'react_id': 0
+                        'u_ids' = []
+                        'is_this_user_reacted' = False
+                    }],
                     'is_pinned': False
                 }
             )
@@ -429,13 +433,7 @@ def doReact (u_id, channel, msg_id, react_id):
     for msg in channel['messages']:
         if msg.get('message_id') == msg_id:
             msg['reacts']['react_id'] == react_id
-            if u_ids in msg['reacts']:
-                msg['reacts']['u_ids'].append(u_id)
-            else:
-                newListOfUid = []
-                msg['reacts']['u_ids'] = newListOfUid
-                msg['reacts']['u_ids'].append(u_id)
-                
+            msg['reacts']['u_ids'].append(u_id)
             if msg['reacts']['is_this_user_reacted']:
                 raise InputError(f'This message is already reacted by this user')
 
