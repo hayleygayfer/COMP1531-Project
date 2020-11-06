@@ -366,10 +366,10 @@ def append_msg_to_channel(channel_id, msg_string, msg_id, u_id, time):
                     'message_id': msg_id,
                     'u_id': u_id,
                     'time_created': time,
-                    'reacts': [ {
+                    'reacts': [{
                         'react_id': 0
-                        'u_ids' = []
-                        'is_this_user_reacted' = False
+                        'u_ids': []
+                        'is_this_user_reacted': False
                     }],
                     'is_pinned': False
                 }
