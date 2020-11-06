@@ -145,6 +145,15 @@ def channel_messages(token, channel_id, start):
             for x in range(newest, oldest, -1):
                 return_array.append(channel['messages'][x])
 
+
+    # Updated for reacts
+    # Set is_this_user_reacted for each message in the display messages depending on whether they have reacted or not
+    for msg in return_array:
+        if u_id in msg['reacts'][0]['u_ids']:
+            msg['reacts'][0]['is_this_user_reacted'] = True
+        else:
+            msg['reacts'][0]['is_this_user_reacted'] = False
+
     # returns the relevant data in a dictionary
     return {
         'messages': return_array,
