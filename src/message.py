@@ -428,7 +428,10 @@ def doReact (u_id, channel, msg_id, react_id):
     for msg in channel['messages']:
         if msg.get('message_id') == msg_id:
             msg['reacts']['react_id'] == react_id
-            msg['reacts']['u_ids'].append(u_id)
+            if 'u_ids' in msg['reacts']:
+                msg['reacts']['u_ids'].append(u_id)
+            else:
+                
             if msg['reacts']['is_this_user_reacted']:
                 raise InputError(f'This message is already reacted by this user')
 
