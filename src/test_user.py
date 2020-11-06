@@ -6,6 +6,8 @@ from error import InputError, AccessError
 from other import clear
 from data import data
 
+from urllib import request
+from PIL import Image # pip3 install Pillow
 
 ## Fixtures
 @pytest.fixture
@@ -183,6 +185,16 @@ def test_invalid_token_set_handle(userObject):
     with pytest.raises(AccessError):
         user.user_profile_sethandle('invalidtoken', 'tony')
 
+###### User Profile Upload Photo ######
+
+# Valid Cases
+# Valid URL and correct image type within the bounds
+def test_uploadphoto_success(userObject):
+    pass
+
+# Invalid Cases
+def test_invalid_uploadphoto(userObject):
+    pass
 
 ###### Helper Functions ######
 
