@@ -42,9 +42,12 @@ data = {
                 'message': "Hi, this is a simple test msg"
                 'time_created': 123456789,
                 'reacts': [
-                    'react_id': 0,
-                    'u_ids': [0, 1, 2],
-                    'is_this_user_racted': False
+                    {
+                        'react_id': 0,
+                        'u_ids': [0, 1, 2],
+                        'is_this_user_racted': False
+                    }
+                    # ONLY ONE REACT ATM
                 ],
                 'is_pinned': True
             },
