@@ -218,8 +218,33 @@ def message_unreact(token, message_id, react_id):
     An AccessError or InputError is raised when there are errors in the function call
 
     '''
+    # Check for valid token
+    u_id = get_uid_from_token(token)
+    if u_id == None:
+        raise AccessError("Invalid token")
+
+    # Find message
+    channel_id = get_channel_id(message_id)
+    if not valid_channel(channel_id):
+        raise InputError("Message not found")
+
+    if not channel_member(u_id, channel_id):
+        raise InputError("You are not a member of this channel")
     
+    # Get channel
+    channel = find_channel(message_id, channel_id)
+
+    # Check that react is valid - this is specific to front end 
+    if react_id != REACT_VALID:
+        raise InputError("Invalid react")
+    # Check if user has already reacted to message 
+    if alreadyReacted(u_id, channel, message_id, react_id):
+        raise InputError("You have already reacted to this message")
+
+    doUnreact(u_id, channel, message_id, react_id)
+
     return {}
+    
 
 def message_pin(token, message_id):
     '''
@@ -434,11 +459,26 @@ def doReact (u_id, channel, msg_id, react_id):
         if msg.get('message_id') == msg_id:
             msg['reacts'][0]['react_id'] == react_id
             msg['reacts'][0]['u_ids'].append(u_id)
-            if msg['reacts'][0]['is_this_user_reacted']:
+            if msg['reacts'][0]['is_this_user_reacted'] == True:
                 raise InputError(f'This message is already reacted by this user')
 
             msg['reacts'][0]['is_this_user_reacted'] == True
-        
- 
 
+# Checks if the user has already reacted to the message
+def alreadyReacted(u_id, channel, message_id, react_id):
+    for msg in channel['messages']:
+        if msg.get('message_id') == message_id:
+            for user in msg['reacts'][0]['u_ids']:
+                if user == u_id:
+                    return True
+    return False 
 
+def doUnreact(u_id, channel, message_id, react_id):
+    for msg in channel['messages']:
+        if msg.get('message_id') == message_id: 
+            for user in msg['reacts'][0]['u_ids']:
+                if user == u_id:
+                    msg['reacts'][0]['u_ids'].remove(u_id)
+            
+            if msg['reacts'][0]['is_this_user_reacted'] == True:
+                msg['reacts'][0]['is_this_user_reacted'] == False
