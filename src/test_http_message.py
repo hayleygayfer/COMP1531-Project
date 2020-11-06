@@ -382,19 +382,6 @@ def test_react_by_two_users (url, user_list, channel_list):
 
 ## INVALID CASES ##
 
-# TODO REMOVE THE FOLLOWING
-# The idea is that the http tests look almost identical to the normal tests.
-'''
-For the following:
-
-with pytest.raises(InputError):
-    msg.message_react(data['token1'], msg1_id, 1)
-
-The equivalent http would be:
-
-assert message_react(url, user_list['token1'], msg1_id, 1) == ERROR
-'''
-
 def test_react_message_id_not_in_channel (url, user_list, channel_list):
     # msg1_id = msg.message_send(data['token2'], data['c2_id'], "This message was sent in channel 2")['message_id']
     msg1_id = message_send(url, user_list['token2'], channel_list['c2_id'], "This message was sent in channel 2")['message_id']
@@ -418,9 +405,62 @@ def test_react_already_reacted_by_user (url, user_list, channel_list):
     # msg.message_react(data['token2'], msg1_id, 1)
     assert message_react(url, user_list['token2'], msg1_id, 1) == ERROR
 
-# TODO: message/unreact
+# message/unreact
 
+## VALID CASES ##
+def test_unreact_owner_not_own_success (url, user_list, channel_list):
+    # channel.channel_join(data['token2'], data['c1_id'])
+    channel_join(url, user_list['token2'], channel_list['c1_id'])
+    # msg1_id = msg.message_send(data['token2'], data['c1_id'], "This message will be unreacted by person 1")['message_id']
+    msg1_id = message_send(url, user_list['token2'], channel_list['c1_id'], "This message will be unreacted by person 1")['message_id']
+    # msg.message_react(data['token1'], msg1_id, 1)
+    message_react(url, user_list['token1'], msg1_id, 1)
+    #assert msg.message_unreact(data['token1'], msg1_id, 1) == SUCCESS
+    assert message_unreact(url, user_list['token1'], msg1_id, 1) == SUCCESS
 
+def test_unreact_member_not_own_success (url, user_list, channel_list):
+    # channel.channel_join(data['token2'], data['c1_id'])
+    channel_join(url, user_list['token2'], channel_list['c1_id'])
+    # msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be unreacted by person 2")['message_id']
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be unreacted by person 2")['message_id']
+    # msg.message_react(data['token2'], msg1_id, 1)
+    message_react(url, user_list['token2'], msg1_id, 1)
+    # assert msg.message_unreact(data['token2'], msg1_id, 1) == SUCCESS
+    assert message_unreact(url, user_list['token2'], msg1_id, 1) == SUCCESS
+
+def test_unreact_owner_own_success (url, user_list, channel_list):
+    #  msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message will be unreacted by person 1 who sent it")['message_id']
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message will be unreacted by person 1 who sent it")['message_id']
+    # msg.message_react(data['token1'], msg1_id, 1)
+    message_react(url, user_list['token1'], msg1_id, 1)
+    # assert msg.message_unreact(data['token1'], msg1_id, 1) == SUCCESS
+    assert message_unreact(url, user_list['token1'], msg1_id, 1) == SUCCESS
+
+def test_unreact_member_own_success (url, user_list, channel_list):
+    # channel.channel_join(data['token2'], data['c1_id'])
+    channel_join(url, user_list['token2'], channel_list['c1_id'])
+    # msg1_id = msg.message_send(data['token2'], data['c1_id'], "This message will be unreacted by person 2 for their own message")['message_id']
+    msg1_id = message_send(url, user_list['token2'], channel_list['c1_id'], "This message will be unreacted by person 2 for their own message")['message_id']
+    #  msg.message_react(data['token2'], msg1_id, 1)
+    message_react(url, user_list['token2'], msg1_id, 1)
+    # assert msg.message_unreact(data['token2'], msg1_id, 1) == SUCCESS
+    assert message_unreact(url, user_list['token2'], msg1_id, 1) == SUCCESS
+
+def test_unreact_unreact_by_two_users (url, user_list, channel_list):
+    # channel.channel_join(data['token2'], data['c1_id'])
+    channel_join(url, user_list['token2'], channel_list['c1_id'])
+    # channel.channel_join(data['token3'], data['c1_id'])
+    channel_join(url, user_list['token3'], channel_list['c1_id'])
+    # msg1_id = msg.message_send(data['token1'], data['c1_id'], "This message was sent by person 1 but will be unreacted by two people")['message_id']
+    msg1_id = message_send(url, user_list['token1'], channel_list['c1_id'], "This message was sent by person 1 but will be unreacted by two people")['message_id']
+    # msg.message_react(data['token2'], msg1_id, 1)
+    message_react(url, user_list['token2'], msg1_id, 1) 
+    # msg.message_react(data['token3'], msg1_id, 1)
+    message_react(url, user_list['token3'], msg1_id, 1) 
+    # assert msg.message_unreact(data['token2'], msg1_id, 1) == SUCCESS
+    assert message_unreact(url, user_list['token2'], msg1_id, 1) == SUCCESS
+    # assert msg.message_unreact(data['token3'], msg1_id, 1) == SUCCESS
+    assert message_unreact(url, user_list['token3'], msg1_id, 1) == SUCCESS
 
 # message/pin
 '''
