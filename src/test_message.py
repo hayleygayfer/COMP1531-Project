@@ -279,15 +279,6 @@ def test_sendlater_success(data):
     
     assert len(channel.channel_messages(data['token1'], data['c1_id'], 0)['messages']) == 1
 
-    # thread for timedelta and see if msg count == 2
-
-    # Sendlater message 4 minutes later, token1 is a part of channel_id1
-    time_delta = timedelta(minutes = 4)
-    future_time = data['time_current'] + time_delta
-    future_time = int(datetime.timestamp(future_time))
-
-    assert msg.message_sendlater(data['token1'], data['c1_id'], "This message is a sendlater message", future_time)['message_id']
-
 
 ## INVALID CASES ##
 # Sendlater to invalid channel (InputError)
@@ -295,6 +286,7 @@ def test_sendlater_invalid_channel(data):
     # Valid time delta
     time_delta = timedelta(minutes = 4)
     future_time = data['time_current'] + time_delta
+    future_time = int(datetime.timestamp(future_time))
 
     # Channel_id invalid
     with pytest.raises(InputError):
@@ -305,6 +297,7 @@ def test_sendlater_invalid_message_len(data):
     # Valid time delta
     time_delta = timedelta(minutes = 4)
     future_time = data['time_current'] + time_delta
+    future_time = int(datetime.timestamp(future_time))
 
     # A string of 1001 chars 
     long_string = "x" * 1001
@@ -326,6 +319,7 @@ def test_sendlater_invalid_time(data):
     time_delta = timedelta(minutes = 4)
     # Time in the past
     future_time = data['time_current'] - time_delta
+    future_time = int(datetime.timestamp(future_time))
 
     # Channel_id invalid
     with pytest.raises(InputError):
@@ -336,6 +330,7 @@ def test_sendlater_in_another_channel(data):
     # Valid time delta
     time_delta = timedelta(minutes = 4)
     future_time = data['time_current'] + time_delta
+    future_time = int(datetime.timestamp(future_time))
 
     # Token1 is not a part of c2_id
     with pytest.raises(AccessError):
