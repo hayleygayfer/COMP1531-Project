@@ -3,6 +3,7 @@ from standup import standup_start, standup_active, standup_send
 from auth import auth_register, auth_login
 from channels import channels_create
 from datetime import datetime, timedelta
+from time import sleep
 
 from error import InputError, AccessError
 from other import clear
@@ -64,7 +65,9 @@ def test_length_less_than_0(state):
 def test_standup_in_channel(state):
     time_finish = standup_start(state['token1'], state['channel_id_1'], 20)['time_finish']
     assert time_finish == (datetime.now() + timedelta(0, 20)).timestamp()
-    # TODO: test that standup is active then inactive after 20s
+    assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == True
+    sleep(20)
+    assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == False
 
 def test_length_1(state):
     time_finish = standup_start(state['token1'], state['channel_id_1'], 1)['time_finish']
@@ -95,6 +98,7 @@ def test_invalid_token_active(state):
 def test_standup_active(state):
     standup_start(state['token1'], state['channel_id_1'], 30)
     assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == True
+
 
 def test_standup_inactive(state):
     assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == False

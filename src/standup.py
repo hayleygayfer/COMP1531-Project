@@ -10,7 +10,7 @@ def activate_standup(channel_id, time_finish):
         if channel['channel_id'] == channel_id:
             channel['standup_finish'] = time_finish
 
-def deactivate_standup(token, channel_id, message):
+def deactivate_standup(token, channel_id):
     message = ''
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
@@ -21,6 +21,9 @@ def deactivate_standup(token, channel_id, message):
 
 def standup_start(token, channel_id, length):
     time_finish = (datetime.now() + timedelta(0, length)).timestamp()
+
+    if length <= 0:
+        raise InputError("not a valid length")
 
     if validate_token(token) == False:
         raise InputError("invalid token")
