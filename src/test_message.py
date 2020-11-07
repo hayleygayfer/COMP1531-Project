@@ -273,6 +273,8 @@ def test_sendlater_success(data):
 
     assert msg.message_sendlater(data['token1'], data['c1_id'], "This message is a sendlater message", future_time)['message_id']
 
+    # TODO: Check that the msg_count is STILL zero, need to fix assertion error
+
     # Thread program, wait the time_delta and assert the correct mesage count is given
     t = threading.Timer(time_delta, None)
     t.start()
