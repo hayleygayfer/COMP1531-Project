@@ -15,6 +15,22 @@ IMG_FILENAME_LEN = 10
 FILE_EXTENSIONS = ['JPG', 'JPEG']
 
 def user_profile(token, u_id):
+    '''
+    Displays details about a certain user to the authenticated user
+
+    Args:
+        1. token (str): the token of the authenticated user who is viewing someone's profile
+        2. u_id (int): identify the user who's details are being accessed
+
+    Return:
+        A dictionary containing details about the user including their,
+        - email
+        - name
+        - handle
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
 
     user_id = find_match('u_id', u_id)
 
@@ -31,6 +47,20 @@ def user_profile(token, u_id):
     }
 
 def user_profile_setname(token, name_first, name_last):
+    '''
+    Updates the authenticated user's first and last names with the given inputs
+
+    Args:
+        1. token (str): the token of the authenticated user who is changing their name
+        2. name_first (str): The new first name
+        3. name_last (str): The new surname
+
+    Return:
+        An empty dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
 
     if validate_first_name(name_first) == False:
         raise InputError("Not a valid first name")
@@ -50,6 +80,20 @@ def user_profile_setname(token, name_first, name_last):
     }
 
 def user_profile_setemail(token, email):
+    '''
+    Updates the authenticated user's email with the given input
+
+    Args:
+        1. token (str): the token of the authenticated user who is changing their name
+        2. email (str): The updated emails
+
+    Return:
+        An empty dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+
     if validate_email(email) == False:
         raise InputError("Not a valid email")
 
@@ -66,6 +110,20 @@ def user_profile_setemail(token, email):
     }
 
 def user_profile_sethandle(token, handle_str):
+    '''
+    Updates the authenticated user's display handle with the given input
+
+    Args:
+        1. token (str): the token of the authenticated user who is changing their name
+        2. handle_str (str): The updated handle
+
+    Return:
+        An empty dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+    
     if validate_handle_str(handle_str) == False:
         raise InputError("Not a valid handle")
 
@@ -85,6 +143,27 @@ def user_profile_sethandle(token, handle_str):
 ## ITERATION 3
 
 def user_profile_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
+    '''
+    Update/Set a profile picture for the authenticated user.
+    The profile picture must be from a web url and must be a jpg/jpeg file
+    The image is cropped using the input x and y coordinates.
+    The coordinates must be in range of the image dimensions.
+
+    Args:
+        1. token (str): the token of the authenticated user who is uploading a new profile picture
+        2. img_url (str): The url of the uploaded image (before cropping)
+        3. x_start (int): The x-coordinate for the top-left pixel of the new image
+        4. y_start (int): The y-coordinate for the top-left pixel of the new image
+        5. x_end (int): The x-coordinate for the bottom-right pixel of the new image
+        6. y_end (int): The y-coordinate for the bottom-right pixel of the new image
+
+    Return:
+        An empty dictionary to indicate that the function call was successful
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+
     # find user
     try:
         u_it = find_user(token)
