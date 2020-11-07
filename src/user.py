@@ -11,7 +11,8 @@ import os
 import random
 import string
 
-IMG_LEN = 10
+IMG_FILENAME_LEN = 10
+FILE_EXTENSIONS = ['JPG', 'JPEG']
 
 def user_profile(token, u_id):
 
@@ -91,10 +92,8 @@ def user_profile_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
         raise AccessError("User not found")
 
     # check if image is jpg
-    ext = img_url.rsplit('.', 1)[-1]
-    allowed_ext = ['JPG', 'JPEG']
-    if ext.upper() not in allowed_ext:
-        print(ext)
+    extension = img_url.rsplit('.', 1)[-1]
+    if extension.upper() not in FILE_EXTENSIONS:
         raise InputError("Image must be of type JPG")
     
     # Check if valid image
@@ -103,35 +102,40 @@ def user_profile_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     except:
         raise InputError("Image not found")
 
-    width, height = img.size
-
     # Check if dimensions are valid
+    width, height = img.size
     if not valid_dimensions(x_start, x_end, width):
-        print(x_start, x_end, width, 0 <= x_start, x_start < x_end, x_end <= width)
-        raise InputError("x dimensions are not valid")
+        raise InputError(f"X dimensions must be between 0 and {width}, inclusive")
     if not valid_dimensions(y_start, y_end, height):
-        raise InputError("y dimensions are not valid")
+        raise InputError(f"Y dimensions must be between 0 and {height}, inclusive")
 
     # Crop image
     img = img.crop((x_start, y_start, x_end, y_end))
     
-    # Create 'static/' is it doesn't already exist
+    # Create 'static/' if it doesn't already exist (inside src -> project/src/static/)
+
+    # Get the absolute path so that static is the same folder regardless of which
+    # directory the script is run in
+    path_script = pathlib.Path(__file__).parent.absolute()
+    path_static = os.path.join(path_script, 'static')
     try:
-        os.mkdir('static')
+        os.mkdir(path_static)
     except FileExistsError:
         pass
 
     # Generate a 10 char filename and use this to locate the save location for the jpg
     filename = generate_img_filename()
-    p = pathlib.Path('static/' + filename)
+    p = os.path.join(path_static, filename)
+
+    # Save the image
     img.save(p)
 
     # Modify the 'profile_img_url' key in users with its address
-    data['users'][u_it]['profile_img_url'] = os.path.join(request.host_url, p)
+    data['users'][u_it]['profile_img_url'] = request.host_url + 'static/' + filename
 
     return {}
 
-
+####################################################################
 
 def validate_handle_str(handle_str):
     return 3 < len(handle_str) < 20
@@ -145,18 +149,9 @@ def find_user(token):
 def valid_dimensions(start, end, max):
     return 0 <= start < end <= max
 
+# Generates a 10 digit string with integers and uppercase characters
+# Does not need to check if the image already exists, since the probability is extremely low (num_images/36^10)
 def generate_img_filename():
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=IMG_LEN)) + '.jpg'
-
-'''
-def generate_url(url, x1, x2, y1, y2):
-    # TODO: modify return
-
-    For outputs with data pertaining to a user, a profile_img_url is present. When images are uploaded for a user profile,
-    after processing them you should store them on the server such that your server now locally has a copy of the cropped 
-    image of the original file linked. Then, the profile_img_url should be a URL to the server, such as
-    http://localhost:5001/imgurl/adfnajnerkn23k4234.jpg (a unique url you generate).
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=IMG_FILENAME_LEN)) + '.jpg'
 
 
-    return "https://gitlab.cse.unsw.edu.au/uploads/-/system/appearance/header_logo/1/unsw_logo_2016.jpg"
-'''
