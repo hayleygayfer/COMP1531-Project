@@ -179,7 +179,7 @@ def user_profile_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     try:
         img = Image.open(urllib.request.urlopen(img_url))
     except:
-        raise InputError("Image not found")
+        raise InputError("Error in opening image. Try another URL")
 
     # Check if dimensions are valid
     width, height = img.size
