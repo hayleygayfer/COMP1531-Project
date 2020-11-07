@@ -202,10 +202,11 @@ def http_user_profile_uploadphoto():
     response = user.user_profile_uploadphoto(token, img_url, x_start, y_start, x_end, y_end)
     return dumps(response)
 
-# TODO: doesn't work properly yet
+# Access Image
 @APP.route('/static/<path:filename>')
 def send_js(filename):
     return send_from_directory('', filename)
+
 
 ###### CHANNELS ######
 
