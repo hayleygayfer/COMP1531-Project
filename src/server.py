@@ -288,7 +288,7 @@ def http_message_edit():
 @APP.route("/message/sendlater", methods=['POST'])
 def http_message_sendlater():
     token = request.get_json()["token"]
-    channel_id = int(request.get_json()["message_id"])
+    channel_id = int(request.get_json()["channel_id"])
     message = request.get_json()["message"]
     time_sent = int(request.get_json()["time_sent"])
     response = msg.message_sendlater(token, channel_id, message, time_sent)
