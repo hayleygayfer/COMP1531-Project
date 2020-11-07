@@ -160,6 +160,24 @@ def message_edit(token, message_id, message):
 
 ## ITERATION 3
 def message_sendlater(token, channel_id, message, time_sent):
+    '''
+    An authenticated user from a channel, can send a message in the future within a channel.
+    The edited message corresponds to the message with id message_id, and is replaced.
+    To be accessed from a member of the channel with id channel_id.
+
+    Args:
+        1. token (str): the token of the authenticated user who is editting the message
+        2. channel_id (int): used to identify the channel
+        3. message (string): the message being sent (cannot be of NoneType)
+        4. time_sent (integer- UNIX timestamp): the time in the future where the message is sent
+
+    Return:
+        The generated message_id (int)
+
+    An AccessError or InputError is raised when there are errors in the function call
+
+    '''
+
     # Check for valid token
     u_id = get_uid_from_token(token)
     if u_id == None:
@@ -180,16 +198,13 @@ def message_sendlater(token, channel_id, message, time_sent):
     # Calculates current timestamp
     # timestamp = datetime.timestamp(datetime.now())
 
-    #print(timestamp)
-
     # Time_sent must be in the future
     if datetime.now() >= time_sent:
         raise InputError(f"Time: {timestamp} is in the past or the current time.")
 
     msg_id = generate_message_id(channel_id)
 
-    # TODO: Threading required for appending at future time
-
+    # Run the rest of the program, while waiting the required time delta for appending message to channel.
     time_delta = datetime.now() - time_sent
     t = threading.Timer(time_delta, append_msg_to_channel(channel_id, message, msg_id, u_id, time_sent))
     t.start()
