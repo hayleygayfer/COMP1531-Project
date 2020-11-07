@@ -44,7 +44,8 @@ def message_send(token, channel_id, message):
         raise InputError("Message must contain at least 1 character")
     
     # Calculates current timestamp
-    timestamp = datetime.timestamp(datetime.now())
+    timestamp = int(datetime.timestamp(datetime.now()))
+    print(timestamp)
 
     msg_id = generate_message_id(channel_id)
     append_msg_to_channel(channel_id, message, msg_id, u_id, timestamp)
@@ -177,6 +178,7 @@ def message_sendlater(token, channel_id, message, time_sent):
     An AccessError or InputError is raised when there are errors in the function call
 
     '''
+    print(type(time_sent))
 
     # Check for valid token
     u_id = get_uid_from_token(token)
@@ -205,7 +207,7 @@ def message_sendlater(token, channel_id, message, time_sent):
     msg_id = generate_message_id(channel_id)
 
     # Run the rest of the program, while waiting the required time delta for appending message to channel.
-    time_delta = int(datetime.now()) - time_sent
+    time_delta =  - time_sent
     t = threading.Timer(time_delta, append_msg_to_channel(channel_id, message, msg_id, u_id, time_sent))
     t.start()
 
