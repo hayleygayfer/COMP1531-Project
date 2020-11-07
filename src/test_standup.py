@@ -2,6 +2,7 @@ import pytest
 from standup import standup_start, standup_active, standup_send
 from auth import auth_register, auth_login
 from channels import channels_create
+from datetime import datetime, timedelta
 
 from error import InputError, AccessError
 from other import clear
@@ -62,17 +63,17 @@ def test_length_less_than_0(state):
 # VALID CASES #
 def test_standup_in_channel(state):
     time_finish = standup_start(state['token1'], state['channel_id_1'], 20)['time_finish']
-    assert time_finish == 20
+    assert time_finish == (datetime.now() + timedelta(0, 20)).timestamp()
     # TODO: test that standup is active then inactive after 20s
 
 def test_length_1(state):
     time_finish = standup_start(state['token1'], state['channel_id_1'], 1)['time_finish']
-    assert time_finish == 1
+    assert time_finish == (datetime.now() + timedelta(0, 1)).timestamp()
     # TODO: sleep 1 second then test standup is not active
 
 def test_length_long(state):
     time_finish = standup_start(state['token1'], state['channel_id_1'], 60)['time_finish']
-    assert time_finish == 60
+    assert time_finish == (datetime.now() + timedelta(0, 60)).timestamp()
     # TODO: test that standup is active, then inactive after a minute
 
 #### standup_active ####
@@ -100,9 +101,9 @@ def test_standup_inactive(state):
 
 def test_standup_time_finish(state):
     standup_start(state['token1'], state['channel_id_1'], 30)
-    assert standup_active(state['token1'], state['channel_id_1'])['time_finish'] == 30
+    assert standup_active(state['token1'], state['channel_id_1'])['time_finish'] == (datetime.now() + timedelta(0, 30)).timestamp()
     standup_start(state['token2'], state['channel_id_2'], 150)
-    assert standup_active(state['token2'], state['channel_id_2'])['time_finish'] == 150
+    assert standup_active(state['token2'], state['channel_id_2'])['time_finish'] == (datetime.now() + timedelta(0, 150)).timestamp()
 
 
 #### standup_send ####
@@ -150,13 +151,13 @@ def test_user_not_in_channel(state):
 
 # VALID CASES #
 def test_message_empty(state):
-    #TODO write test
+    #TODO: write test
     pass
 
 def test_message_1000_char(state):
-    #TODO write test
+    #TODO: write test
     pass
 
 def test_standup_active_send(state):
-    #TODO write test
+    #TODO: write test
     pass
