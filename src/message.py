@@ -178,21 +178,24 @@ def message_sendlater(token, channel_id, message, time_sent):
         raise InputError("Message must contain at least 1 character")
 
     # Calculates current timestamp
-    timestamp = datetime.fromtimestamp(timestamp)
+    # timestamp = datetime.timestamp(datetime.now())
+
+    #print(timestamp)
 
     # Time_sent must be in the future
-    if timestamp >= time_sent:
+    if datetime.now() >= time_sent:
         raise InputError(f"Time: {timestamp} is in the past or the current time.")
 
     msg_id = generate_message_id(channel_id)
+
     # TODO: Threading required for appending at future time
 
-    time_delta = timestamp - time_sent
-    t = threading.Timer(time_delta, append_msg_to_channel(channel_id, message, msg_id, u_id, timestamp))
+    time_delta = datetime.now() - time_sent
+    t = threading.Timer(time_delta, append_msg_to_channel(channel_id, message, msg_id, u_id, time_sent))
     t.start()
 
     return {
-        'message_id': 0
+        'message_id': msg_id
     }
 
 def message_react(token, message_id, react_id):
