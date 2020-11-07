@@ -2,8 +2,16 @@ from data import data
 from error import InputError, AccessError
 from auth import validate_first_name, validate_last_name, validate_email
 
-from urllib import request
+import urllib
 from PIL import Image # pip3 install Pillow
+import pathlib
+from flask import request
+import os
+
+import random
+import string
+
+IMG_LEN = 10
 
 def user_profile(token, u_id):
 
@@ -83,30 +91,43 @@ def user_profile_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
         raise AccessError("User not found")
 
     # check if image is jpg
-    if not img_url.endswith('.jpg'):
-        raise InputError("Image must be of type .jpg")
+    ext = img_url.rsplit('.', 1)[-1]
+    allowed_ext = ['JPG', 'JPEG']
+    if ext.upper() not in allowed_ext:
+        print(ext)
+        raise InputError("Image must be of type JPG")
     
     # Check if valid image
     try:
-        img = Image.open(request.urlopen(img_url))
+        img = Image.open(urllib.request.urlopen(img_url))
     except:
         raise InputError("Image not found")
 
     width, height = img.size
-    
+
     # Check if dimensions are valid
     if not valid_dimensions(x_start, x_end, width):
+        print(x_start, x_end, width, 0 <= x_start, x_start < x_end, x_end <= width)
         raise InputError("x dimensions are not valid")
     if not valid_dimensions(y_start, y_end, height):
         raise InputError("y dimensions are not valid")
-    
-    # TODO: generate url function
-    new_url = generate_url(img_url, x_start, x_end, y_start, y_end)
 
-    if not profile_img_exists(u_it):
-        data['users'][u_it].append(new_url)
-    else:
-        data['users'][u_it]['profile_img_url'] = new_url
+    # Crop image
+    img = img.crop((x_start, y_start, x_end, y_end))
+    
+    # Create 'static/' is it doesn't already exist
+    try:
+        os.mkdir('static')
+    except FileExistsError:
+        pass
+
+    # Generate a 10 char filename and use this to locate the save location for the jpg
+    filename = generate_img_filename()
+    p = pathlib.Path('static/' + filename)
+    img.save(p)
+
+    # Modify the 'profile_img_url' key in users with its address
+    data['users'][u_it]['profile_img_url'] = os.path.join(request.host_url, p)
 
     return {}
 
@@ -124,16 +145,18 @@ def find_user(token):
 def valid_dimensions(start, end, max):
     return 0 <= start < end <= max
 
-def profile_img_exists(u_it):
-    return 'profile_img_url' in data['users'][u_it]
+def generate_img_filename():
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=IMG_LEN)) + '.jpg'
 
+'''
 def generate_url(url, x1, x2, y1, y2):
     # TODO: modify return
-    '''
+
     For outputs with data pertaining to a user, a profile_img_url is present. When images are uploaded for a user profile,
     after processing them you should store them on the server such that your server now locally has a copy of the cropped 
     image of the original file linked. Then, the profile_img_url should be a URL to the server, such as
     http://localhost:5001/imgurl/adfnajnerkn23k4234.jpg (a unique url you generate).
-    '''
+
 
     return "https://gitlab.cse.unsw.edu.au/uploads/-/system/appearance/header_logo/1/unsw_logo_2016.jpg"
+'''
