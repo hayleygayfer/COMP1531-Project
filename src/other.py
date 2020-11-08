@@ -55,8 +55,8 @@ def search(token, query_str):
 
     for channel in channels:
         for msg in channel['messages']:
-            if query_str in msg['message']:
-                messages.append(msg['message'])
+            if query_str.lower() in msg['message'].lower():
+                messages.append(msg)
 
     return {
         'messages': messages
