@@ -4,6 +4,7 @@ from echo_http_test import url
 import pytest
 
 from datetime import datetime, timedelta
+import time
 
 SUCCESS = 200
 ERROR = 400
@@ -345,6 +346,26 @@ def test_sendlater_future_time(url, user_list, channel_list):
 
     assert message_sendlater(url, user_list['token1'], channel_list['c1_id'], "This message is a sendlater message", future_time) == SUCCESS
     
+def test_sendlater_multiple(url, user_list, channel_list):
+    # Send message 5 seconds later
+    future_time = datetime.now() + timedelta(seconds=5)
+    future_time = int(datetime.timestamp(future_time))
+    message_sendlater(url, user_list['token1'], channel_list['c1_id'], "Second", future_time)
+
+    # Send message 8 seconds later
+    future_time = datetime.now() + timedelta(seconds=8)
+    future_time = int(datetime.timestamp(future_time))
+    message_sendlater(url, user_list['token1'], channel_list['c1_id'], "Third", future_time)
+
+    message_send(url, user_list['token1'], channel_list['c1_id'], "First")
+
+    assert len(channel_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']) == 1
+
+    time.sleep(5)
+    assert len(channel_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']) == 2
+
+    time.sleep(3)
+    assert len(channel_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']) == 3
 
 ## INVALID CASES ##
 def test_sendlater_invalid_channel(url, user_list, channel_list):
