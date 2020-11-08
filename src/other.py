@@ -4,6 +4,9 @@ from error import AccessError, InputError
 from channel import user_is_owner, validate_user
 from channels import channels_list
 
+OWNER = 1
+MEMBER = 2
+
 def clear():
     global data
     data['users'].clear()
@@ -19,8 +22,7 @@ def users_all(token):
     }
 
 def admin_userpermission_change(token, u_id, permission_id):
-    #print(permission_id)
-
+    
     if valid_token(token) is False:
         raise AccessError
 
@@ -28,11 +30,11 @@ def admin_userpermission_change(token, u_id, permission_id):
     if user == []:
         raise InputError("Not a valid u_id")
 
-    if permission_id != 'MEMBER' or 'OWNER':
+    if permission_id != MEMBER and permission_id != OWNER:
         raise InputError("Permission does not exist")
 
     u_it = find_user(token)
-    if data['users'][u_it]['permissions'] != 'OWNER':
+    if data['users'][u_it]['permissions'] != OWNER:
         raise AccessError("User is not an owner")
 
     u_token = user[0]['token']
