@@ -9,6 +9,8 @@ def clear():
     data['users'].clear()
     data['channels'].clear()
 
+    return {}
+
 def users_all(token):
     if valid_token(token) is False:
         raise AccessError
@@ -17,6 +19,8 @@ def users_all(token):
     }
 
 def admin_userpermission_change(token, u_id, permission_id):
+    #print(permission_id)
+
     if valid_token(token) is False:
         raise AccessError
 
@@ -40,13 +44,19 @@ def admin_userpermission_change(token, u_id, permission_id):
 
 def search(token, query_str):
     if valid_token(token) is False:
-        raise AccessError
+        raise AccessError("Invalid token")
+
+    # Search not specific enough
+    if len(query_str) <= 1:
+        raise InputError("Enter at least 2 characters")
     
-    channels = channels_list(token)
+    channels = channels_list(token)['channels']
     messages = []
 
     for channel in channels:
-        messages.append(list(filter(lambda message: query_str in message['message'], channel['messages'])))
+        for msg in channel['messages']:
+            if query_str in msg['message']:
+                messages.append(msg['message'])
 
     return {
         'messages': messages
