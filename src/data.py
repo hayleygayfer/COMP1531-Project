@@ -45,7 +45,7 @@ data = {
                     {
                         'react_id': 0,
                         'u_ids': [0, 1, 2],
-                        'is_this_user_racted': False
+                        'is_this_user_reacted': False
                     }
                     # ONLY ONE REACT ATM
                 ],
