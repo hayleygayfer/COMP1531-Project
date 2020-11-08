@@ -84,13 +84,18 @@ def channel_join(url_join, token, channel_id):
     response = requests.post(url_join + "channel/join", json=payload)
     return response.status_code
 
+def channel_invite(url_invite, token, channel_id, u_id):
+    payload = {"token": token, "channel_id": channel_id, "u_id": u_id}
+    response = requests.post(url_invite + "channel/invite", json=payload)
+    return response.status_code
+
 def channel_addowner(url_add, token, channel_id, u_id):
     payload = {"token": token, "channel_id": channel_id, "u_id": u_id}
     response = requests.post(url_add + "channel/addowner", json=payload)
     return response.status_code
 
-def message_sendlater(url_sendlater, token, channel_id, message_id, time_sent):
-    payload = {'token': token, "channel_id": channel_id, 'message_id': message_id, 'time_sent': time_sent}
+def message_sendlater(url_sendlater, token, channel_id, msg, time_sent):
+    payload = {'token': token, "channel_id": channel_id, 'message': msg, 'time_sent': time_sent}
     response = requests.post(url_sendlater + "message/sendlater", json=payload)
     return response.status_code
 
@@ -329,7 +334,7 @@ def test_empty_string (url, user_list, channel_list):
     assert message_ID1 == message_id_at_index_zero
 
 
-# TODO: message/sendlater
+# message/sendlater
 
 ## VALID CASES ##
 def test_sendlater_future_time(url, user_list, channel_list):
