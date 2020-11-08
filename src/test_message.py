@@ -37,8 +37,6 @@ def data():
     # user2 creates a channel
     c2_id = channels.channels_create(token2, "channel_2", True)['channel_id']
 
-    time_current = datetime.now()
-
     return {
         'u1_id': u1_id,
         'u2_id': u2_id,
@@ -48,7 +46,6 @@ def data():
         'token3': token3,
         'c1_id': c1_id,
         'c2_id': c2_id,
-        'time_current': time_current,
     }
 
     
@@ -267,7 +264,7 @@ def test_sendlater_future_time(data):
 
     # Sendlater message 5 seconds later, token1 is a part of channel_id1
     time_delta = timedelta(seconds = 5)
-    future_time = data['time_current'] + time_delta
+    future_time = datetime.now() + time_delta
     future_time = int(datetime.timestamp(future_time))
 
     msg.message_sendlater(data['token1'], data['c1_id'], "This message is a sendlater message", future_time)
@@ -282,12 +279,12 @@ def test_sendlater_future_time(data):
 # Keep multiple threads running
 def test_sendlater_multiple(data):
     # Send message 5 seconds later
-    future_time = data['time_current'] + timedelta(seconds=5)
+    future_time = datetime.now() + timedelta(seconds=5)
     future_time = int(datetime.timestamp(future_time))
     msg.message_sendlater(data['token1'], data['c1_id'], "Second", future_time)
 
     # Send message 8 seconds later
-    future_time = data['time_current'] + timedelta(seconds=8)
+    future_time = datetime.now() + timedelta(seconds=8)
     future_time = int(datetime.timestamp(future_time))
     msg.message_sendlater(data['token1'], data['c1_id'], "Third", future_time)
 
@@ -311,7 +308,7 @@ def test_sendlater_multiple(data):
 def test_sendlater_invalid_channel(data):
     # Valid time delta
     time_delta = timedelta(minutes = 4)
-    future_time = data['time_current'] + time_delta
+    future_time = datetime.now() + time_delta
     future_time = int(datetime.timestamp(future_time))
 
     # Channel_id invalid
@@ -322,7 +319,7 @@ def test_sendlater_invalid_channel(data):
 def test_sendlater_invalid_message_len(data):
     # Valid time delta
     time_delta = timedelta(minutes = 4)
-    future_time = data['time_current'] + time_delta
+    future_time = datetime.now() + time_delta
     future_time = int(datetime.timestamp(future_time))
 
     # A string of 1001 chars 
@@ -344,7 +341,7 @@ def test_sendlater_invalid_time(data):
     # Valid time delta
     time_delta = timedelta(minutes = 4)
     # Time in the past
-    future_time = data['time_current'] - time_delta
+    future_time = datetime.now() - time_delta
     future_time = int(datetime.timestamp(future_time))
 
     # Channel_id invalid
@@ -355,7 +352,7 @@ def test_sendlater_invalid_time(data):
 def test_sendlater_in_another_channel(data):
     # Valid time delta
     time_delta = timedelta(minutes = 4)
-    future_time = data['time_current'] + time_delta
+    future_time = datetime.now() + time_delta
     future_time = int(datetime.timestamp(future_time))
 
     # Token1 is not a part of c2_id
