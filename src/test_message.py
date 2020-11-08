@@ -261,23 +261,23 @@ OUTPUT : {message_id}
 '''
 ## VALID CASES ##
 # Sendlater at a valid time in the future (to a channel token is a part of)
-def test_sendlater_success(data):
+def test_sendlater_future_time(data):
     # Token1 sends a message to the channel they are a part of
     # msg.message_send(data['token1'], data['c1_id'], "First message")
-    assert len(channel.channel_messages(data['token1'], data['c1_id'], 0)['messages']) == 0
 
-    # Sendlater message 4 days later, token1 is a part of channel_id1
+    # Sendlater message 5 seconds later, token1 is a part of channel_id1
     time_delta = timedelta(seconds = 5)
     future_time = data['time_current'] + time_delta
     future_time = int(datetime.timestamp(future_time))
 
-    assert msg.message_sendlater(data['token1'], data['c1_id'], "This message is a sendlater message", future_time)['message_id']
-
-    # TODO: Check that the msg_count is STILL zero, need to fix assertion error
-
     # Thread program, wait the time_delta and assert the correct mesage count is given
-    t = threading.Timer(time_delta, None)
+    t = threading.Timer(time_delta, msg.message_sendlater, [data['token1'], data['c1_id'], "This message is a sendlater message", future_time])
     t.start()
+    # still no messages yet
+    assert len(channel.channel_messages(data['token1'], data['c1_id'], 0)['messages']) == 0
+    
+    # TODO fast forward 5 secs
+    time.sleep(5)
     
     assert len(channel.channel_messages(data['token1'], data['c1_id'], 0)['messages']) == 1
 
