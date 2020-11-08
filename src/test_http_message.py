@@ -3,6 +3,8 @@ import json
 from echo_http_test import url
 import pytest
 
+from datetime import datetime, timedelta
+
 SUCCESS = 200
 ERROR = 400
 
@@ -85,6 +87,11 @@ def channel_join(url_join, token, channel_id):
 def channel_addowner(url_add, token, channel_id, u_id):
     payload = {"token": token, "channel_id": channel_id, "u_id": u_id}
     response = requests.post(url_add + "channel/addowner", json=payload)
+    return response.status_code
+
+def message_sendlater(url_sendlater, token, channel_id, message_id, time_sent):
+    payload = {'token': token, "channel_id": channel_id, 'message_id': message_id, 'time_sent': time_sent}
+    response = requests.post(url_sendlater + "message/sendlater", json=payload)
     return response.status_code
 
 def message_react(url_react, token, message_id, react_id):
@@ -326,19 +333,69 @@ def test_empty_string (url, user_list, channel_list):
 
 ## VALID CASES ##
 def test_sendlater_future_time(url, user_list, channel_list):
-    pass
+    # Time in future with valid parameters means success
+    time_delta = timedelta(seconds = 5)
+    future_time = datetime.now() + time_delta
+    future_time = int(datetime.timestamp(future_time))
+
+    assert message_sendlater(url, user_list['token1'], channel_list['c1_id'], "This message is a sendlater message", future_time) == SUCCESS
+    
 
 ## INVALID CASES ##
 def test_sendlater_invalid_channel(url, user_list, channel_list):
-    pass
+    # Valid time delta
+    time_delta = timedelta(minutes = 4)
+    future_time = datetime.now() + time_delta
+    future_time = int(datetime.timestamp(future_time))
+
+    # InputError msg.message_sendlater(data['token1'], 4645, "Sent to invalid channel_id", future_time)['message_id']
+    assert message_sendlater(url, user_list['token1'], 4645, "Sent to invalid channel_id", future_time) == ERROR
+    
 
 def test_sendlater_invalid_message_len(url, user_list, channel_list):
-    pass
+    # Valid time delta
+    time_delta = timedelta(minutes = 4)
+    future_time = datetime.now() + time_delta
+    future_time = int(datetime.timestamp(future_time))
+
+    # A string of 1001 chars 
+    long_string = "x" * 1001
+
+    # An empty string
+    empty_string = ""
+
+    # InputError msg.message_sendlater(data['token1'], data['c1_id'], long_string, future_time)['message_id']
+    assert message_sendlater(url, user_list['token1'], channel_list['c1_id'], long_string, future_time) == ERROR
+
+    # InputError msg.message_sendlater(data['token1'], data['c1_id'], empty_string, future_time)['message_id']
+    assert message_sendlater(url, user_list['token1'], channel_list['c1_id'], empty_string, future_time) == ERROR
+    
 
 def test_sendlater_invalid_time(url, user_list, channel_list):
-    pass 
+    # Valid time delta
+    time_delta = timedelta(minutes = 4)
+    # Time in the past
+    future_time = datetime.now() - time_delta
+    future_time = int(datetime.timestamp(future_time))
+
+    # Channel_id invalid
+    # InputError msg.message_sendlater(data['token1'], 4645, "Sendlater time in pass is not possible", future_time)['message_id']
+    assert message_sendlater(url, user_list['token1'], channel_list['c1_id'], "Sendlater time in pass is not possible", future_time) == ERROR 
 
 def test_sendlater_in_another_channel(url, user_list, channel_list):
+    # Valid time delta
+    time_delta = timedelta(minutes = 4)
+    future_time = datetime.now() + time_delta
+    future_time = int(datetime.timestamp(future_time))
+
+    # Token1 is not a part of c2_id
+    # AccessError msg.message_sendlater(data['token1'], data['c2_id'], "Sent to invalid channel_id", future_time)['message_id']
+    assert message_sendlater(url, user_list['token1'], channel_list['c2_id'], "Sent to invalid channel", future_time) == ERROR 
+
+    # Token2 invites token1 to c2_id
+    channel_invite(url, user_list['token2'], channel_list['c2_id'], user_list['u1_id'])
+
+    assert message_sendlater(url, user_list['token1'], channel_list['c2_id'], "Now part of channel", future_time) == SUCCESS
     pass
 
 # message/react
