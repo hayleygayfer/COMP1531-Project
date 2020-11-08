@@ -270,17 +270,41 @@ def test_sendlater_future_time(data):
     future_time = data['time_current'] + time_delta
     future_time = int(datetime.timestamp(future_time))
 
-    # Thread program, wait the time_delta and assert the correct mesage count is given
-    t = threading.Timer(time_delta, msg.message_sendlater, [data['token1'], data['c1_id'], "This message is a sendlater message", future_time])
-    t.start()
+    msg.message_sendlater(data['token1'], data['c1_id'], "This message is a sendlater message", future_time)
+
     # still no messages yet
     assert len(channel.channel_messages(data['token1'], data['c1_id'], 0)['messages']) == 0
     
-    # TODO fast forward 5 secs
     time.sleep(5)
-    
+
     assert len(channel.channel_messages(data['token1'], data['c1_id'], 0)['messages']) == 1
 
+# Keep multiple threads running
+def test_sendlater_multiple(data):
+    # Send message 5 seconds later
+    future_time = data['time_current'] + timedelta(seconds=5)
+    future_time = int(datetime.timestamp(future_time))
+    msg.message_sendlater(data['token1'], data['c1_id'], "Second", future_time)
+
+    # Send message 8 seconds later
+    future_time = data['time_current'] + timedelta(seconds=8)
+    future_time = int(datetime.timestamp(future_time))
+    msg.message_sendlater(data['token1'], data['c1_id'], "Third", future_time)
+
+    # Send message now
+    msg.message_send(data['token1'], data['c1_id'], "First")
+
+    # Only one message exists currently
+    assert len(channel.channel_messages(data['token1'], data['c1_id'], 0)['messages']) == 1
+
+    # Wait 5 seconds
+    time.sleep(5)
+    assert len(channel.channel_messages(data['token1'], data['c1_id'], 0)['messages']) == 2
+
+    # Wait 3 seconds
+    time.sleep(3)
+    assert len(channel.channel_messages(data['token1'], data['c1_id'], 0)['messages']) == 3
+    
 
 ## INVALID CASES ##
 # Sendlater to invalid channel (InputError)
