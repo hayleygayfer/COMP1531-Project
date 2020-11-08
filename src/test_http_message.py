@@ -337,14 +337,20 @@ def test_empty_string (url, user_list, channel_list):
 
 # message/sendlater
 
+
 ## VALID CASES ##
 def test_sendlater_future_time(url, user_list, channel_list):
-    # Time in future with valid parameters means success
     time_delta = timedelta(seconds = 5)
     future_time = datetime.now() + time_delta
     future_time = int(datetime.timestamp(future_time))
 
     assert message_sendlater(url, user_list['token1'], channel_list['c1_id'], "This message is a sendlater message", future_time) == SUCCESS
+
+    assert len(channel_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']) == 0
+
+    time.sleep(5)
+
+    assert len(channel_messages(url, user_list['token1'], channel_list['c1_id'], 0)['messages']) == 1
     
 def test_sendlater_multiple(url, user_list, channel_list):
     # Send message 5 seconds later
