@@ -209,6 +209,7 @@ def message_sendlater(token, channel_id, message, time_sent):
     time_delta = float(time_sent - timestamp)
 
     t = threading.Timer(time_delta, append_msg_to_channel, [channel_id, message, msg_id, u_id, time_sent])
+    t.daemon = True
     t.start()
 
     return {
