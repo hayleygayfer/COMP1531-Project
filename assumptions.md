@@ -81,7 +81,10 @@
 
 ## OTHER.PY
 
-* Search based on query_str returns all messages that contain that string
+* Search based on query_str returns the data for all messages which contain that string
+    * The cases of both the query string and the message in channel does not matter
+    * e.g. query_str = 'meSsAGe' will return the data for a message with string = '1MESSAGE2'
+* Query strings must contain at least 2 characters
 * Owner permissions are stored seperately in user dictionaries
 
 ## OTHER ASSUMPTIONS
