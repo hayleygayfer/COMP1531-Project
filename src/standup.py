@@ -17,7 +17,12 @@ def deactivate_standup(token, channel_id):
             channel['standup_finish'] = None
             message = channel['standup_message']
 
-    message_send(token, channel_id, message)
+    if len(message) != 0:
+        try:
+            message_send(token, channel_id, message)
+        except:
+            raise InputError("Invalid message")
+
 
 def standup_start(token, channel_id, length):
     time_finish = (datetime.now() + timedelta(0, length)).timestamp()
@@ -75,14 +80,17 @@ def standup_send(token, channel_id, message):
     if len(message) > 1000:
         raise InputError("message over 1000 characters")
 
-    u_id = token_to_u_id(token)
+    u_id = token_to_u_id(token)['u_id']
     if exists_in_channel(channel_id, u_id) == False:
         raise InputError("user not in channel")
 
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             handle = token_to_handle(token)
-            channel['standup_message'] = f"{channel['standup_message']}\n{handle}: {message}"
+            if channel['standup_message'] == '':
+                channel['standup_message'] = f"{handle}: {message}"
+            else:
+                channel['standup_message'] = f"{channel['standup_message']}\n{handle}: {message}"
 
     return {}
 

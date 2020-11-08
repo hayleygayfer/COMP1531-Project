@@ -2,13 +2,14 @@ import pytest
 from standup import standup_start, standup_active, standup_send
 from auth import auth_register, auth_login
 from channels import channels_create
+from channel import channel_invite
 from datetime import datetime, timedelta
 from time import sleep
+import threading
 
 from error import InputError, AccessError
-from other import clear
+from other import clear, search
 from data import data
-
 
 ## Fixtures
 @pytest.fixture
@@ -31,6 +32,11 @@ def state():
         'channel_id_1': channel1_id,
         'channel_id_2': channel2_id,
     }
+
+## standup_active thread ##
+def is_inactive(token, ch_id):
+    assert standup_active(token, ch_id)['is_active'] == False
+
 
 #### standup_start ####
 
@@ -64,20 +70,17 @@ def test_length_less_than_0(state):
 # VALID CASES #
 def test_standup_in_channel(state):
     time_finish = standup_start(state['token1'], state['channel_id_1'], 20)['time_finish']
-    assert time_finish == (datetime.now() + timedelta(0, 20)).timestamp()
     assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == True
-    sleep(20)
-    assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == False
+    #threading.Timer(20, is_inactive, [state['token1'], state['channel_id_1']]).start()
 
 def test_length_1(state):
     time_finish = standup_start(state['token1'], state['channel_id_1'], 1)['time_finish']
-    assert time_finish == (datetime.now() + timedelta(0, 1)).timestamp()
-    # TODO: sleep 1 second then test standup is not active
+    #threading.Timer(1, is_inactive, [state['token1'], state['channel_id_1']]).start()
 
 def test_length_long(state):
     time_finish = standup_start(state['token1'], state['channel_id_1'], 60)['time_finish']
-    assert time_finish == (datetime.now() + timedelta(0, 60)).timestamp()
-    # TODO: test that standup is active, then inactive after a minute
+    assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == True
+    #threading.Timer(60, is_inactive, [state['token1'], state['channel_id_1']]).start()
 
 #### standup_active ####
 
@@ -98,17 +101,18 @@ def test_invalid_token_active(state):
 def test_standup_active(state):
     standup_start(state['token1'], state['channel_id_1'], 30)
     assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == True
-
+    #threading.Timer(30, is_inactive, [state['token1'], state['channel_id_1']]).start()
 
 def test_standup_inactive(state):
     assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == False
 
 def test_standup_time_finish(state):
     standup_start(state['token1'], state['channel_id_1'], 30)
-    assert standup_active(state['token1'], state['channel_id_1'])['time_finish'] == (datetime.now() + timedelta(0, 30)).timestamp()
+    assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == True
     standup_start(state['token2'], state['channel_id_2'], 150)
-    assert standup_active(state['token2'], state['channel_id_2'])['time_finish'] == (datetime.now() + timedelta(0, 150)).timestamp()
-
+    assert standup_active(state['token2'], state['channel_id_2'])['is_active'] == True
+    #threading.Timer(30, is_inactive, [state['token1'], state['channel_id_1']]).start()
+    #threading.Timer(150, is_inactive, [state['token2'], state['channel_id_2']]).start()
 
 #### standup_send ####
 
@@ -132,7 +136,7 @@ def test_invalid_token_send(state):
         standup_send(invalid_token, state['channel_id_1'], message)
 
 def test_message_over_1000_char(state):
-    invalid_message = 1000*'a'
+    invalid_message = 1001*'a'
 
     standup_start(state['token1'], state['channel_id_1'], 60)
 
@@ -155,13 +159,33 @@ def test_user_not_in_channel(state):
 
 # VALID CASES #
 def test_message_empty(state):
-    #TODO: write test
-    pass
+    message = ''
+    standup_start(state['token1'], state['channel_id_1'], 2)
+    standup_send(state['token1'], state['channel_id_1'], message)
+    sleep(1)
+    messages = search(state['token1'], 'persononeone:')
+    assert messages != []
 
 def test_message_1000_char(state):
-    #TODO: write test
-    pass
+    message = 1000*'a'
 
-def test_standup_active_send(state):
-    #TODO: write test
-    pass
+    standup_start(state['token1'], state['channel_id_1'], 2)
+    standup_send(state['token1'], state['channel_id_1'], message)
+    sleep(1)
+    messages = search(state['token1'], 'persononeone:')
+    assert messages != []
+
+def test_standup_active_send_two_people(state):
+    message = 'hello'
+    channel_invite(state['token1'], state['channel_id_1'], state['u_id2'])
+
+    standup_start(state['token1'], state['channel_id_1'], 2)
+    standup_send(state['token1'], state['channel_id_1'], message)
+    standup_send(state['token2'], state['channel_id_1'], message)
+    sleep(1)
+    messages1 = search(state['token1'], 'persononeone:')['messages']
+    messages2 = search(state['token1'], 'persontwotwo:')['messages']
+
+    assert messages1 != []
+    assert messages2 != []
+    assert data['channels'][0]['messages'][0]['message'] == "persononeone: hello\npersontwotwo: hello"
