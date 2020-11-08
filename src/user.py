@@ -210,7 +210,11 @@ def user_profile_uploadphoto(token, img_url, x_start, y_start, x_end, y_end):
     img.save(p)
 
     # Modify the 'profile_img_url' key in users with its address
-    data['users'][u_it]['profile_img_url'] = request.host_url + 'static/' + filename
+    try:
+        data['users'][u_it]['profile_img_url'] = request.host_url + 'static/' + filename
+    except RuntimeError:
+        # not running on flask
+        data['users'][u_it]['profile_img_url'] = img_url
 
     return {}
 
