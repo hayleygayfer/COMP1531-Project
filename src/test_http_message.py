@@ -324,6 +324,23 @@ def test_empty_string (url, user_list, channel_list):
 
 # TODO: message/sendlater
 
+## VALID CASES ##
+def test_sendlater_future_time(url, user_list, channel_list):
+    pass
+
+## INVALID CASES ##
+def test_sendlater_invalid_channel(url, user_list, channel_list):
+    pass
+
+def test_sendlater_invalid_message_len(url, user_list, channel_list):
+    pass
+
+def test_sendlater_invalid_time(url, user_list, channel_list):
+    pass 
+
+def test_sendlater_in_another_channel(url, user_list, channel_list):
+    pass
+
 # message/react
 
 ## VALID CASES ##
