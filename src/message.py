@@ -7,6 +7,7 @@ import time
 
 MAX_MSG_IN_CH = 10000
 REACT_VALID = 1
+FLOCKR_OWNER = 1
 
 def message_send(token, channel_id, message):
     '''
@@ -81,18 +82,18 @@ def message_remove(token, message_id):
     if not valid_channel(channel_id) or message_not_found(channel_id, message_id):
         raise InputError("Message not found")
 
-    # Only a channel owner or flockr owner can remove a message
+    # Only a channel owner or a flockr owner can remove a message
     channel = find_channel(message_id, channel_id)
     owners = channel['owner_members']
-    flockr_owner_id = get_flockr_owner_id(u_id)
-    if user_is_not_owner(u_id, owners) and u_id != flockr_owner_id:
+
+    if user_is_not_owner(u_id, owners) and not is_flockr_owner(u_id):
         raise AccessError("You are not authorised to remove this message")
 
     # an owner cannot remove another owner's message unless it's your own
     for msg in channel['messages']:
         if msg.get('message_id') == message_id:
             msg_creator = msg['u_id']
-    if not user_is_not_owner(msg_creator, owners) or msg_creator == flockr_owner_id:
+    if not user_is_not_owner(msg_creator, owners) or is_flockr_owner(msg_creator):
         # trying to edit a channel/flockr owner's message
         if msg_creator != u_id:
             raise AccessError("You cannot remove another owner's message")
@@ -132,18 +133,18 @@ def message_edit(token, message_id, message):
     if not valid_channel(channel_id):
         raise InputError("Message not found")
 
-    # Only a channel owner or flockr owner can remove a message
+    # Only a channel owner or a flockr owner can remove a message
     channel = find_channel(message_id, channel_id)
     owners = channel['owner_members']
-    flockr_owner_id = get_flockr_owner_id(u_id)
-    if user_is_not_owner(u_id, owners) and u_id != flockr_owner_id:
+
+    if user_is_not_owner(u_id, owners) and not is_flockr_owner(u_id):
         raise AccessError("You are not authorised to edit this message")
 
     # an owner cannot edit another owner's message unless it's your own
     for msg in channel['messages']:
         if msg.get('message_id') == message_id:
             msg_creator = msg['u_id']
-    if not user_is_not_owner(msg_creator, owners) or msg_creator == flockr_owner_id:
+    if not user_is_not_owner(msg_creator, owners) or is_flockr_owner(msg_creator):
         # trying to edit a channel/flockr owner's message
         if msg_creator != u_id:
             raise AccessError("You cannot edit another owner's message")
@@ -306,7 +307,7 @@ def message_unreact(token, message_id, react_id):
 
 def message_pin(token, message_id):
     '''
-    A channel owner (or Flockr owner), pins a particular message in the channel.
+    A channel owner (or a flockr owner), pins a particular message in the channel.
     Marking a message as pinned gives the message display priority on the frontend.
 
     Args:
@@ -336,8 +337,8 @@ def message_pin(token, message_id):
     # User must be a channel/flockr owner
     channel = find_channel(message_id, channel_id)
     owners = channel['owner_members']
-    flockr_owner_id = get_flockr_owner_id(u_id)
-    if user_is_not_owner(u_id, owners) and u_id != flockr_owner_id:
+
+    if user_is_not_owner(u_id, owners) and not is_flockr_owner(u_id):
         raise AccessError("You must be an owner to pin this message")
     
 
@@ -348,7 +349,7 @@ def message_pin(token, message_id):
 
 def message_unpin(token, message_id):
     '''
-    A channel owner (or Flockr owner), unpins a particular message in the channel.
+    A channel owner (or a flockr owner), unpins a particular message in the channel.
     Unpinning a pinned message removes the pinned status of the message on the frontend.
 
     Args:
@@ -378,8 +379,8 @@ def message_unpin(token, message_id):
     # User must be a channel/flockr owner
     channel = find_channel(message_id, channel_id)
     owners = channel['owner_members']
-    flockr_owner_id = get_flockr_owner_id(u_id)
-    if user_is_not_owner(u_id, owners) and u_id != flockr_owner_id:
+
+    if user_is_not_owner(u_id, owners) and not is_flockr_owner(u_id):
         raise AccessError("You must be an owner to pin this message")
     
 
@@ -487,11 +488,10 @@ def user_is_not_owner(u_id, owners):
             return False
     return True
 
-# Returns the user_id corresponding to the owner of FlockR
-def get_flockr_owner_id(u_id):
-    if u_id == data['users'][0].get('u_id'):
-        return True
-    return False
+def is_flockr_owner(u_id):
+    for user in data['users']:
+        if u_id == user['u_id']:
+            return user['permissions'] == FLOCKR_OWNER
 
 # Pin the message to channel 
 def doPin(channel, msg_id):
