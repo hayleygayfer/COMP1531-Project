@@ -34,6 +34,7 @@
 * The Flockr owner has the right to remove any owner
     * If the Flockr owner removes the last owner of a channel, then they automatically become a channel owner
 * A negative start value in `channel_messages` defualts to 0
+* `channel_messages` updates the current user's reacted messages, so that the like button is filled in on the frontend
 
 
 ## CHANNELS.PY
@@ -60,6 +61,7 @@
     * However, they are not permitted to edit/delete other owner's messages
 * Any user in the channel can react to their own message
 * Multiple messages can be pinned to the same channel
+* The only react type available is 'liking' a message
 
 
 ## USER.PY
