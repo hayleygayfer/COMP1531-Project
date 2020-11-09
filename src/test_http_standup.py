@@ -77,7 +77,7 @@ def test_standup_in_channel_http(url, state):
     assert response.status_code == 200
 
     payload = {'token': state['token1'], 'channel_id': state['c_id_1']}
-    response = requests.get(url + "standup/active", json=payload)
+    response = requests.get(url + "standup/active", params=payload)
     assert response.status_code == 200
     assert response.json()['is_active'] == True
 
@@ -88,7 +88,7 @@ def test_length_1_http(url, state):
     sleep(1)
     
     payload = {'token': state['token1'], 'channel_id': state['c_id_1']}
-    response = requests.get(url + "standup/active", json=payload)
+    response = requests.get(url + "standup/active", params=payload)
     assert response.status_code == 200
     assert response.json()['is_active'] == False
 
@@ -98,7 +98,7 @@ def test_length_long_http(url, state):
     assert response.status_code == 200
     
     payload = {'token': state['token1'], 'channel_id': state['c_id_1']}
-    response = requests.get(url + "standup/active", json=payload)
+    response = requests.get(url + "standup/active", params=payload)
     assert response.status_code == 200
     assert response.json()['is_active'] == True
 
@@ -112,7 +112,7 @@ def test_channel_id_invalid_active_http(url, state):
     assert response.status_code == 200
 
     payload = {'token': state['token1'], 'channel_id': invalid_ch_id}
-    response = requests.get(url + "standup/active", json=payload)
+    response = requests.get(url + "standup/active", params=payload)
     assert response.status_code == 400
 
 # VALID CASES #
@@ -122,13 +122,13 @@ def test_standup_active_http(url, state):
     assert response.status_code == 200
 
     payload = {'token': state['token1'], 'channel_id': state['c_id_1']}
-    response = requests.get(url + "standup/active", json=payload)
+    response = requests.get(url + "standup/active", params=payload)
     assert response.status_code == 200
     assert response.json()['is_active'] == True
 
 def test_standup_inactive_http(url, state):
     payload = {'token': state['token1'], 'channel_id': state['c_id_1']}
-    response = requests.get(url + "standup/active", json=payload)
+    response = requests.get(url + "standup/active", params=payload)
     assert response.status_code == 200
     assert response.json()['is_active'] == False
 
@@ -142,12 +142,12 @@ def test_standup_time_finish_http(url, state):
     assert response.status_code == 200
 
     payload = {'token': state['token1'], 'channel_id': state['c_id_1']}
-    response = requests.get(url + "standup/active", json=payload)
+    response = requests.get(url + "standup/active", params=payload)
     assert response.status_code == 200
     assert response.json()['is_active'] == True
 
     payload = {'token': state['token2'], 'channel_id': state['c_id_2']}
-    response = requests.get(url + "standup/active", json=payload)
+    response = requests.get(url + "standup/active", params=payload)
     assert response.status_code == 200
     assert response.json()['is_active'] == True
 
