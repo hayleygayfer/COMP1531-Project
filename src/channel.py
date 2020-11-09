@@ -1,6 +1,8 @@
 from data import data
 from error import InputError, AccessError
 
+FLOCKR_OWNER = 1
+
 def channel_invite(token_inviter, channel_id, u_id_invitee):
     '''
     Invite a user who is not currently in the channel, to the channel.
@@ -466,9 +468,9 @@ def size_owners(channel_id):
 
 # Determine if the authenticated user is the flockr owner
 def is_token_flockr_owner(token):
-    if token == data['users'][0].get('token'):
-        return True
-    return False
+    for user in data['users']:
+        if user['token'] == token:
+            return user['permissions'] == FLOCKR_OWNER
 
 # Gets user object from u_id
 def get_user_names(u_id):
