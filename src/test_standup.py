@@ -63,16 +63,16 @@ def test_length_less_than_0(state):
 
 # VALID CASES #
 def test_standup_in_channel(state):
-    time_finish = standup_start(state['token1'], state['channel_id_1'], 20)['time_finish']
+    standup_start(state['token1'], state['channel_id_1'], 20)['time_finish']
     assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == True
     #threading.Timer(20, is_inactive, [state['token1'], state['channel_id_1']]).start()
 
 def test_length_1(state):
-    time_finish = standup_start(state['token1'], state['channel_id_1'], 1)['time_finish']
+    standup_start(state['token1'], state['channel_id_1'], 1)['time_finish']
     #threading.Timer(1, is_inactive, [state['token1'], state['channel_id_1']]).start()
 
 def test_length_long(state):
-    time_finish = standup_start(state['token1'], state['channel_id_1'], 60)['time_finish']
+    standup_start(state['token1'], state['channel_id_1'], 60)['time_finish']
     assert standup_active(state['token1'], state['channel_id_1'])['is_active'] == True
     #threading.Timer(60, is_inactive, [state['token1'], state['channel_id_1']]).start()
 
