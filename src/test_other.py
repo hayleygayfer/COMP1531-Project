@@ -38,8 +38,12 @@ def userObject():
 
 # Clear removes all user and channel data from the data structure
 def test_clear(userObject):
+    # Count the number of users
     assert len(d.data['users']) == 2
+
     assert clear() != None
+
+    # Count users again
     assert len(d.data['users']) == 0
 
 
@@ -103,7 +107,7 @@ def test_search_not_in_channel(userObject):
 
 ## INVALID CASES
 
-# Not enough characters for a valid search
+# Valid search queries must have at least 2 characters
 def test_search_short(userObject):
     with pytest.raises(InputError):
         search(userObject['ft'], 'M')
