@@ -53,12 +53,6 @@ def test_standup_already_active(state):
     with pytest.raises(InputError):
         standup_start(state['token1'], state['channel_id_1'], 20)
 
-def test_token_not_valid_start(state):
-    invalid_token = 123
-
-    with pytest.raises(InputError):
-        standup_start(invalid_token, state['channel_id_1'], 20)
-
 def test_length_equal_0(state):
     with pytest.raises(InputError):
         standup_start(state['token1'], state['channel_id_1'], 0)
@@ -91,12 +85,6 @@ def test_channel_id_invalid_active(state):
     with pytest.raises(InputError):
         standup_active(state['token1'], invalid_ch_id)
 
-def test_invalid_token_active(state):
-    invalid_token = 123
-
-    with pytest.raises(InputError):
-        standup_active(invalid_token, state['channel_id_1'])
-
 # VALID CASES #
 def test_standup_active(state):
     standup_start(state['token1'], state['channel_id_1'], 30)
@@ -125,15 +113,6 @@ def test_invalid_channel_id_send(state):
 
     with pytest.raises(InputError):
         standup_send(state['token1'], invalid_ch_id, message)
-
-def test_invalid_token_send(state):
-    invalid_token = 123
-    message = "message"
-
-    standup_start(state['token1'], state['channel_id_1'], 60)
-
-    with pytest.raises(InputError):
-        standup_send(invalid_token, state['channel_id_1'], message)
 
 def test_message_over_1000_char(state):
     invalid_message = 1001*'a'

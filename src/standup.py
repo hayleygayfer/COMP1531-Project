@@ -30,9 +30,6 @@ def standup_start(token, channel_id, length):
     if length <= 0:
         raise InputError("not a valid length")
 
-    if validate_token(token) == False:
-        raise InputError("invalid token")
-
     if validate_channel(channel_id) == False:
         raise InputError("invalid channel")
 
@@ -47,9 +44,6 @@ def standup_start(token, channel_id, length):
     }
 
 def standup_active(token, channel_id):
-    if validate_token(token) == False:
-        raise InputError("invalid token")
-
     if validate_channel(channel_id) == False:
         raise InputError("invalid channel")
 
@@ -69,7 +63,7 @@ def standup_active(token, channel_id):
 
 def standup_send(token, channel_id, message):
     if validate_token(token) == False:
-        raise InputError("invalid token")
+        raise AccessError("invalid token")
 
     if validate_channel(channel_id) == False:
         raise InputError("invalid channel")

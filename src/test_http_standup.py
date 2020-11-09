@@ -60,12 +60,6 @@ def test_standup_already_active_http(url, state):
     response = requests.post(url + "standup/start", json=payload)
     assert response.status_code == 400
 
-def test_token_not_valid_start_http(url, state):
-    invalid_token = 123
-    payload = {'token': invalid_token, 'channel_id': state['c_id_1'], 'length': 5}
-    response = requests.post(url + "standup/start", json=payload)
-    assert response.status_code == 400
-
 def test_length_equal_0_http(url, state):
     payload = {'token': state['token1'], 'channel_id': state['c_id_1'], 'length': 0}
     response = requests.post(url + "standup/start", json=payload)
@@ -121,16 +115,6 @@ def test_channel_id_invalid_active_http(url, state):
     response = requests.get(url + "standup/active", json=payload)
     assert response.status_code == 400
 
-def test_invalid_token_active_http(url, state):
-    invalid_token = 123
-    payload = {'token': state['token1'], 'channel_id': state['c_id_1'], 'length': 20}
-    response = requests.post(url + "standup/start", json=payload)
-    assert response.status_code == 200
-
-    payload = {'token': invalid_token, 'channel_id': state['c_id_1']}
-    response = requests.get(url + "standup/active", json=payload)
-    assert response.status_code == 400
-
 # VALID CASES #
 def test_standup_active_http(url, state):
     payload = {'token': state['token1'], 'channel_id': state['c_id_1'], 'length': 20}
@@ -177,16 +161,6 @@ def test_invalid_channel_id_send_http(url, state):
     assert response.status_code == 200
 
     payload = {'token': state['token1'], 'channel_id': invalid_ch_id, 'message': 'hello'}
-    response = requests.post(url + "standup/send", json=payload)
-    assert response.status_code == 400
-
-def test_invalid_token_send_http(url, state):
-    invalid_token = 123
-    payload = {'token': state['token1'], 'channel_id': state['c_id_1'], 'length': 30}
-    response = requests.post(url + "standup/start", json=payload)
-    assert response.status_code == 200
-
-    payload = {'token': invalid_token, 'channel_id': state['c_id_1'], 'message': 'hello'}
     response = requests.post(url + "standup/send", json=payload)
     assert response.status_code == 400
 
