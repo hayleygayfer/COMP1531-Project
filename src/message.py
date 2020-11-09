@@ -524,12 +524,10 @@ def alreadyReacted(u_id, channel, msg_id, react_id):
 def doReact (u_id, channel, msg_id, react_id):
     for msg in channel['messages']:
         if msg.get('message_id') == msg_id:
+            if alreadyReacted(u_id, channel, msg_id, react_id) == True:
+                raise InputError(f'This message is already reacted by this user')
             msg['reacts'][0]['react_id'] == react_id
             msg['reacts'][0]['u_ids'].append(u_id)
-            if msg['reacts'][0]['is_this_user_reacted'] == True:
-                raise InputError(f'This message is already reacted by this user')
-
-            msg['reacts'][0]['is_this_user_reacted'] == True
 
 def noReact(u_id, channel, msg_id, react_id):
     for msg in channel['messages']:
