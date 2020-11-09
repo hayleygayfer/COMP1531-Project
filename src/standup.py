@@ -10,7 +10,7 @@ def standup_start(token, channel_id, length):
 def standup_active(token, channel_id):
 
     return {
-        'is_active': True/False,
+        'is_active': False,
         'time_finish': 12345
     }
 

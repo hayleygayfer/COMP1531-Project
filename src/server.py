@@ -79,7 +79,7 @@ def http_auth_logout():
 # Auth/PasswordReset/Request
 @APP.route("/auth/passwordreset/request", methods=['POST'])
 def http_auth_passwordreset_request():
-    email = request.get_json()['token']
+    email = request.get_json()['email']
     response = auth.auth_passwordreset_request(email)
     return dumps(response)
 
@@ -293,7 +293,7 @@ def http_message_edit():
 @APP.route("/message/sendlater", methods=['POST'])
 def http_message_sendlater():
     token = request.get_json()["token"]
-    channel_id = int(request.get_json()["message_id"])
+    channel_id = int(request.get_json()["channel_id"])
     message = request.get_json()["message"]
     time_sent = int(request.get_json()["time_sent"])
     response = msg.message_sendlater(token, channel_id, message, time_sent)
@@ -349,7 +349,7 @@ def http_standup_start():
 @APP.route("/standup/active", methods=['GET'])
 def http_standup_active():
     token = request.args.get("token")
-    channel_id = int(request.get_json()["query_str"])
+    channel_id = int(request.args.get("channel_id"))
     response = standup_active(token, channel_id)
     return dumps(response)
 

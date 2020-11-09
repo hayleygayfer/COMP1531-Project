@@ -58,16 +58,33 @@
 * Users cannot edit/delete their own messages unless they are an owner (or FlockR owner)
 * You must be a channel owner (or FlockR owner) to edit/delete messages
     * However, they are not permitted to edit/delete other owner's messages
+* Any user in the channel can react to their own message
+* Multiple messages can be pinned to the same channel
 
 
 ## USER.PY
 
 * Users must be logged in with a valid token to change their first or last name
 * Handles are unique, a user cannot set their handle to one already in use
+* When uploading a photo, the extension can be any of the following:
+    * .jpg
+    * .jpeg
+    * .JPG
+    * .JPEG
+* The image is saved locally inside /src/static before getting hosted on the server
+    * If the static directory does not exist, it gets created
+* The saved image's filename becomes a 10 character combination of random uppercase letters and digits
+* The image url will be updated in the upload_url field on the frontend
+* An example of the generated url is the following:
+    * localhost:46472/static/HEN46S3H2K.jpg
+
 
 ## OTHER.PY
 
-* Search based on query_str returns all messages that contain that string
+* Search based on query_str returns the data for all messages which contain that string
+    * The cases of both the query string and the message in channel does not matter
+    * e.g. query_str = 'meSsAGe' will return the data for a message with string = '1MESSAGE2'
+* Query strings must contain at least 2 characters
 * Owner permissions are stored seperately in user dictionaries
 
 ## OTHER ASSUMPTIONS
