@@ -79,7 +79,7 @@ def http_auth_logout():
 # Auth/PasswordReset/Request
 @APP.route("/auth/passwordreset/request", methods=['POST'])
 def http_auth_passwordreset_request():
-    email = request.get_json()['token']
+    email = request.get_json()['email']
     response = auth.auth_passwordreset_request(email)
     return dumps(response)
 

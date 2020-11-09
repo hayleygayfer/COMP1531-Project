@@ -1,6 +1,7 @@
 data = {
     'users': [],
     'channels': [],
+    'reset_codes': []
 }
 
 '''
@@ -56,6 +57,12 @@ data = {
             }
         ],
         'message_count': 2
+    }
+],
+'reset_codes' : [
+    {
+        'u_id': 1,
+        'reset_code': 11111
     }
 ]
 '''

@@ -182,8 +182,25 @@ def test_register_login_logout():
     assert(auth.auth_logout(token)['is_success'] == True)
     
 
-    
-    
+###### Auth Password Reset ######
+
+# Invalid Cases #
+
+def test_invalid_reset():
+    clear()
+
+    # Register User
+    user = auth.auth_register("clint@barton.com", "password", "Clint", "Barton")
+
+    # Logout User
+    auth.auth_logout(user['token'])
+
+    # Request Reset
+    auth.auth_passwordreset_request("clint@barton.com")
+
+    # Password Reset
+    with pytest.raises(InputError):
+        auth.auth_passwordreset_reset("invalidcode", "password2")    
     
 
 
