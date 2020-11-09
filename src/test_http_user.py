@@ -4,6 +4,9 @@ from echo_http_test import url
 import auth
 import pytest
 
+SUCCESS = 200
+ERROR = 400
+
 ## Fixtures
 @pytest.fixture
 def userObject(url):
@@ -221,6 +224,63 @@ def test_invalid_token_set_handle(userObject, url):
     response = requests.put(url + 'user/profile/sethandle', json=payload)
     assert response.status_code == 400
 
+
+###### User Profile Upload Photo ######
+
+# Valid Cases
+
+# Upload a jpg/jpeg image with valid coordinates
+def test_uploadphoto_success(userObject, url):
+    assert photo(url, userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 0, 0, 1, 1) == SUCCESS
+
+    assert photo(url, userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/1/14/Un_super_paysage.jpeg", 0, 0, 1, 1) == SUCCESS
+
+# Invalid Cases
+
+# Not uploading a jpg file
+def test_uploadphoto_not_jpg(userObject, url):
+    # png
+    assert photo(url, userObject['token'], "http://www.pngmart.com/files/7/Red-Smoke-Transparent-Images-PNG.png", 0, 0, 1, 1) == ERROR
+
+    # gif
+    assert photo(url, userObject['token'], "http://www.pngmart.com/files/7/Red-Smoke-Transparent-Images-PNG.png", 0, 0, 1, 1) == ERROR
+
+    # svg
+    assert photo(url, userObject['token'], "https://svgsilh.com/svg/1801287.svg", 0, 0, 1, 1) == ERROR
+
+# Uploading an invalid image
+def test_non_existant_img(userObject, url):
+    assert photo(url, userObject['token'], "https://google.com/my_image.jpg", 0, 0, 1, 1) == ERROR
+    
+    assert photo(url, userObject['token'], "https://web.flock.com/?/flock.jpg", 0, 0, 1, 1) == ERROR
+
+# Cropping an image with invalid dimensions
+def test_invalid_dimensions(userObject, url):
+    # Image Dimensions: 3456 x 2304 pixels
+
+    # Out of range
+    assert photo(url, userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 0, 0, 3457, 2305) == ERROR
+
+    # Perfect fit
+    assert photo(url, userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 0, 0, 3456, 2304) == SUCCESS
+
+    # x_start > x_end
+    assert photo(url, userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 100, 0, 10, 100) == ERROR
+
+    # y_start > y_end
+    assert photo(url, userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 0, 100, 100, 10) == ERROR
+
+    # x_start = x_end
+    assert photo(url, userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 100, 100, 100, 300) == ERROR
+
+    # empty box
+    assert photo(url, userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 100, 100, 100, 100) == ERROR
+
+    # negative
+    assert photo(url, userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", -1, -2, 100, 200) == ERROR
+
+
+
 ###### Helper Functions ######
 
 # Retrieves information about a user
@@ -228,3 +288,8 @@ def retrieveUser(token, u_id, url):
     params = {'token': token, 'u_id': int(u_id)}
     response = requests.get(url + 'user/profile', params=params)
     return response.json().get('user')
+
+def photo(url_photo, token, image_url, x1, y1, x2, y2):
+    payload = {'token': token, 'img_url': image_url, 'x_start': x1, 'y_start': y1, 'x_end': x2, 'y_end': y2}
+    response = requests.post(url_photo + "user/profile/uploadphoto", json=payload)
+    return response.status_code

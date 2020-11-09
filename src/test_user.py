@@ -4,8 +4,11 @@ import user
 
 from error import InputError, AccessError
 from other import clear
-from data import data
 
+from urllib import request
+from PIL import Image # pip3 install Pillow
+
+SUCCESS = {}
 
 ## Fixtures
 @pytest.fixture
@@ -47,24 +50,24 @@ def test_invalid_token(userObject):
 # Valid Cases
 
 def test_valid_set_first_name(userObject):
-    initialUser = retrieveUser(userObject['u_id'])
+    initialUser = user.user_profile(userObject['token'], userObject['u_id'])['user']
 
     # Tests initial name
     assert initialUser['name_first'] == 'Tony'
     user.user_profile_setname(userObject['token'], 'Anthony', 'Stark')
-    updatedUser = retrieveUser(userObject['u_id'])
+    updatedUser = user.user_profile(userObject['token'], userObject['u_id'])['user']
 
     # Tests changed name
     assert updatedUser['name_first'] == 'Anthony'
 
 
 def test_valid_set_last_name(userObject):
-    initialUser = retrieveUser(userObject['u_id'])
+    initialUser = user.user_profile(userObject['token'], userObject['u_id'])['user']
 
     # Tests initial name
     assert initialUser['name_last'] == 'Stark'
     user.user_profile_setname(userObject['token'], 'Tony', 'Potts')
-    updatedUser = retrieveUser(userObject['u_id'])
+    updatedUser = user.user_profile(userObject['token'], userObject['u_id'])['user']
 
     # Tests changed name
     assert updatedUser['name_last'] == 'Potts'
@@ -100,12 +103,12 @@ def test_invalid_token_set_name(userObject):
 # Valid Cases
 
 def test_valid_set_email(userObject):
-    initialUser = retrieveUser(userObject['u_id'])
+    initialUser = user.user_profile(userObject['token'], userObject['u_id'])['user']
 
     # Tests initial name
     assert initialUser['email'] == 'tonystark@avengers.com'
     user.user_profile_setemail(userObject['token'], 'tony@avengers.com')
-    updatedUser = retrieveUser(userObject['u_id'])
+    updatedUser = user.user_profile(userObject['token'], userObject['u_id'])['user']
 
     # Tests changed name
     assert updatedUser['email'] == 'tony@avengers.com'
@@ -149,12 +152,12 @@ def test_invalid_token_set_email(userObject):
 # Valid Cases
 
 def test_valid_set_handle(userObject):
-    initialUser = retrieveUser(userObject['u_id'])
+    initialUser = user.user_profile(userObject['token'], userObject['u_id'])['user']
 
     # Tests initial name
     assert initialUser['handle_str'] == 'tonystark'
     user.user_profile_sethandle(userObject['token'], 'tony')
-    updatedUser = retrieveUser(userObject['u_id'])
+    updatedUser = user.user_profile(userObject['token'], userObject['u_id'])['user']
 
     # Tests changed name
     assert updatedUser['handle_str'] == 'tony'
@@ -183,12 +186,69 @@ def test_invalid_token_set_handle(userObject):
     with pytest.raises(AccessError):
         user.user_profile_sethandle('invalidtoken', 'tony')
 
+###### User Profile Upload Photo ######
 
-###### Helper Functions ######
+# Valid Cases
 
-# Retrieves information about a user
-def retrieveUser(u_id):
-    for f_user in data['users']:
-        if u_id == f_user['u_id']:
-            return f_user
-    return None
+# Upload a jpg/jpeg image with valid coordinates
+def test_uploadphoto_success(userObject):
+    assert user.user_profile_uploadphoto(userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 0, 0, 1, 1) == SUCCESS
+
+    assert user.user_profile_uploadphoto(userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/1/14/Un_super_paysage.jpeg", 0, 0, 1, 1) == SUCCESS
+
+# Invalid Cases
+
+# Not uploading a jpg file
+def test_uploadphoto_not_jpg(userObject):
+    # png
+    with pytest.raises(InputError):
+        user.user_profile_uploadphoto(userObject['token'], "http://www.pngmart.com/files/7/Red-Smoke-Transparent-Images-PNG.png", 0, 0, 1, 1)
+
+    # gif
+    with pytest.raises(InputError):
+        user.user_profile_uploadphoto(userObject['token'], "http://www.pngmart.com/files/7/Red-Smoke-Transparent-Images-PNG.png", 0, 0, 1, 1)
+
+    # svg
+    with pytest.raises(InputError):
+        user.user_profile_uploadphoto(userObject['token'], "https://svgsilh.com/svg/1801287.svg", 0, 0, 1, 1)
+
+# Uploading an invalid image
+def test_non_existant_img(userObject):
+    with pytest.raises(InputError):
+        user.user_profile_uploadphoto(userObject['token'], "https://google.com/my_image.jpg", 0, 0, 1, 1)
+    
+    with pytest.raises(InputError):
+        user.user_profile_uploadphoto(userObject['token'], "https://web.flock.com/?/flock.jpg", 0, 0, 1, 1)
+
+# Cropping an image with invalid dimensions
+def test_invalid_dimensions(userObject):
+    # Image Dimensions: 3456 x 2304 pixels
+
+    # Out of range
+    with pytest.raises(InputError):
+        user.user_profile_uploadphoto(userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 0, 0, 3457, 2305)
+
+    # Perfect fit
+    assert user.user_profile_uploadphoto(userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 0, 0, 3456, 2304) == SUCCESS
+
+    # x_start > x_end
+    with pytest.raises(InputError):
+        user.user_profile_uploadphoto(userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 100, 0, 10, 100)
+
+    # y_start > y_end
+    with pytest.raises(InputError):
+        user.user_profile_uploadphoto(userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 0, 100, 100, 10)
+
+    # x_start = x_end
+    with pytest.raises(InputError):
+        user.user_profile_uploadphoto(userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 100, 100, 100, 300)
+
+    # empty box
+    with pytest.raises(InputError):
+        user.user_profile_uploadphoto(userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", 100, 100, 100, 100)
+
+    # negative
+    with pytest.raises(InputError):
+        user.user_profile_uploadphoto(userObject['token'], "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg", -1, -2, 100, 200)
+
+
