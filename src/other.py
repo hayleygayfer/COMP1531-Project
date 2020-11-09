@@ -35,14 +35,7 @@ def admin_userpermission_change(token, u_id, permission_id):
 
     u_it = find_user(token)
     if data['users'][u_it]['permissions'] != OWNER:
-        raise AccessError("User is not an owner")
-
-    # Trying to remove the last flockr owner (which will be yourself)
-    if count_owners() == 1 and permission_id == MEMBER:
-        raise InputError("There must be at least one flockr owner")
-
-    u_token = user[0]['token']
-    u_it = find_user(u_token)
+        raise AccessError("You must be an owner to change permissions")
 
     # Check if proposed permission change is already in effect
     if data['users'][u_it]['permissions'] == permission_id:
@@ -51,6 +44,13 @@ def admin_userpermission_change(token, u_id, permission_id):
         else:
             status = " member"
         raise InputError(f"User is already a{status}")
+
+    # Trying to remove the last flockr owner (which will be yourself)
+    if count_owners() == 1 and permission_id == MEMBER:
+        raise InputError("There must be at least one flockr owner")
+
+    u_token = user[0]['token']
+    u_it = find_user(u_token)
 
     data['users'][u_it]['permissions'] = permission_id
     
