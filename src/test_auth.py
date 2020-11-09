@@ -381,11 +381,11 @@ def test_invalid_reset():
     auth.auth_logout(user['token'])
 
     # Request Reset
-    auth.passwordreset_request("clint@barton.com")
+    auth.auth_passwordreset_request("clint@barton.com")
 
     # Password Reset
     with pytest.raises(InputError):
-        auth.passwordreset("invalidcode", "password2")    
+        auth.auth_passwordreset_reset("invalidcode", "password2")    
     
 
 
