@@ -86,6 +86,9 @@
     * e.g. query_str = 'meSsAGe' will return the data for a message with string = '1MESSAGE2'
 * Query strings must contain at least 2 characters
 * Owner permissions are stored seperately in user dictionaries
+* There must always be a flockr owner so that last flockr owner cannot set their own permission as a member
+* Setting a redundant permission will throw an error
+    * e.g. Setting a member's permission to 'member'
 
 ## OTHER ASSUMPTIONS
 
