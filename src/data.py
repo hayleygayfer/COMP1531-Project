@@ -14,7 +14,9 @@ data = {
         'name_first': 'John',
         'name_last': 'Doe',
         'handle_str': 'handle',
-        'profile_img_url': 'https://google.com/sample_img'
+        'profile_img_url': 'https://google.com/sample_img',
+        'permissions': 1/2
+        # 1 for owner and 2 for member
     }
 ],
 'channels': [
