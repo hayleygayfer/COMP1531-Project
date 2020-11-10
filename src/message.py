@@ -153,6 +153,31 @@ def message_edit(token, message_id, message):
         'is_success': True
     }
 
+
+## ITERATION 3
+def message_sendlater(token, channel_id, message, time_sent):
+    
+    return {
+        'message_id': 0
+    }
+
+def message_react(token, message_id, react_id):
+    
+    return {}
+
+def message_unreact(token, message_id, react_id):
+    
+    return {}
+
+def message_pin(token, message_id):
+    
+    return {}
+
+def message_unpin(token, message_id):
+    
+    return {}
+
+
 #################################################################################
 ## HELPER FUNCTIONS ##
 #################################################################################
@@ -213,7 +238,9 @@ def append_msg_to_channel(channel_id, msg_string, msg_id, u_id, time):
                     'message': msg_string,
                     'message_id': msg_id,
                     'u_id': u_id,
-                    'time_created': time
+                    'time_created': time,
+                    'reacts': [],
+                    'is_pinned': False
                 }
             )
             channel['message_count'] += 1

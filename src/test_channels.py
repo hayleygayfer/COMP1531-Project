@@ -77,7 +77,9 @@ def test_user_is_in_all_channels():
             'owner_members': [u1_id],
             'is_public': True,
             'messages': [],
-            'message_count': 0
+            'message_count': 0,
+            'standup_finish': None,
+            'standup_message': ''
         },
         {
             'channel_id': c2_id, 
@@ -86,7 +88,9 @@ def test_user_is_in_all_channels():
             'owner_members': [u2_id],
             'is_public': True,
             'messages': [],
-            'message_count': 0
+            'message_count': 0,
+            'standup_finish': None,
+            'standup_message': ''
         },
     ]
 
@@ -118,7 +122,9 @@ def test_user_is_in_some_channels():
             'owner_members': [u1_id],
             'is_public': True,
             'messages': [],
-            'message_count': 0
+            'message_count': 0,
+            'standup_finish': None,
+            'standup_message': ''
         },
     ]
     # user2 and user3 will not see the same list
@@ -168,7 +174,9 @@ def test_total_channels():
             'owner_members': [u1_id],
             'is_public': True,
             'messages': [],
-            'message_count': 0
+            'message_count': 0,
+            'standup_finish': None,
+            'standup_message': ''
         },  
                 {
             'channel_id': c2_id, 
@@ -177,7 +185,9 @@ def test_total_channels():
             'owner_members': [u1_id],
             'is_public': True,
             'messages': [],
-            'message_count': 0
+            'message_count': 0,
+            'standup_finish': None,
+            'standup_message': ''
         },   
                 {
             'channel_id': c3_id, 
@@ -186,7 +196,9 @@ def test_total_channels():
             'owner_members': [u1_id],
             'is_public': True,
             'messages': [],
-            'message_count': 0
+            'message_count': 0,
+            'standup_finish': None,
+            'standup_message': ''
         },   
     ]
     # check that user1 is in all channels
@@ -215,7 +227,9 @@ def test_total_channels_not_created_by_user():
             'owner_members': [u1_id],
             'is_public': True,
             'messages': [],
-            'message_count': 0
+            'message_count': 0,
+            'standup_finish': None,
+            'standup_message': ''
         },  
                 {
             'channel_id': c2_id, 
@@ -224,7 +238,9 @@ def test_total_channels_not_created_by_user():
             'owner_members': [u1_id],
             'is_public': True,
             'messages': [],
-            'message_count': 0
+            'message_count': 0,
+            'standup_finish': None,
+            'standup_message': ''
         },   
                 {
             'channel_id': c3_id, 
@@ -233,7 +249,9 @@ def test_total_channels_not_created_by_user():
             'owner_members': [u1_id],
             'is_public': True,
             'messages': [],
-            'message_count': 0
+            'message_count': 0,
+            'standup_finish': None,
+            'standup_message': ''
         },   
     ]
     # user1 and user2 see the same list
@@ -291,7 +309,9 @@ def test_public_private():
             'owner_members': [u1_id],
             'is_public': True,
             'messages': [],
-            'message_count': 0
+            'message_count': 0,
+            'standup_finish': None,
+            'standup_message': ''
         },  
         {
             'channel_id': cprivate_id, 
@@ -300,6 +320,8 @@ def test_public_private():
             'owner_members': [u1_id],
             'is_public': False,
             'messages': [],
-            'message_count': 0
+            'message_count': 0,
+            'standup_finish': None,
+            'standup_message': ''
         },   
     ]
