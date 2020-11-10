@@ -42,11 +42,11 @@ def search(token, query_str):
     if valid_token(token) is False:
         raise AccessError
     
-    channels = channels_list(token)['channels']
+    channels = channels_list(token)
     messages = []
 
     for channel in channels:
-        messages.extend(list(filter(lambda message: query_str in message['message'], channel['messages'])))
+        messages.append(list(filter(lambda message: query_str in message['message'], channel['messages'])))
 
     return {
         'messages': messages

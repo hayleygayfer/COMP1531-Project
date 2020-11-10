@@ -50,7 +50,7 @@ def auth_logout(token):
     Can be accessed by anyone who is currently logged in
 
     Args:
-        1. token (str): the token of the authenticated user who is attempting to log out
+        1. token (int): the token of the authenticated user who is attempting to log out
 
     Return:
         A dictionary to indicate that the function call was successful
@@ -85,7 +85,7 @@ def auth_register(email, password, name_first, name_last):
     Return:
         A dictionary containing the following keys:
         'u_id' (int): The user_id is a fixed integer used for identification
-        'token' (str): A ticket which allows the user to explore the Flockr in their current session
+        'token' (int): A ticket which allows the user to explore the Flockr in their current session
 
     The password is hashed before it is stored so the original string is not visible on the server
     A handle is generated using the names of the user and is added to their user data
@@ -141,17 +141,6 @@ def auth_register(email, password, name_first, name_last):
         'u_id': len(data['users']),
         'token': str(encoded_token),
     }
-
-## ITERATION 3
-
-def auth_passwordreset_request(email):
-
-    return {}
-
-def auth_passwordreset_reset(reset_code, new_password):
-
-    return {}
-
 
 #########################################################################
 

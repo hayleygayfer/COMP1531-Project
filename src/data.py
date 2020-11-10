@@ -13,7 +13,6 @@ data = {
         'name_first': 'John',
         'name_last': 'Doe',
         'handle_str': 'handle',
-        'profile_img_url': 'https://google.com/sample_img'
     }
 ],
 'channels': [
@@ -40,16 +39,11 @@ data = {
                 'u_id': 1,
                 'message_id': 10001,
                 'message': "Hi, this is a simple test msg"
-                'time_created': 123456789,
-                'reacts': [
-                    'react_id': 0,
-                    'u_ids': [0, 1, 2],
-                    'is_this_user_racted': False
-                ],
-                'is_pinned': True
             },
             {
-                # Another message
+                'u_id': 2,
+                'message_id': 10002,
+                'message': "I got it!"
             }
         ],
         'message_count': 2

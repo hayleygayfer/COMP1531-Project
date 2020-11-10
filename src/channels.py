@@ -8,7 +8,7 @@ def channels_list(token):
     An authorised user must be appart of the channel. 
     
     Args:
-        1. Token of authorised user (str)
+        1. Token of authorised user (int)
     Return:
         A dictionary of all the channels and their associated details 
         - Each key is a channel 
@@ -38,7 +38,7 @@ def channels_listall(token):
     The authentication does not impact the list.
     
     Args:
-        1. Token of user (str)
+        1. Token of user (int)
     Return:
         A dictionary of all the channels and their associated details. 
         The Authentication does not matter
@@ -63,7 +63,7 @@ def channels_create(token, name, is_public):
     Member must be authenticated to create channel. 
     
     Args:
-        1. Token of user (str)
+        1. Token of user (int)
         2. Name of channel (string): Must be more than 20 characters long
         3. If the channel is public or private (True/False) 
     Return:
@@ -88,9 +88,7 @@ def channels_create(token, name, is_public):
         'owner_members': [ channel_creator['u_id'] ],
         'is_public': is_public,
         'messages': [],
-        'message_count': 0,
-        'standup_finish': None,
-        'standup_message': ''
+        'message_count': 0
     }
 
     data['channels'].append(channel)

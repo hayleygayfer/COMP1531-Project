@@ -102,9 +102,7 @@ def test_user_is_in_all_channels_http(url, user_list, channel_list):
             'owner_members': [user_list['user1']['u_id']],
             'is_public': True,
             'messages': [],
-            'message_count': 0,
-            'standup_finish': None,
-            'standup_message': ''
+            'message_count': 0
         },
         {
             'channel_id': channel_list['c_id_2'], 
@@ -113,9 +111,7 @@ def test_user_is_in_all_channels_http(url, user_list, channel_list):
             'owner_members': [user_list['user2']['u_id']],
             'is_public': True,
             'messages': [],
-            'message_count': 0,
-            'standup_finish': None,
-            'standup_message': ''
+            'message_count': 0
         },
     ]
 
@@ -142,9 +138,7 @@ def test_user_is_in_some_channels_http(url, user_list, channel_list):
             'owner_members': [user_list['user1']['u_id']],
             'is_public': True,
             'messages': [],
-            'message_count': 0,
-            'standup_finish': None,
-            'standup_message': ''
+            'message_count': 0
         },
     ]
 
@@ -183,9 +177,7 @@ def test_total_channels_http(url, user_list, channel_list):
             'owner_members': [user_list['user1']['u_id']],
             'is_public': True,
             'messages': [],
-            'message_count': 0,
-            'standup_finish': None,
-            'standup_message': ''
+            'message_count': 0
         },
         {
             'channel_id': channel_list['c_id_2'], 
@@ -194,9 +186,7 @@ def test_total_channels_http(url, user_list, channel_list):
             'owner_members': [user_list['user2']['u_id']],
             'is_public': True,
             'messages': [],
-            'message_count': 0,
-            'standup_finish': None,
-            'standup_message': ''
+            'message_count': 0
         },
     ]
 
@@ -214,9 +204,7 @@ def test_total_channels_not_created_by_user_http(url, user_list, channel_list):
             'owner_members': [user_list['user1']['u_id']],
             'is_public': True,
             'messages': [],
-            'message_count': 0,
-            'standup_finish': None,
-            'standup_message': ''
+            'message_count': 0
         },
         {
             'channel_id': channel_list['c_id_2'], 
@@ -225,9 +213,7 @@ def test_total_channels_not_created_by_user_http(url, user_list, channel_list):
             'owner_members': [user_list['user2']['u_id']],
             'is_public': True,
             'messages': [],
-            'message_count': 0,
-            'standup_finish': None,
-            'standup_message': ''
+            'message_count': 0
         },
     ]
 
@@ -280,9 +266,7 @@ def test_public_private_http(url, user_list):
             'owner_members': [user_list['user1']['u_id']],
             'is_public': False,
             'messages': [],
-            'message_count': 0,
-            'standup_finish': None,
-            'standup_message': ''
+            'message_count': 0
         },
         {
             'channel_id': c_id_public['channel_id'], 
@@ -291,9 +275,7 @@ def test_public_private_http(url, user_list):
             'owner_members': [user_list['user1']['u_id']],
             'is_public': True,
             'messages': [],
-            'message_count': 0,
-            'standup_finish': None,
-            'standup_message': ''
+            'message_count': 0
         },
     ]
 
