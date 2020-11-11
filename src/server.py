@@ -256,7 +256,7 @@ def http_admin_userpermission_change():
 @APP.route("/search", methods=['GET'])
 def http_search():
     token = request.args.get("token")
-    query_str = request.get_json()["query_str"]
+    query_str = request.args.get("query_str")
     response = search(token, query_str)
     return dumps(response)
 

@@ -7,6 +7,9 @@ import jwt
 import smtplib, ssl
 from random import random
 
+MEMBER = 2
+OWNER = 1
+
 SECRET = 'adaskljnkjladsncjakldnckjscankj'
 
 def auth_login(email, password):
@@ -115,9 +118,9 @@ def auth_register(email, password, name_first, name_last):
             raise InputError("Email address is already being used by another user")
 
     handle = generate_valid_handle(name_first, name_last)
-    permissions = 'MEMBER'
+    permissions = MEMBER
     if data['users'] == []:
-        permissions = 'OWNER'
+        permissions = OWNER
 
     # Hashed password
     hash_password = hashlib.sha256(password.encode()).hexdigest()
