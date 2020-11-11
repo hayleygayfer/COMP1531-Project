@@ -1,6 +1,6 @@
 import sys
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from error import InputError
 from data import data
@@ -25,7 +25,7 @@ def defaultHandler(err):
     response.content_type = 'application/json'
     return response
 
-APP = Flask(__name__)
+APP = Flask(__name__, static_url_path='/static/')
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -79,7 +79,7 @@ def http_auth_logout():
 # Auth/PasswordReset/Request
 @APP.route("/auth/passwordreset/request", methods=['POST'])
 def http_auth_passwordreset_request():
-    email = request.get_json()['token']
+    email = request.get_json()['email']
     response = auth.auth_passwordreset_request(email)
     return dumps(response)
 
@@ -202,6 +202,11 @@ def http_user_profile_uploadphoto():
     response = user.user_profile_uploadphoto(token, img_url, x_start, y_start, x_end, y_end)
     return dumps(response)
 
+# Access Image
+@APP.route('/static/<path:filename>')
+def send_js(filename):
+    return send_from_directory('', filename)
+
 
 ###### CHANNELS ######
 
@@ -288,7 +293,7 @@ def http_message_edit():
 @APP.route("/message/sendlater", methods=['POST'])
 def http_message_sendlater():
     token = request.get_json()["token"]
-    channel_id = int(request.get_json()["message_id"])
+    channel_id = int(request.get_json()["channel_id"])
     message = request.get_json()["message"]
     time_sent = int(request.get_json()["time_sent"])
     response = msg.message_sendlater(token, channel_id, message, time_sent)
