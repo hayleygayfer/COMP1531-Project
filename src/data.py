@@ -1,6 +1,7 @@
 data = {
     'users': [],
     'channels': [],
+    'reset_codes': []
 }
 
 '''
@@ -13,7 +14,9 @@ data = {
         'name_first': 'John',
         'name_last': 'Doe',
         'handle_str': 'handle',
-        'profile_img_url': 'https://google.com/sample_img'
+        'profile_img_url': 'https://google.com/sample_img',
+        'permissions': 1/2
+        # 1 for owner and 2 for member
     }
 ],
 'channels': [
@@ -42,9 +45,12 @@ data = {
                 'message': "Hi, this is a simple test msg"
                 'time_created': 123456789,
                 'reacts': [
-                    'react_id': 0,
-                    'u_ids': [0, 1, 2],
-                    'is_this_user_racted': False
+                    {
+                        'react_id': 0,
+                        'u_ids': [0, 1, 2],
+                        'is_this_user_reacted': False
+                    }
+                    # ONLY ONE REACT ATM
                 ],
                 'is_pinned': True
             },
@@ -53,6 +59,12 @@ data = {
             }
         ],
         'message_count': 2
+    }
+],
+'reset_codes' : [
+    {
+        'u_id': 1,
+        'reset_code': 11111
     }
 ]
 '''

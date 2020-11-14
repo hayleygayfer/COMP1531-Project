@@ -1,6 +1,8 @@
 from data import data
 from error import InputError, AccessError
 
+FLOCKR_OWNER = 1
+
 def channel_invite(token_inviter, channel_id, u_id_invitee):
     '''
     Invite a user who is not currently in the channel, to the channel.
@@ -144,6 +146,15 @@ def channel_messages(token, channel_id, start):
             # add messages from newest to oldest
             for x in range(newest, oldest, -1):
                 return_array.append(channel['messages'][x])
+
+
+    # Updated for reacts
+    # Set is_this_user_reacted for each message in the display messages depending on whether they have reacted or not
+    for msg in return_array:
+        if u_id in msg['reacts'][0]['u_ids']:
+            msg['reacts'][0]['is_this_user_reacted'] = True
+        else:
+            msg['reacts'][0]['is_this_user_reacted'] = False
 
     # returns the relevant data in a dictionary
     return {
@@ -457,9 +468,9 @@ def size_owners(channel_id):
 
 # Determine if the authenticated user is the flockr owner
 def is_token_flockr_owner(token):
-    if token == data['users'][0].get('token'):
-        return True
-    return False
+    for user in data['users']:
+        if user['token'] == token:
+            return user['permissions'] == FLOCKR_OWNER
 
 # Gets user object from u_id
 def get_user_names(u_id):
