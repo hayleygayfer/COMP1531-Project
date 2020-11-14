@@ -250,7 +250,7 @@ def test_empty_string (data):
 
 ## ITERATION 3 TESTS ##
 
-# TODO: message_sendlater
+# message_sendlater
 # message_pin
 '''
 sendlater(token, channel_id, message, time_sent)
