@@ -269,6 +269,8 @@ def validate_token(token):
     except:
         raise AccessError("Invalid token")
 
-    return [user for user in data['users'] if user.get('email') == email['email']][0]
-    
+    for user in data['users']:
+        if user.get('email') == email['email']:
+            return user
+    return None
 
