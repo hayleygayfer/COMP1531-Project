@@ -16,6 +16,7 @@ def deactivate_standup(token, channel_id):
         if channel['channel_id'] == channel_id:
             channel['standup_finish'] = None
             message = channel['standup_message']
+            channel['standup_message'] = ''
 
     if len(message) != 0:
         try:
