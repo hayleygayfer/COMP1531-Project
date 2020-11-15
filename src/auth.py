@@ -99,7 +99,6 @@ def auth_register(email, password, name_first, name_last):
 
     '''
 
-    SECRET = 'adaskljnkjladsncjakldnckjscankj'
 
     if validate_email(email) == False:
         raise InputError(f"Email entered is not a valid email ")
@@ -223,10 +222,7 @@ def generate_reset_code():
 
 def validate_email(email):
     regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
-    if search(regex, email):  
-        return True    
-    else:  
-        return False
+    return search(regex, email) != None
 
 def validate_first_name(name_first):
     if not 0 < len(name_first) <= 50:
@@ -246,14 +242,10 @@ def validate_last_name(name_last):
             return False
 
 def validate_password(password):
-    if len(password) < 6:
-        return False
+    return len(password) >= 6
 
 def check_handle_exists(handle):
-    for user in data['users']:
-        if user['handle_str'] == handle:
-            return True
-    return False
+    return any(user['handle_str'] == handle for user in data['users'])
  
 def generate_valid_handle(name_first, name_last):
     handle = "{0}{1}".format(name_first, name_last).lower()
@@ -269,22 +261,4 @@ def generate_valid_handle(name_first, name_last):
         handle = handle + str(int(random()*100000))
     return handle
 
-###### VALIDATE TOKEN ######
 
-def validate_token(token):
-    SECRET = 'adaskljnkjladsncjakldnckjscankj'
-    try:
-        email = jwt.decode(token, SECRET, algorithms=['HS256'])
-    except:
-        raise AccessError("Invalid token")
-    for user in data['users']:
-        if user.get('email') == email['email']:
-            return user
-    return None
-
-
-if __name__ == '__main__':
-    auth_register("ethoshansen@gmail.com", "password", "Ethan", "Hansen")
-    print(data)
-    auth_passwordreset_request("ethoshansen@gmail.com")
-    print(data)
