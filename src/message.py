@@ -402,19 +402,13 @@ def get_uid_from_token(token):
 
 # Determines if the channel is valid or not
 def valid_channel(channel_id):
-    for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
-            return True
-    return False
+    return any(channel['channel_id'] == channel_id for channel in data['channels'])
 
 # Determines if a user is a member of a channel
 def channel_member(u_id, channel_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            for member in channel['all_members']:
-                if member == u_id:
-                    return True
-    return False        
+            return any(member == u_id for member in channel['all_members'])       
 
 # Generate a message_id based on the channel and the messages inside that channel
 def generate_message_id(channel_id):
@@ -435,10 +429,7 @@ def get_channel_id(message_id):
 def message_not_found(channel_id, msg_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            for msg in channel['messages']:
-                if msg.get('message_id') == msg_id:
-                    return False
-    return True
+            return not any(msg.get('message_id') == msg_id for msg in channel['messages'])
 
 # Adds a message to a channel along with other relevant details
 def append_msg_to_channel(channel_id, msg_string, msg_id, u_id, time):
@@ -483,10 +474,7 @@ def do_remove(channel, msg_id):
 
 # Identifies if a user is an owner of a channel
 def user_is_not_owner(u_id, owners):
-    for p in owners:
-        if p == u_id:
-            return False
-    return True
+    return not any(person == u_id for person in owners)
 
 def is_flockr_owner(u_id):
     for user in data['users']:
@@ -515,10 +503,7 @@ def doUnpin(channel, msg_id):
 def alreadyReacted(u_id, channel, msg_id, react_id):
     for msg in channel['messages']:
         if msg.get('message_id') == msg_id:
-            for user in msg['reacts'][0]['u_ids']:
-                if user == u_id:
-                    return True
-    return False
+            return any(user == u_id for user in msg['reacts'][0]['u_ids'])
 
 # react to a message in the channel
 def doReact (u_id, channel, msg_id, react_id):
@@ -528,13 +513,9 @@ def doReact (u_id, channel, msg_id, react_id):
                 raise InputError(f'This message is already reacted by this user')
             msg['reacts'][0]['u_ids'].append(u_id)
 
+# Returns True if the message corresponding to msg_id does not have any reacts (empty list)
 def noReact(u_id, channel, msg_id, react_id):
-    for msg in channel['messages']:
-        if msg.get('message_id') == msg_id:
-            if msg['reacts'][0]['u_ids'] == []:
-                return True
-    return False
-
+    return any(msg.get('message_id') == msg_id and msg['reacts'][0]['u_ids'] == [] for msg in channel['messages'])
 
 # removes react from message in channel
 def doUnreact(u_id, channel, msg_id, react_id):

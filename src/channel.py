@@ -362,24 +362,15 @@ def channel_removeowner(token, channel_id, u_id):
 
 # Validates the active token
 def validate_token(token):
-    for users in data['users']:
-        if token == users.get('token'):
-            return True
-    return False
+    return any(user.get('token') == token for user in data['users'])
 
 # Validates the channel
 def validate_channel(channel_id):
-    for channel in data['channels']:
-        if channel.get('channel_id') == channel_id:
-            return True
-    return False
+    return any(channel.get('channel_id') == channel_id for channel in data['channels'])
 
 # Validates the user
 def validate_user(u_id):
-    for users in data['users']:
-        if users.get('u_id') == u_id:
-            return True
-    return False
+    return any(user.get('u_id') == u_id for user in data['users'])
 
 # Returns the corresponding u_id from the active token
 def token_to_u_id(token):
@@ -391,22 +382,15 @@ def token_to_u_id(token):
                 'name_last': user['name_last']
             }
 
-# Check if channel with is private
+# Returns True if channel with channel_id is a private channel
 def private_channel(channel_id):
-    for channel in data['channels']:
-        if channel['channel_id'] == channel_id:
-            if channel.get('is_public') is True:
-                return False
-    return True
+    return any(channel['channel_id'] == channel_id and channel.get('is_public') is False for channel in data['channels'])
 
 # Check if user exists within the channel
 def exists_in_channel(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            for user in channel['all_members']:
-                if user == u_id:
-                    return True
-    return False
+            return any(user == u_id for user in channel['all_members'])
 
 # Add data of user to channel for new users to a channel
 def append_data(channel_id, u_id):
@@ -418,10 +402,7 @@ def append_data(channel_id, u_id):
 def user_is_owner(channel_id, u_id):
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            for owners in channel['owner_members']:
-                if owners == u_id:
-                    return True
-    return False
+            return any(user == u_id for user in channel['owner_members'])
 
 # Add user data for new owner members of a channel
 def append_user_owner(channel_id, u_id):
@@ -452,11 +433,7 @@ def rem_user_member(channel_id, u_id):
 def is_token_owner(token, channel_id):      
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
-            for owners in channel['owner_members']:
-                # match the u_id of the authenticated user to the ids of all owners
-                if token_to_u_id(token)['u_id'] == owners:
-                    return True
-    return False
+            return any(token_to_u_id(token)['u_id'] == owner for owner in channel['owner_members'])
 
 # Determine the number of owners in a channel
 def size_owners(channel_id):
