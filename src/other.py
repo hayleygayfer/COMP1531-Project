@@ -79,10 +79,7 @@ def search(token, query_str):
 
 # validate token
 def valid_token(token):
-    for users in data['users']:
-        if token == users.get('token'):
-            return True
-    return False
+    return any(user.get('token') == token for user in data['users'])
 
 # count the number of flockr owners
 def count_owners():
